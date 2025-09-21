@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { FaVolumeUp, FaVolumeMute, FaPlay, FaPause, FaStar } from 'react-icons/fa';
+import { useGoogleReviews } from './GoogleReviewsHook';
 
 interface SophisticatedHeroProps {
   googleReviews?: {
@@ -20,6 +21,9 @@ export default function SophisticatedHero({
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isOpen, setIsOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Fetch live Google Reviews data
+  const { data: reviewsData, loading: reviewsLoading } = useGoogleReviews();
 
   // Calculate business status
   useEffect(() => {
@@ -150,15 +154,20 @@ export default function SophisticatedHero({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.5, duration: 0.8 }}
         >
-          <div className="backdrop-blur-sm bg-black/20 border border-white/10 rounded-2xl p-4 flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <FaStar className="text-yellow-400 text-lg" />
-              <span className="text-white font-semibold text-lg">
-                {googleReviews?.overallRating || 4.8}
+          <div className="backdrop-blur-sm bg-black/20 border border-white/10 rounded-2xl p-6 flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <FaStar className="text-yellow-400 text-xl" />
+              <span className="text-white font-bold text-2xl">
+                {reviewsLoading ? '4.8' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.8)}
               </span>
             </div>
-            <div className="text-white/80 text-sm">
-              {(googleReviews?.totalReviews || 883).toLocaleString()} reviews
+            <div className="text-center">
+              <div className="text-white font-bold text-xl">
+                {reviewsLoading ? '883' : (reviewsData?.totalReviews || googleReviews?.totalReviews || 883).toLocaleString()}
+              </div>
+              <div className="text-yellow-400/80 text-sm font-medium uppercase tracking-wider">
+                Google Reviews
+              </div>
             </div>
           </div>
         </motion.div>
