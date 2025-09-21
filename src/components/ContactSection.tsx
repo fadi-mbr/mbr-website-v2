@@ -259,7 +259,7 @@ export default function ContactSection() {
                       value={formData.name}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 bg-surface border border-gray-600 rounded text-white focus:border-primary focus:outline-none transition-colors"
+                      className="w-full px-4 py-3 bg-surface border border-gray-600 rounded-xl text-white focus:border-primary focus:outline-none transition-colors"
                       placeholder="Your name"
                     />
                   </div>
@@ -273,7 +273,7 @@ export default function ContactSection() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-surface border border-gray-600 rounded text-white focus:border-primary focus:outline-none transition-colors"
+                      className="w-full px-4 py-3 bg-surface border border-gray-600 rounded-xl text-white focus:border-primary focus:outline-none transition-colors"
                       placeholder="+971 XX XXX XXXX"
                     />
                   </div>
@@ -325,7 +325,7 @@ export default function ContactSection() {
                     value={formData.message}
                     onChange={handleInputChange}
                     rows={4}
-                    className="w-full px-4 py-3 bg-surface border border-gray-600 rounded text-white focus:border-primary focus:outline-none transition-colors resize-none"
+                    className="w-full px-4 py-3 bg-surface border border-gray-600 rounded-xl text-white focus:border-primary focus:outline-none transition-colors resize-none"
                     placeholder="Tell us about your vehicle and service requirements..."
                   ></textarea>
                 </div>

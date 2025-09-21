@@ -211,7 +211,7 @@ export default function SophisticatedHero({
                 href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium text-lg rounded-none overflow-hidden transition-all duration-500 hover:scale-105"
+                className="group relative px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium text-lg rounded-xl overflow-hidden transition-all duration-500 hover:scale-105"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <span className="relative">Book Premium Service</span>
@@ -219,7 +219,7 @@ export default function SophisticatedHero({
 
               <a
                 href="#services"
-                className="group px-8 py-4 border-2 border-white/30 text-white font-medium text-lg rounded-none backdrop-blur-sm hover:border-white/60 hover:bg-white/10 transition-all duration-500"
+                className="group px-8 py-4 border-2 border-white/30 text-white font-medium text-lg rounded-xl backdrop-blur-sm hover:border-white/60 hover:bg-white/10 transition-all duration-500"
               >
                 Explore Services
               </a>

@@ -283,7 +283,7 @@ export default function SophisticatedReviews() {
               href="https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"
               target="_blank"
               rel="noopener noreferrer"
-              className="group px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium rounded-none overflow-hidden transition-all duration-500 hover:scale-105"
+              className="group px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium rounded-xl overflow-hidden transition-all duration-500 hover:scale-105"
             >
               <div className="flex items-center space-x-3">
                 <FaGoogle className="w-5 h-5" />
@@ -295,7 +295,7 @@ export default function SophisticatedReviews() {
               href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20saw%20your%20excellent%20reviews%20and%20need%20automotive%20service"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 border-2 border-white/30 text-white font-medium rounded-none backdrop-blur-sm hover:border-white/60 hover:bg-white/10 transition-all duration-500"
+              className="px-8 py-4 border-2 border-white/30 text-white font-medium rounded-xl backdrop-blur-sm hover:border-white/60 hover:bg-white/10 transition-all duration-500"
             >
               Join Our Happy Customers
             </a>
