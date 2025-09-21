@@ -43,7 +43,7 @@ export async function GET() {
       },
       placeId: data.result.place_id,
       googleMapsUrl: data.result.url || `https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A`,
-      embedUrl: `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3609.7896!2d${data.result.geometry.location.lng}!3d${data.result.geometry.location.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s${encodeURIComponent(data.result.name)}!5e0!3m2!1sen!2sae`
+      embedUrl: `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=place_id:${data.result.place_id}&zoom=15`
     };
 
     return NextResponse.json({
@@ -66,7 +66,7 @@ export async function GET() {
         },
         placeId: PLACE_ID,
         googleMapsUrl: "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A",
-        embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3609.7896!2d55.2250031!3d25.1389859!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f6b71675d0d27%3A0x1d4e82b5f02b40f1!2sMBR%20Auto%20Services!5e0!3m2!1sen!2sae"
+        embedUrl: `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=place_id:${PLACE_ID}&zoom=15`
       },
       error: error instanceof Error ? error.message : 'Failed to fetch location data',
       fallback: true

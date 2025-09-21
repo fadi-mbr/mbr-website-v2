@@ -394,9 +394,6 @@ export default function ContactSection() {
                 <p className="text-body text-gray-300 mb-2">
                   {locationData?.address || "Al Quoz Industrial Area 4, Dubai, UAE"}
                 </p>
-                <p className="text-caption text-gray-400">
-                  Behind Mall of the Emirates, Easy Parking Available
-                </p>
                 {locationData && (
                   <a
                     href={locationData.googleMapsUrl}

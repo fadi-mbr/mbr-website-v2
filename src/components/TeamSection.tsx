@@ -67,7 +67,7 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
   };
 
   return (
-    <section id="team" className="relative py-24 bg-gradient-to-b from-black via-gray-900 to-gray-800 overflow-hidden">
+    <section id="team" className="relative py-24 bg-gradient-to-b from-black via-black to-gray-950 overflow-hidden">
 
       {/* Background Elements */}
       <div className="absolute inset-0">
@@ -107,7 +107,7 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
               key={stat.label}
               className="text-center group"
             >
-              <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:border-white/20 transition-all duration-500">
+              <div className="bg-gradient-to-br from-gray-950/40 to-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:border-white/20 transition-all duration-500">
                 <stat.icon className="w-12 h-12 text-red-600 mx-auto mb-6" />
                 <div className="text-4xl font-light text-white mb-2">
                   {stat.number}
@@ -142,7 +142,7 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
                 whileHover={{ y: -10 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden hover:border-white/20 transition-all duration-500">
+                <div className="bg-gradient-to-br from-gray-950/30 to-black/30 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden hover:border-white/20 transition-all duration-500">
 
                   {/* Member Photo */}
                   <div className="relative aspect-square overflow-hidden">
@@ -207,7 +207,7 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
           viewport={{ once: true }}
         >
-          <div className="inline-block bg-gradient-to-r from-gray-800/40 to-gray-900/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8">
+          <div className="inline-block bg-gradient-to-r from-gray-950/40 to-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8">
             <h3 className="text-2xl font-light text-white mb-4">
               Experience the MBR Difference
             </h3>
