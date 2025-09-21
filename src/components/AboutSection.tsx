@@ -127,7 +127,7 @@ export default function AboutSection() {
             className="relative"
             variants={itemVariants}
           >
-            <div className="relative h-96 overflow-hidden rounded-lg">
+            <div className="relative h-96 overflow-hidden rounded-3xl">
               <Image
                 src="/images/mbr_mechanic.webp"
                 alt="MBR Auto Services Workshop"

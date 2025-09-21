@@ -112,7 +112,7 @@ export default function SophisticatedServices() {
               whileHover={{ y: -10 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-black/50 to-gray-950/30 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-500">
+              <div className="relative overflow-hidden glass-card glass-shimmer">
 
                 {/* Service Image */}
                 <div className="relative h-64 overflow-hidden">
@@ -149,7 +149,7 @@ export default function SophisticatedServices() {
                 </div>
 
                 {/* Service Content */}
-                <div className="p-8">
+                <div className="p-8 glass-content">
                   <div className="mb-6">
                     <h3 className="text-2xl font-light text-white mb-2">
                       {service.title}
@@ -204,7 +204,7 @@ export default function SophisticatedServices() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8 bg-gradient-to-r from-gray-950/40 to-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-6 md:p-8 hover:border-white/20 transition-all duration-500">
+          <div className="inline-flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8 glass-card-premium p-6 md:p-8">
             <Image
               src="/images/Bosch_Logo24.webp"
               alt="Bosch Authorized Service"

@@ -179,7 +179,7 @@ export default function SophisticatedReviews() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center space-x-8 bg-gradient-to-r from-gray-950/40 to-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8">
+          <div className="inline-flex items-center space-x-8 glass-card-premium p-8">
             <FaGoogle className="text-6xl text-red-500" />
 
             <div className="text-center">
@@ -227,7 +227,7 @@ export default function SophisticatedReviews() {
                 rel="noopener noreferrer"
                 className="block h-full"
               >
-                <div className="bg-gradient-to-br from-gray-950/30 to-black/30 backdrop-blur-sm border border-white/10 rounded-3xl p-8 h-full hover:border-white/20 transition-all duration-500 cursor-pointer">
+                <div className="glass-card glass-shimmer p-8 h-full cursor-pointer">
 
                 {/* Quote Icon */}
                 <FaQuoteLeft className="text-red-600/60 text-2xl mb-6" />

@@ -154,7 +154,7 @@ export default function SophisticatedHero({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.5, duration: 0.8 }}
         >
-          <div className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg">
+          <div className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-3xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg">
             <div className="flex items-center space-x-1 md:space-x-2">
               <FaGoogle className="text-red-500 text-sm md:text-base" />
               <FaStar className="text-luxury-gold text-sm md:text-base" />
@@ -235,7 +235,7 @@ export default function SophisticatedHero({
             viewport={{ once: true }}
           >
             <div className="text-center group cursor-pointer">
-              <div className="bg-gradient-to-br from-gray-950/50 to-black/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
+              <div className="glass-card p-8">
                 <div className="text-4xl font-light text-white mb-4">15+</div>
                 <div className="text-lg text-luxury-silver mb-2">Years</div>
                 <div className="text-sm text-muted-enhanced">Excellence in Dubai</div>
@@ -243,7 +243,7 @@ export default function SophisticatedHero({
             </div>
 
             <div className="text-center group cursor-pointer">
-              <div className="bg-gradient-to-br from-gray-950/50 to-black/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
+              <div className="glass-card p-8">
                 <div className="text-4xl font-light text-white mb-4">5000+</div>
                 <div className="text-lg text-luxury-silver mb-2">Customers</div>
                 <div className="text-sm text-muted-enhanced">Trust Our Service</div>
@@ -251,7 +251,7 @@ export default function SophisticatedHero({
             </div>
 
             <div className="text-center group cursor-pointer">
-              <div className="bg-gradient-to-br from-gray-950/50 to-black/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
+              <div className="glass-card p-8">
                 <div className="text-4xl font-light text-white mb-4">24/7</div>
                 <div className="text-lg text-luxury-silver mb-2">Support</div>
                 <div className="text-sm text-muted-enhanced">Always Available</div>
@@ -267,7 +267,7 @@ export default function SophisticatedHero({
             transition={{ duration: 1, ease: "easeOut", delay: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="inline-flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 bg-gradient-to-r from-gray-950/30 to-black/30 backdrop-blur-sm border border-white/10 p-6 md:p-8 rounded-3xl">
+            <div className="inline-flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 glass-card-premium p-6 md:p-8">
               <Image
                 src="/images/Bosch_Logo24.webp"
                 alt="Bosch Authorized Service"

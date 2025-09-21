@@ -149,7 +149,7 @@ export default function LuxuryHero({
           variants={itemVariants}
         >
           {/* Video Container with Elegant Frame */}
-          <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-gold shadow-2xl">
+          <div className="relative w-full h-full rounded-3xl overflow-hidden border-2 border-gold shadow-2xl">
             <video
               ref={videoRef}
               autoPlay
