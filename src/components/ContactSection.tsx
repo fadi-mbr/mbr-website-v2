@@ -35,7 +35,7 @@ const contactInfo = [
     title: "Visit Us",
     primary: "Al Quoz Industrial 4",
     secondary: "Dubai, UAE",
-    description: "Behind Mall of the Emirates",
+    description: "Behind Times Square mall",
     action: "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A",
     color: "text-red-400"
   },
