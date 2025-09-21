@@ -1,0 +1,126 @@
+[
+  {
+    "name": "Basel Kelzia",
+    "position": "CEO",
+    "image": "/images/team-photos/image00012.webp",
+    "description": "Our CEO brings vision and leadership to drive MBR forward.",
+    "socialMedia": {
+      "type": "instagram",
+      "url": "https://www.instagram.com/dr.abu.adam/"
+    }
+  },
+  {
+    "name": "Michael Touma",
+    "position": "Workshop Manager",
+    "image": "/images/team-photos/image00002.webp",
+    "description": "Leading our workshop operations with a focus on quality and efficiency.",
+    "socialMedia": {
+      "type": "instagram",
+      "url": "https://www.instagram.com/michael_touma/"
+    }
+  },
+  {
+    "name": "Team Member 3",
+    "position": "Technical Director",
+    "image": "/images/team-photos/image00003.webp",
+    "description": "Guiding our technical strategy with expertise in system architecture and implementation.",
+    "socialMedia": {
+      "type": "linkedin",
+      "url": "https://linkedin.com/in/team-member-3"
+    }
+  },
+  {
+    "name": "Team Member 4",
+    "position": "Lead Developer",
+    "image": "/images/team-photos/image00004.webp",
+    "description": "An expert in full-stack development who brings creative solutions to complex problems.",
+    "socialMedia": null
+  },
+  {
+    "name": "Team Member 5",
+    "position": "Senior Developer",
+    "image": "/images/team-photos/image00005.webp",
+    "description": "Specializing in backend systems and data architecture with a focus on performance optimization.",
+    "socialMedia": {
+      "type": "github",
+      "url": "https://github.com/teammember5"
+    }
+  },
+  {
+    "name": "Team Member 6",
+    "position": "DevOps Engineer",
+    "image": "/images/team-photos/image00006.webp",
+    "description": "Ensuring seamless deployment and operation of our systems through innovative DevOps practices.",
+    "socialMedia": {
+      "type": "linkedin",
+      "url": "https://linkedin.com/in/team-member-6"
+    }
+  },
+  {
+    "name": "Team Member 7",
+    "position": "UX Designer",
+    "image": "/images/team-photos/image00007.webp",
+    "description": "Creating intuitive and engaging user experiences that delight our clients and their customers.",
+    "socialMedia": {
+      "type": "dribbble",
+      "url": "https://dribbble.com/teammember7"
+    }
+  },
+  {
+    "name": "Team Member 8",
+    "position": "UI Designer",
+    "image": "/images/team-photos/image00008.webp",
+    "description": "Crafting beautiful, responsive interfaces that bring our applications to life.",
+    "socialMedia": {
+      "type": "behance",
+      "url": "https://behance.net/teammember8"
+    }
+  },
+  {
+    "name": "Team Member 9",
+    "position": "Project Manager",
+    "image": "/images/team-photos/image00009.webp",
+    "description": "Efficiently coordinating resources and timelines to ensure projects are delivered on time and within budget.",
+    "socialMedia": {
+      "type": "linkedin",
+      "url": "https://linkedin.com/in/team-member-9"
+    }
+  },
+  {
+    "name": "Team Member 10",
+    "position": "Marketing Lead",
+    "image": "/images/team-photos/image00010.webp",
+    "description": "Developing and executing marketing strategies that boost our brand presence and client engagement.",
+    "socialMedia": {
+      "type": "twitter",
+      "url": "https://twitter.com/teammember10"
+    }
+  },
+  {
+    "name": "Team Member 11",
+    "position": "Sales Manager",
+    "image": "/images/team-photos/image00011.webp",
+    "description": "Building strong client relationships and identifying growth opportunities in new markets.",
+    "socialMedia": null
+  },
+  {
+    "name": "Team Member 12",
+    "position": "Customer Service",
+    "image": "/images/team-photos/image00012.webp",
+    "description": "Providing exceptional support and ensuring client satisfaction across all our services.",
+    "socialMedia": {
+      "type": "linkedin",
+      "url": "https://linkedin.com/in/team-member-12"
+    }
+  },
+  {
+    "name": "Team Member 13",
+    "position": "Office Manager",
+    "image": "/images/team-photos/image00013.webp",
+    "description": "Keeping operations running smoothly and creating an efficient, productive work environment.",
+    "socialMedia": {
+      "type": "instagram",
+      "url": "https://instagram.com/teammember13"
+    }
+  }
+]
