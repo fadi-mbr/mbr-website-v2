@@ -52,13 +52,13 @@ export function getTeamMembers(): TeamMember[] {
   return getStaticTeamMembers();
 }
 
-// Static fallback data matching the CSV content
+// Static fallback data matching the CSV content exactly
 function getStaticTeamMembers(): TeamMember[] {
   return [
     {
       name: "Basel Kelzia",
       position: "Owner & CEO",
-      image: "/images/team-photos/image00001.webp",
+      image: "/images/team-photos/image00012.webp", // Updated to match CSV
       description: "Passionate automotive expert with 15+ years leading MBR Auto Services. Committed to quality service and customer satisfaction.",
       socialType: "instagram",
       socialUrl: "https://www.instagram.com/dr.abu.adam/"
