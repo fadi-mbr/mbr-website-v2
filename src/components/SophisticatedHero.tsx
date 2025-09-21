@@ -186,7 +186,7 @@ export default function SophisticatedHero({
             viewport={{ once: true }}
           >
             <h1 className="text-6xl md:text-8xl font-extralight text-white mb-8 tracking-tight">
-              Making Better Rides
+              <span className="mbr-letter">M</span>aking <span className="mbr-letter">B</span>etter <span className="mbr-letter">R</span>ides
             </h1>
             <div className="max-w-4xl mx-auto">
               <p className="text-xl md:text-2xl font-light text-gray-300 mb-4">

@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Porsche 911 Font Import */
+@font-face {
+  font-family: '911Porsche';
+  src: url('/fonts/911porschav3.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* BMW/Mercedes-Inspired Luxury Automotive Design System */
 :root {
   /* Core Brand Colors */
@@ -459,4 +468,12 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* MBR Porsche Font Styling */
+.mbr-letter {
+  font-family: '911Porsche', monospace;
+  color: #E30613; /* Red color */
+  font-weight: normal;
+  display: inline;
 }

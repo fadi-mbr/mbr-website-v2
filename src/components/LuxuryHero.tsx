@@ -283,7 +283,7 @@ export default function LuxuryHero({
         >
           <div className="luxury-panel p-4 w-full text-center">
             <h1 className="luxury-text text-2xl font-light tracking-wide">
-              Making Better Rides
+              <span className="mbr-letter">M</span>aking <span className="mbr-letter">B</span>etter <span className="mbr-letter">R</span>ides
             </h1>
             <p className="text-gray-400 text-sm mt-1">
               Expert Car Care in Dubai • Premium Automotive Excellence
