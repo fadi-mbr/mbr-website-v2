@@ -7,6 +7,7 @@ import { FaStar, FaGoogle, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 interface Review {
   author_name: string;
+  author_url?: string;
   rating: number;
   text: string;
   time: number;
@@ -229,6 +230,12 @@ export default function LuxuryReviewsSection() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5 }}
                 >
+                  <a
+                    href={reviewsData.reviews?.[currentReview]?.author_url || "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block cursor-pointer hover:opacity-80 transition-opacity"
+                  >
                   {/* Stars */}
                   <div className="flex mb-4">
                     {reviewsData.reviews && reviewsData.reviews[currentReview] &&
@@ -260,6 +267,7 @@ export default function LuxuryReviewsSection() {
                       </div>
                     </div>
                   </div>
+                  </a>
                 </motion.div>
               </div>
             )}

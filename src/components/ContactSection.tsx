@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   FaPhone,
@@ -36,7 +36,7 @@ const contactInfo = [
     primary: "Al Quoz Industrial 4",
     secondary: "Dubai, UAE",
     description: "Behind Mall of the Emirates",
-    action: "https://maps.app.goo.gl/6A6XeA4Nk4qD8MdRA",
+    action: "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A",
     color: "text-red-400"
   },
   {
@@ -60,6 +60,18 @@ const workingHours = [
   { day: "Sunday", hours: "Closed" }
 ];
 
+interface LocationData {
+  name: string;
+  address: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+  placeId: string;
+  googleMapsUrl: string;
+  embedUrl: string;
+}
+
 export default function ContactSection() {
   const [formData, setFormData] = useState({
     name: '',
@@ -70,6 +82,23 @@ export default function ContactSection() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [locationData, setLocationData] = useState<LocationData | null>(null);
+
+  useEffect(() => {
+    const fetchLocationData = async () => {
+      try {
+        const response = await fetch('/api/location');
+        const result = await response.json();
+        if (result.success && result.data) {
+          setLocationData(result.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch location data:', error);
+      }
+    };
+
+    fetchLocationData();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -343,25 +372,41 @@ export default function ContactSection() {
                 Our Location
               </h3>
               <div className="aspect-video bg-gray-800 rounded-lg mb-6 overflow-hidden">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.1234567890!2d55.2345678!3d25.1234567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDA3JzI0LjQiTiA1NcKwMTQnMDQuNCJF!5e0!3m2!1sen!2sae!4v1234567890123"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="filter grayscale hover:grayscale-0 transition-all duration-500"
-                  title="MBR Auto Services Location"
-                ></iframe>
+                {locationData ? (
+                  <iframe
+                    src={locationData.embedUrl}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="filter grayscale hover:grayscale-0 transition-all duration-500"
+                    title="MBR Auto Services Location"
+                  ></iframe>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                )}
               </div>
               <div className="text-center">
                 <p className="text-body text-gray-300 mb-2">
-                  Al Quoz Industrial Area 4, Dubai, UAE
+                  {locationData?.address || "Al Quoz Industrial Area 4, Dubai, UAE"}
                 </p>
                 <p className="text-caption text-gray-400">
                   Behind Mall of the Emirates, Easy Parking Available
                 </p>
+                {locationData && (
+                  <a
+                    href={locationData.googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-2 text-primary hover:text-red-400 transition-colors"
+                  >
+                    View on Google Maps
+                  </a>
+                )}
               </div>
             </div>
 
@@ -371,7 +416,7 @@ export default function ContactSection() {
                 Working Hours
               </h3>
               <div className="space-y-3">
-                {workingHours.map((schedule, index) => (
+                {workingHours.map((schedule) => (
                   <div key={schedule.day} className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0">
                     <span className="text-body text-gray-300">
                       {schedule.day}

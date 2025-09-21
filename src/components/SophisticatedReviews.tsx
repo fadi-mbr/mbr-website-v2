@@ -7,6 +7,7 @@ import { FaStar, FaGoogle, FaQuoteLeft } from 'react-icons/fa';
 
 interface Review {
   author_name: string;
+  author_url?: string;
   rating: number;
   text: string;
   time: number;
@@ -40,6 +41,7 @@ export default function SophisticatedReviews() {
             reviews: [
               {
                 author_name: "Ahmad Al-Mansouri",
+                author_url: "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A",
                 rating: 5,
                 text: "Exceptional service! The team at MBR diagnosed and fixed my BMW's electrical issue quickly. Professional, knowledgeable, and trustworthy. They explained everything clearly and the pricing was fair. Highly recommend for anyone looking for quality automotive care in Dubai.",
                 time: Date.now() - 86400000,
@@ -219,7 +221,13 @@ export default function SophisticatedReviews() {
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm border border-white/10 rounded-3xl p-8 h-full hover:border-white/20 transition-all duration-500">
+              <a
+                href={review.author_url || "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block h-full"
+              >
+                <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm border border-white/10 rounded-3xl p-8 h-full hover:border-white/20 transition-all duration-500 cursor-pointer">
 
                 {/* Quote Icon */}
                 <FaQuoteLeft className="text-red-600/60 text-2xl mb-6" />
@@ -257,6 +265,7 @@ export default function SophisticatedReviews() {
                   <FaGoogle className="text-gray-500 text-lg" />
                 </div>
               </div>
+              </a>
             </motion.div>
           ))}
         </motion.div>
@@ -271,7 +280,7 @@ export default function SophisticatedReviews() {
         >
           <div className="inline-flex flex-col sm:flex-row gap-6">
             <a
-              href="https://www.google.com/maps/place/MBR+Auto+Services"
+              href="https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"
               target="_blank"
               rel="noopener noreferrer"
               className="group px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium rounded-none overflow-hidden transition-all duration-500 hover:scale-105"
