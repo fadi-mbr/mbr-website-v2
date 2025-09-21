@@ -105,14 +105,14 @@ export default function MinimalHero({
                 href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary"
+                className="liquid-glass-btn liquid-glass-btn-primary"
               >
                 Book Service
               </a>
 
               <a
                 href="#services"
-                className="btn-secondary"
+                className="liquid-glass-btn liquid-glass-btn-secondary"
               >
                 Our Services
               </a>
@@ -158,7 +158,7 @@ export default function MinimalHero({
       {/* Video Controls - Minimal */}
       <motion.button
         onClick={toggleMute}
-        className="absolute bottom-8 right-8 p-3 bg-black/50 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-black/70 transition-all duration-300"
+        className="absolute bottom-8 right-8 liquid-glass-control"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 2, duration: 0.5 }}

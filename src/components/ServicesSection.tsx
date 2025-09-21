@@ -118,12 +118,12 @@ export default function ServicesSection() {
                       href={`https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20${encodeURIComponent(service.title.toLowerCase())}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-primary text-center flex-1"
+                      className="liquid-glass-btn liquid-glass-btn-primary flex-1"
                     >
                       Book Service
                     </a>
 
-                    <button className="btn-secondary flex-1">
+                    <button className="liquid-glass-btn liquid-glass-btn-secondary flex-1">
                       Learn More
                     </button>
                   </div>

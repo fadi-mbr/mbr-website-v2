@@ -166,7 +166,7 @@ export default function LuxuryHero({
             <div className="absolute bottom-4 right-4">
               <button
                 onClick={toggleMute}
-                className="luxury-panel p-3 rounded-full transition-all duration-300 hover:scale-110"
+                className="liquid-glass-control"
               >
                 {isMuted ? (
                   <FaVolumeMute className="text-white text-sm" />

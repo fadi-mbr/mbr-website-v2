@@ -195,7 +195,7 @@ export default function LuxuryReviewsSection() {
                 <div className="flex justify-between items-center mb-6">
                   <button
                     onClick={prevReview}
-                    className="p-2 text-muted-enhanced hover:text-white transition-colors"
+                    className="liquid-glass-nav"
                     aria-label="Previous review"
                   >
                     <FaArrowLeft className="w-4 h-4" />
@@ -216,7 +216,7 @@ export default function LuxuryReviewsSection() {
 
                   <button
                     onClick={nextReview}
-                    className="p-2 text-muted-enhanced hover:text-white transition-colors"
+                    className="liquid-glass-nav"
                     aria-label="Next review"
                   >
                     <FaArrowRight className="w-4 h-4" />
@@ -286,7 +286,7 @@ export default function LuxuryReviewsSection() {
             href="https://www.google.com/maps/place/MBR+Auto+Services"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-secondary inline-flex items-center space-x-2"
+            className="liquid-glass-btn liquid-glass-btn-secondary inline-flex items-center space-x-2"
           >
             <FaGoogle className="w-4 h-4" />
             <span>View All Reviews</span>

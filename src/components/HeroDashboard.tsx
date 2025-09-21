@@ -274,14 +274,14 @@ export default function HeroDashboard({
         >
           <button
             onClick={togglePlay}
-            className="hud-element p-3 rounded-full pointer-events-auto hover:scale-110 transition-transform"
+            className="liquid-glass-control pointer-events-auto"
           >
             {isPlaying ? <FaPause className="text-white" /> : <FaPlay className="text-white" />}
           </button>
 
           <button
             onClick={toggleMute}
-            className="hud-element p-3 rounded-full pointer-events-auto hover:scale-110 transition-transform"
+            className="liquid-glass-control pointer-events-auto"
           >
             {isMuted ? <FaVolumeMute className="text-white" /> : <FaVolumeUp className="text-white" />}
           </button>

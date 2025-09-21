@@ -179,15 +179,14 @@ export default function SophisticatedServices() {
                       href={`https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20${encodeURIComponent(service.title.toLowerCase())}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 group/btn relative px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium text-center rounded-xl overflow-hidden transition-all duration-300 hover:scale-105"
+                      className="flex-1 liquid-glass-btn liquid-glass-btn-primary"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                      <span className="relative">Book Service</span>
+                      Book Service
                     </a>
 
-                    <button className="flex-1 group/btn px-6 py-3 border border-white/30 text-white font-medium rounded-xl hover:border-white/50 hover:bg-white/10 transition-all duration-300 flex items-center justify-center space-x-2">
+                    <button className="flex-1 liquid-glass-btn liquid-glass-btn-secondary flex items-center justify-center space-x-2">
                       <span>Learn More</span>
-                      <FaArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                      <FaArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

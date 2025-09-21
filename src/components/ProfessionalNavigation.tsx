@@ -71,7 +71,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
               href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondary"
+              className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small"
             >
               Book Service
             </a>
@@ -133,7 +133,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                 href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block btn-primary text-center mt-6"
+                className="block liquid-glass-btn liquid-glass-btn-primary text-center mt-6"
                 onClick={() => setIsOpen(false)}
               >
                 Book Service

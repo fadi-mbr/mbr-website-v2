@@ -333,7 +333,7 @@ export default function ContactSection() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full btn-primary flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <>
@@ -452,14 +452,14 @@ export default function ContactSection() {
               href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20immediate%20automotive%20assistance"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary flex items-center space-x-2"
+              className="liquid-glass-btn liquid-glass-btn-primary flex items-center space-x-2"
             >
               <FaWhatsapp className="w-5 h-5" />
               <span>WhatsApp Now</span>
             </a>
             <a
               href="tel:8006272886"
-              className="btn-secondary flex items-center space-x-2"
+              className="liquid-glass-btn liquid-glass-btn-secondary flex items-center space-x-2"
             >
               <FaPhone className="w-4 h-4" />
               <span>Call 800-MBR-AUTO</span>

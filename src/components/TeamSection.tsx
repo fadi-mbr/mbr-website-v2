@@ -220,13 +220,13 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
                 href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20would%20like%20to%20meet%20your%20team%20and%20discuss%20my%20vehicle%20needs"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium rounded-xl overflow-hidden transition-all duration-500 hover:scale-105"
+                className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large"
               >
                 Meet Our Team
               </a>
               <a
                 href="#contact"
-                className="px-8 py-4 border-2 border-white/30 text-white font-medium rounded-xl backdrop-blur-sm hover:border-white/60 hover:bg-white/10 transition-all duration-500"
+                className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-large"
               >
                 Visit Our Workshop
               </a>

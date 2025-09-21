@@ -133,14 +133,14 @@ export default function SophisticatedHero({
         >
           <button
             onClick={togglePlay}
-            className="backdrop-blur-sm bg-black/20 border border-white/20 rounded-full p-3 text-white hover:bg-black/40 transition-all duration-300"
+            className="liquid-glass-control"
             aria-label={isPlaying ? "Pause video" : "Play video"}
           >
             {isPlaying ? <FaPause className="w-4 h-4" /> : <FaPlay className="w-4 h-4" />}
           </button>
           <button
             onClick={toggleMute}
-            className="backdrop-blur-sm bg-black/20 border border-white/20 rounded-full p-3 text-white hover:bg-black/40 transition-all duration-300"
+            className="liquid-glass-control"
             aria-label={isMuted ? "Unmute video" : "Mute video"}
           >
             {isMuted ? <FaVolumeMute className="w-4 h-4" /> : <FaVolumeUp className="w-4 h-4" />}
@@ -211,15 +211,14 @@ export default function SophisticatedHero({
                 href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium text-lg rounded-xl overflow-hidden transition-all duration-500 hover:scale-105"
+                className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <span className="relative">Book Premium Service</span>
+                Book Premium Service
               </a>
 
               <a
                 href="#services"
-                className="group px-8 py-4 border-2 border-white/30 text-white font-medium text-lg rounded-xl backdrop-blur-sm hover:border-white/60 hover:bg-white/10 transition-all duration-500"
+                className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-large"
               >
                 Explore Services
               </a>

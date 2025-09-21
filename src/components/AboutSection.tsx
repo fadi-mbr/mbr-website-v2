@@ -254,13 +254,13 @@ export default function AboutSection() {
                 href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20would%20like%20to%20learn%20more%20about%20your%20services"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary"
+                className="liquid-glass-btn liquid-glass-btn-primary"
               >
                 Get Started
               </a>
               <a
                 href="#services"
-                className="btn-secondary"
+                className="liquid-glass-btn liquid-glass-btn-secondary"
               >
                 View Services
               </a>

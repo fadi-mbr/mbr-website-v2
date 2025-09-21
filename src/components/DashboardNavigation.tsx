@@ -162,7 +162,7 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
               href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20automotive%20service"
               target="_blank"
               rel="noopener noreferrer"
-              className="hud-element px-6 py-2 text-sm font-medium rounded-lg transition-all duration-300 hover:scale-105"
+              className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -174,7 +174,7 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
           <div className="md:hidden">
             <motion.button
               onClick={() => setIsOpen(!isOpen)}
-              className="hud-element p-2 rounded-md"
+              className="liquid-glass-control"
               whileTap={{ scale: 0.95 }}
             >
               {isOpen ? (
@@ -229,7 +229,7 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
                 href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20automotive%20service"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hud-element block w-full text-center px-4 py-2 text-sm font-medium rounded-lg"
+                className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small block w-full text-center"
               >
                 <span className="hud-text">Book Service via WhatsApp</span>
               </a>
