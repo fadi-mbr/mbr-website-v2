@@ -166,7 +166,7 @@ export default function AboutSection() {
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="card-minimal p-6 h-full">
+              <div className="glass-card p-6 h-full">
                 <achievement.icon className="w-8 h-8 text-primary mx-auto mb-4" />
                 <div className="text-3xl font-light text-white mb-2">
                   {achievement.number}
@@ -204,7 +204,7 @@ export default function AboutSection() {
             {certifications.map((cert, index) => (
               <motion.div
                 key={cert.title}
-                className="card-minimal p-8 flex items-center space-x-6"
+                className="glass-card p-8 flex items-center space-x-6"
                 initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut", delay: index * 0.2 }}
@@ -241,7 +241,7 @@ export default function AboutSection() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
           viewport={{ once: true }}
         >
-          <div className="card-minimal p-8 inline-block">
+          <div className="glass-card-premium p-8 inline-block">
             <h3 className="text-subheading text-white mb-4">
               Ready to Experience the Difference?
             </h3>

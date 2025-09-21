@@ -118,7 +118,7 @@ export default function HeroDashboard({
           custom={0}
         >
           {/* Left HUD: Logo */}
-          <div className="hud-element p-4 pointer-events-auto">
+          <div className="glass-card p-4 pointer-events-auto">
             <Image
               src="/images/Logo_horizontal.svg"
               alt="MBR Auto Services"
@@ -174,7 +174,7 @@ export default function HeroDashboard({
           animate="visible"
           custom={1}
         >
-          <div className="hud-element p-8 max-w-2xl pointer-events-auto">
+          <div className="glass-card p-8 max-w-2xl pointer-events-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent">
               PERFORMANCE DASHBOARD
             </h1>
@@ -230,7 +230,7 @@ export default function HeroDashboard({
           animate="visible"
           custom={2}
         >
-          <div className="hud-element p-4 max-w-4xl w-full mx-4 pointer-events-auto">
+          <div className="glass-card p-4 max-w-4xl w-full mx-4 pointer-events-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
               {/* Hours */}
               <div className="flex items-center justify-center space-x-2">

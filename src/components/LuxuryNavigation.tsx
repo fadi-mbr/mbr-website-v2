@@ -168,7 +168,7 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
               href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
               target="_blank"
               rel="noopener noreferrer"
-              className="luxury-panel px-6 py-2 text-sm font-medium transition-all duration-300 hover:scale-105"
+              className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -180,7 +180,7 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
           <div className="md:hidden">
             <motion.button
               onClick={() => setIsOpen(!isOpen)}
-              className="luxury-panel p-3 rounded-lg"
+              className="liquid-glass-control"
               whileTap={{ scale: 0.95 }}
             >
               {isOpen ? (
@@ -235,7 +235,7 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
                 href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="luxury-panel block w-full text-center px-4 py-3 rounded-lg"
+                className="liquid-glass-btn liquid-glass-btn-secondary block w-full text-center"
               >
                 <span className="luxury-text">Book Premium Service</span>
               </a>

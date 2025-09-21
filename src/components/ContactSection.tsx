@@ -193,7 +193,7 @@ export default function ContactSection() {
                   rel={info.action.startsWith('http') ? 'noopener noreferrer' : undefined}
                   className="block h-full"
                 >
-                  <div className="card-minimal p-6 h-full text-center group hover:bg-surface transition-colors">
+                  <div className="glass-card p-6 h-full text-center group hover:bg-surface transition-colors">
                     <info.icon className={`w-8 h-8 mx-auto mb-4 ${info.color} group-hover:scale-110 transition-transform`} />
                     <h3 className="text-subheading text-white mb-2">
                       {info.title}
@@ -210,7 +210,7 @@ export default function ContactSection() {
                   </div>
                 </a>
               ) : (
-                <div className="card-minimal p-6 h-full text-center">
+                <div className="glass-card p-6 h-full text-center">
                   <info.icon className={`w-8 h-8 mx-auto mb-4 ${info.color}`} />
                   <h3 className="text-subheading text-white mb-2">
                     {info.title}
@@ -241,7 +241,7 @@ export default function ContactSection() {
 
           {/* Contact Form */}
           <motion.div variants={itemVariants}>
-            <div className="card-minimal p-8">
+            <div className="glass-card p-8">
               <h3 className="text-heading text-white mb-6">
                 Send us a Message
               </h3>
@@ -367,7 +367,7 @@ export default function ContactSection() {
           <motion.div variants={itemVariants} className="space-y-8">
 
             {/* Map Embed */}
-            <div className="card-minimal p-8">
+            <div className="glass-card p-8">
               <h3 className="text-heading text-white mb-6">
                 Our Location
               </h3>
@@ -408,7 +408,7 @@ export default function ContactSection() {
             </div>
 
             {/* Working Hours */}
-            <div className="card-minimal p-8">
+            <div className="glass-card p-8">
               <h3 className="text-heading text-white mb-6">
                 Working Hours
               </h3>

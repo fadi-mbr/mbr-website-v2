@@ -95,7 +95,7 @@ export default function LuxuryHero({
           className="col-span-4 row-span-1 flex items-center"
           variants={itemVariants}
         >
-          <div className="luxury-panel p-4 w-full">
+          <div className="glass-card p-4 w-full">
             <Image
               src="/images/Logo_horizontal.svg"
               alt="MBR Auto Services"
@@ -112,7 +112,7 @@ export default function LuxuryHero({
           className="col-span-4 col-start-9 row-span-1 flex items-center justify-end"
           variants={itemVariants}
         >
-          <div className="luxury-panel p-4 flex items-center space-x-6">
+          <div className="glass-card p-4 flex items-center space-x-6">
             {/* Google Reviews */}
             <div className="text-center">
               <div className="flex items-center space-x-1 mb-1">
@@ -281,7 +281,7 @@ export default function LuxuryHero({
           className="col-span-6 col-start-4 row-span-1 row-start-6 flex items-center justify-center"
           variants={itemVariants}
         >
-          <div className="luxury-panel p-4 w-full text-center">
+          <div className="glass-card p-4 w-full text-center">
             <div className="mb-2 flex justify-center">
               <Image
                 src="/images/Logo_horizontal.svg"

@@ -143,7 +143,7 @@ export default function LuxuryReviewsSection() {
             className="flex flex-col justify-center"
             variants={itemVariants}
           >
-            <div className="card-minimal p-8 text-center">
+            <div className="glass-card p-8 text-center">
 
               {/* Google Badge */}
               <div className="flex items-center justify-center mb-8">
@@ -189,7 +189,7 @@ export default function LuxuryReviewsSection() {
             variants={itemVariants}
           >
             {reviewsData && reviewsData.reviews && reviewsData.reviews.length > 0 && (
-              <div className="card-minimal p-8 relative">
+              <div className="glass-card p-8 relative">
 
                 {/* Review Navigation */}
                 <div className="flex justify-between items-center mb-6">

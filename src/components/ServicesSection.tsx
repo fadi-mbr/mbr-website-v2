@@ -88,7 +88,7 @@ export default function ServicesSection() {
               whileHover={{ y: -8 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="card-minimal h-full overflow-hidden">
+              <div className="glass-card h-full overflow-hidden">
 
                 {/* Service Image */}
                 <div className="relative h-64 mb-6 overflow-hidden">
@@ -141,7 +141,7 @@ export default function ServicesSection() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center space-x-6 p-8 card-minimal">
+          <div className="inline-flex items-center space-x-6 p-8 glass-card-premium">
             <Image
               src="/images/Bosch_Logo24.webp"
               alt="Bosch Authorized Service"
