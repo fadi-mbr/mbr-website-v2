@@ -282,9 +282,16 @@ export default function LuxuryHero({
           variants={itemVariants}
         >
           <div className="luxury-panel p-4 w-full text-center">
-            <h1 className="luxury-text text-2xl font-light tracking-wide">
-              <span className="mbr-letter">M</span>aking <span className="mbr-letter">B</span>etter <span className="mbr-letter">R</span>ides
-            </h1>
+            <div className="mb-2 flex justify-center">
+              <Image
+                src="/images/Logo_horizontal.svg"
+                alt="MBR Auto Services"
+                width={200}
+                height={75}
+                className="w-auto h-12 object-contain filter brightness-100"
+                priority
+              />
+            </div>
             <p className="text-gray-400 text-sm mt-1">
               Expert Car Care in Dubai • Premium Automotive Excellence
             </p>

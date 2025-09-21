@@ -80,9 +80,16 @@ export default function MinimalHero({
             initial="hidden"
             animate="visible"
           >
-            <h1 className="hero-title">
-              Making Better Rides
-            </h1>
+            <div className="mb-8 flex justify-center">
+              <Image
+                src="/images/Logo_horizontal.svg"
+                alt="MBR Auto Services"
+                width={400}
+                height={150}
+                className="w-auto h-20 md:h-24 lg:h-32 object-contain filter brightness-100"
+                priority
+              />
+            </div>
 
             <p className="hero-subtitle">
               Expert Car Care in Dubai • Premium Automotive Excellence

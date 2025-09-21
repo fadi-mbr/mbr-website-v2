@@ -185,9 +185,16 @@ export default function SophisticatedHero({
             transition={{ duration: 1, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            <h1 className="text-6xl md:text-8xl font-extralight text-white mb-8 tracking-tight">
-              <span className="mbr-letter">M</span>aking <span className="mbr-letter">B</span>etter <span className="mbr-letter">R</span>ides
-            </h1>
+            <div className="mb-8 flex justify-center">
+              <Image
+                src="/images/Logo_horizontal.svg"
+                alt="MBR Auto Services"
+                width={400}
+                height={150}
+                className="w-auto h-24 md:h-32 lg:h-40 object-contain filter brightness-100"
+                priority
+              />
+            </div>
             <div className="max-w-4xl mx-auto">
               <p className="text-xl md:text-2xl font-light text-gray-300 mb-4">
                 Expert Car Care in Dubai

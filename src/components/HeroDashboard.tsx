@@ -178,8 +178,18 @@ export default function HeroDashboard({
             <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent">
               PERFORMANCE DASHBOARD
             </h1>
+            <div className="mb-6 flex justify-center">
+              <Image
+                src="/images/Logo_horizontal.svg"
+                alt="MBR Auto Services"
+                width={300}
+                height={100}
+                className="w-auto h-16 md:h-20 object-contain filter brightness-100"
+                priority
+              />
+            </div>
             <p className="hud-text text-lg md:text-xl mb-6">
-              Making Better Rides • Expert Car Care in Dubai
+              Expert Car Care in Dubai
             </p>
 
             {/* Live Metrics */}
