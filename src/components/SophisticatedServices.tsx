@@ -204,7 +204,7 @@ export default function SophisticatedServices() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center space-x-8 bg-gradient-to-r from-gray-950/40 to-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:border-white/20 transition-all duration-500">
+          <div className="inline-flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8 bg-gradient-to-r from-gray-950/40 to-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-6 md:p-8 hover:border-white/20 transition-all duration-500">
             <Image
               src="/images/Bosch_Logo24.webp"
               alt="Bosch Authorized Service"
@@ -212,14 +212,14 @@ export default function SophisticatedServices() {
               height={60}
               className="opacity-80"
             />
-            <div className="text-left">
+            <div className="text-center md:text-left">
               <h3 className="text-2xl font-light text-white mb-3">
                 Bosch Authorized Service Partner
               </h3>
               <p className="text-gray-400 mb-4">
                 Certified quality, genuine parts, and manufacturer-level diagnostics
               </p>
-              <div className="flex items-center space-x-6 text-sm text-gray-500">
+              <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-6 text-sm text-gray-500">
                 <span>• Genuine Parts</span>
                 <span>• Certified Technicians</span>
                 <span>• Warranty Coverage</span>

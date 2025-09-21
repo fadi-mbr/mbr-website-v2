@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { FaVolumeUp, FaVolumeMute, FaPlay, FaPause, FaStar } from 'react-icons/fa';
+import { FaVolumeUp, FaVolumeMute, FaPlay, FaPause, FaStar, FaGoogle } from 'react-icons/fa';
 import { useGoogleReviews } from './GoogleReviewsHook';
 
 interface SophisticatedHeroProps {
@@ -149,24 +149,25 @@ export default function SophisticatedHero({
 
         {/* Reviews Badge - Bottom Left */}
         <motion.div
-          className="absolute bottom-8 left-8 z-20"
+          className="absolute bottom-4 left-4 z-20"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.5, duration: 0.8 }}
         >
-          <div className="backdrop-blur-sm bg-black/20 border border-white/10 rounded-2xl p-6 flex items-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <FaStar className="text-yellow-400 text-xl" />
-              <span className="text-white font-bold text-2xl">
+          <div className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg">
+            <div className="flex items-center space-x-1 md:space-x-2">
+              <FaGoogle className="text-red-500 text-sm md:text-base" />
+              <FaStar className="text-luxury-gold text-sm md:text-base" />
+              <span className="text-white font-bold text-sm md:text-lg">
                 {reviewsLoading ? '4.8' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.8)}
               </span>
             </div>
-            <div className="text-center">
-              <div className="text-white font-bold text-xl">
+            <div className="text-left">
+              <div className="text-white font-semibold text-xs md:text-sm">
                 {reviewsLoading ? '883' : (reviewsData?.totalReviews || googleReviews?.totalReviews || 883).toLocaleString()}
               </div>
-              <div className="text-yellow-400/80 text-sm font-medium uppercase tracking-wider">
-                Google Reviews
+              <div className="text-red-400 text-xs font-medium uppercase tracking-wide">
+                Reviews
               </div>
             </div>
           </div>
@@ -196,10 +197,10 @@ export default function SophisticatedHero({
               />
             </div>
             <div className="max-w-4xl mx-auto">
-              <p className="text-xl md:text-2xl font-light text-gray-300 mb-4">
+              <p className="text-xl md:text-2xl font-light text-body-enhanced mb-4">
                 Expert Car Care in Dubai
               </p>
-              <p className="text-lg text-gray-400 mb-12">
+              <p className="text-lg text-muted-enhanced mb-12">
                 Premium Automotive Excellence • Trusted by 5,000+ Customers • 15+ Years Experience
               </p>
             </div>
@@ -236,24 +237,24 @@ export default function SophisticatedHero({
             <div className="text-center group cursor-pointer">
               <div className="bg-gradient-to-br from-gray-950/50 to-black/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
                 <div className="text-4xl font-light text-white mb-4">15+</div>
-                <div className="text-lg text-gray-300 mb-2">Years</div>
-                <div className="text-sm text-gray-500">Excellence in Dubai</div>
+                <div className="text-lg text-luxury-silver mb-2">Years</div>
+                <div className="text-sm text-muted-enhanced">Excellence in Dubai</div>
               </div>
             </div>
 
             <div className="text-center group cursor-pointer">
               <div className="bg-gradient-to-br from-gray-950/50 to-black/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
                 <div className="text-4xl font-light text-white mb-4">5000+</div>
-                <div className="text-lg text-gray-300 mb-2">Customers</div>
-                <div className="text-sm text-gray-500">Trust Our Service</div>
+                <div className="text-lg text-luxury-silver mb-2">Customers</div>
+                <div className="text-sm text-muted-enhanced">Trust Our Service</div>
               </div>
             </div>
 
             <div className="text-center group cursor-pointer">
               <div className="bg-gradient-to-br from-gray-950/50 to-black/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
                 <div className="text-4xl font-light text-white mb-4">24/7</div>
-                <div className="text-lg text-gray-300 mb-2">Support</div>
-                <div className="text-sm text-gray-500">Always Available</div>
+                <div className="text-lg text-luxury-silver mb-2">Support</div>
+                <div className="text-sm text-muted-enhanced">Always Available</div>
               </div>
             </div>
           </motion.div>
@@ -266,19 +267,19 @@ export default function SophisticatedHero({
             transition={{ duration: 1, ease: "easeOut", delay: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="inline-flex items-center space-x-6 bg-gradient-to-r from-gray-950/30 to-black/30 backdrop-blur-sm border border-white/10 p-8 rounded-3xl">
+            <div className="inline-flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 bg-gradient-to-r from-gray-950/30 to-black/30 backdrop-blur-sm border border-white/10 p-6 md:p-8 rounded-3xl">
               <Image
                 src="/images/Bosch_Logo24.webp"
                 alt="Bosch Authorized Service"
                 width={120}
                 height={64}
-                className="h-16 w-auto opacity-80"
+                className="h-12 md:h-16 w-auto opacity-80"
               />
-              <div className="text-left">
-                <h3 className="text-xl font-light text-white mb-2">
+              <div className="text-center md:text-left">
+                <h3 className="text-lg md:text-xl font-light text-white mb-2">
                   Bosch Authorized Service Center
                 </h3>
-                <p className="text-gray-400">
+                <p className="text-sm md:text-base text-muted-enhanced">
                   Certified quality and genuine parts guarantee
                 </p>
               </div>

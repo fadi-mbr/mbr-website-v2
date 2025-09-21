@@ -88,7 +88,7 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
           <h2 className="text-5xl md:text-6xl font-extralight text-white mb-8 tracking-tight">
             Meet Our Expert Team
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-body-enhanced max-w-3xl mx-auto leading-relaxed">
             Passionate automotive professionals dedicated to delivering exceptional service
             and building lasting relationships with every customer.
           </p>
@@ -112,10 +112,10 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
                 <div className="text-4xl font-light text-white mb-2">
                   {stat.number}
                 </div>
-                <h3 className="text-lg text-gray-300 mb-2">
+                <h3 className="text-lg text-luxury-silver mb-2">
                   {stat.label}
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-enhanced">
                   {stat.description}
                 </p>
               </div>
@@ -189,7 +189,7 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
                     <p className="text-red-400 font-medium text-sm uppercase tracking-wider mb-4">
                       {member.position}
                     </p>
-                    <p className="text-gray-400 text-sm leading-relaxed">
+                    <p className="text-muted-enhanced text-sm leading-relaxed">
                       {member.description}
                     </p>
                   </div>
@@ -211,7 +211,7 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
             <h3 className="text-2xl font-light text-white mb-4">
               Experience the MBR Difference
             </h3>
-            <p className="text-gray-400 mb-6 max-w-2xl">
+            <p className="text-muted-enhanced mb-6 max-w-2xl">
               Our team of certified professionals is ready to provide you with
               exceptional automotive service and personalized care for your vehicle.
             </p>

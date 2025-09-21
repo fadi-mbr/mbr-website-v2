@@ -164,7 +164,7 @@ export default function LuxuryReviewsSection() {
                     />
                   ))}
                 </div>
-                <p className="text-body text-gray-400">
+                <p className="text-body text-muted-enhanced">
                   Based on {reviewsData?.totalReviews || 883} reviews
                 </p>
               </div>
@@ -173,11 +173,11 @@ export default function LuxuryReviewsSection() {
               <div className="grid grid-cols-2 gap-6 mt-8">
                 <div className="text-center">
                   <div className="text-2xl font-light text-white">98%</div>
-                  <div className="text-caption text-gray-400">Satisfaction</div>
+                  <div className="text-caption text-muted-enhanced">Satisfaction</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-light text-white">15+</div>
-                  <div className="text-caption text-gray-400">Years Experience</div>
+                  <div className="text-caption text-muted-enhanced">Years Experience</div>
                 </div>
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function LuxuryReviewsSection() {
                 <div className="flex justify-between items-center mb-6">
                   <button
                     onClick={prevReview}
-                    className="p-2 text-gray-400 hover:text-white transition-colors"
+                    className="p-2 text-muted-enhanced hover:text-white transition-colors"
                     aria-label="Previous review"
                   >
                     <FaArrowLeft className="w-4 h-4" />
@@ -216,7 +216,7 @@ export default function LuxuryReviewsSection() {
 
                   <button
                     onClick={nextReview}
-                    className="p-2 text-gray-400 hover:text-white transition-colors"
+                    className="p-2 text-muted-enhanced hover:text-white transition-colors"
                     aria-label="Next review"
                   >
                     <FaArrowRight className="w-4 h-4" />
@@ -240,12 +240,12 @@ export default function LuxuryReviewsSection() {
                   <div className="flex mb-4">
                     {reviewsData.reviews && reviewsData.reviews[currentReview] &&
                      [...Array(reviewsData.reviews[currentReview].rating)].map((_, i) => (
-                      <FaStar key={i} className="w-4 h-4 text-yellow-400 mr-1" />
+                      <FaStar key={i} className="w-4 h-4 text-luxury-gold mr-1" />
                     ))}
                   </div>
 
                   {/* Review Text */}
-                  <blockquote className="text-body text-gray-300 mb-6 leading-relaxed">
+                  <blockquote className="text-body text-body-enhanced mb-6 leading-relaxed">
                     &ldquo;{reviewsData.reviews && reviewsData.reviews[currentReview] ? reviewsData.reviews[currentReview].text : ''}&rdquo;
                   </blockquote>
 
@@ -262,7 +262,7 @@ export default function LuxuryReviewsSection() {
                         {reviewsData.reviews && reviewsData.reviews[currentReview] ?
                          reviewsData.reviews[currentReview].author_name : 'Loading...'}
                       </div>
-                      <div className="text-caption text-gray-400">
+                      <div className="text-caption text-muted-enhanced">
                         Verified Customer
                       </div>
                     </div>

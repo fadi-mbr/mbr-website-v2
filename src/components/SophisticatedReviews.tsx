@@ -166,7 +166,7 @@ export default function SophisticatedReviews() {
           <h2 className="text-5xl md:text-6xl font-extralight text-white mb-8 tracking-tight">
             Customer Stories
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-body-enhanced max-w-3xl mx-auto">
             Real experiences from our valued customers across Dubai
           </p>
         </motion.div>
@@ -189,18 +189,18 @@ export default function SophisticatedReviews() {
                 </span>
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (
-                    <FaStar key={i} className="w-6 h-6 text-yellow-400 mx-1" />
+                    <FaStar key={i} className="w-6 h-6 text-luxury-gold mx-1" />
                   ))}
                 </div>
               </div>
-              <p className="text-gray-300 text-lg">
+              <p className="text-body-enhanced text-lg">
                 Based on {(reviewsData?.totalReviews || 883).toLocaleString()} Google Reviews
               </p>
             </div>
 
             <div className="text-center">
               <div className="text-3xl font-light text-white mb-2">98%</div>
-              <p className="text-gray-400">Satisfaction Rate</p>
+              <p className="text-muted-enhanced">Satisfaction Rate</p>
             </div>
           </div>
         </motion.div>
@@ -235,12 +235,12 @@ export default function SophisticatedReviews() {
                 {/* Stars */}
                 <div className="flex mb-4">
                   {[...Array(review.rating)].map((_, i) => (
-                    <FaStar key={i} className="w-4 h-4 text-yellow-400 mr-1" />
+                    <FaStar key={i} className="w-4 h-4 text-luxury-gold mr-1" />
                   ))}
                 </div>
 
                 {/* Review Text */}
-                <blockquote className="text-gray-300 mb-6 leading-relaxed text-sm">
+                <blockquote className="text-body-enhanced mb-6 leading-relaxed text-sm">
                   &ldquo;{review.text}&rdquo;
                 </blockquote>
 
@@ -256,13 +256,13 @@ export default function SophisticatedReviews() {
                       <div className="text-white font-medium">
                         {review.author_name}
                       </div>
-                      <div className="text-gray-400 text-xs">
+                      <div className="text-muted-enhanced text-xs">
                         {review.relative_time_description}
                       </div>
                     </div>
                   </div>
 
-                  <FaGoogle className="text-gray-500 text-lg" />
+                  <FaGoogle className="text-subtle-enhanced text-lg" />
                 </div>
               </div>
               </a>

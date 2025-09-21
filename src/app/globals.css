@@ -28,11 +28,18 @@
   --surface-elevated: #1a1a1a;
   --surface-glass: rgba(255, 255, 255, 0.03);
 
-  /* Text Hierarchy */
+  /* Enhanced Text Hierarchy - Luxury Automotive */
   --text-primary: #ffffff;
   --text-secondary: #e5e5e5;
-  --text-muted: #999999;
-  --text-subtle: #666666;
+  --text-body: #d1d5db;
+  --text-muted: #9ca3af;
+  --text-subtle: #6b7280;
+
+  /* Luxury Text Accents */
+  --text-luxury-silver: #f3f4f6;
+  --text-luxury-gold: #fcd34d;
+  --text-brand-red: #f87171;
+  --text-success: #34d399;
 
   /* Luxury Typography Scale */
   --font-display: 'Inter', -apple-system, sans-serif;
@@ -476,4 +483,33 @@ body {
   color: #E30613; /* Red color */
   font-weight: normal;
   display: inline;
+}
+
+/* Luxury Text Color Utilities */
+.text-luxury-silver {
+  color: var(--text-luxury-silver);
+}
+
+.text-luxury-gold {
+  color: var(--text-luxury-gold);
+}
+
+.text-brand-red {
+  color: var(--text-brand-red);
+}
+
+.text-success {
+  color: var(--text-success);
+}
+
+.text-body-enhanced {
+  color: var(--text-body);
+}
+
+.text-muted-enhanced {
+  color: var(--text-muted);
+}
+
+.text-subtle-enhanced {
+  color: var(--text-subtle);
 }
