@@ -134,7 +134,7 @@ export default function SophisticatedReviews() {
 
   if (loading) {
     return (
-      <section id="reviews" className="relative py-24 bg-gradient-to-b from-gray-900 to-black">
+      <section id="reviews" className="relative py-24 bg-gradient-to-b from-black to-gray-950">
         <div className="container-luxury">
           <div className="flex items-center justify-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
@@ -145,7 +145,7 @@ export default function SophisticatedReviews() {
   }
 
   return (
-    <section id="reviews" className="relative py-24 bg-gradient-to-b from-gray-900 to-black overflow-hidden">
+    <section id="reviews" className="relative py-24 bg-gradient-to-b from-black to-gray-950 overflow-hidden">
 
       {/* Background Elements */}
       <div className="absolute inset-0">
@@ -179,7 +179,7 @@ export default function SophisticatedReviews() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center space-x-8 bg-gradient-to-r from-gray-800/40 to-gray-900/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8">
+          <div className="inline-flex items-center space-x-8 bg-gradient-to-r from-gray-950/40 to-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8">
             <FaGoogle className="text-6xl text-red-500" />
 
             <div className="text-center">
@@ -227,7 +227,7 @@ export default function SophisticatedReviews() {
                 rel="noopener noreferrer"
                 className="block h-full"
               >
-                <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-sm border border-white/10 rounded-3xl p-8 h-full hover:border-white/20 transition-all duration-500 cursor-pointer">
+                <div className="bg-gradient-to-br from-gray-950/30 to-black/30 backdrop-blur-sm border border-white/10 rounded-3xl p-8 h-full hover:border-white/20 transition-all duration-500 cursor-pointer">
 
                 {/* Quote Icon */}
                 <FaQuoteLeft className="text-red-600/60 text-2xl mb-6" />

@@ -371,7 +371,7 @@ export default function ContactSection() {
               <h3 className="text-heading text-white mb-6">
                 Our Location
               </h3>
-              <div className="aspect-video bg-gray-800 rounded-lg mb-6 overflow-hidden">
+              <div className="aspect-video bg-gray-950 rounded-lg mb-6 overflow-hidden">
                 {locationData ? (
                   <iframe
                     src={locationData.embedUrl}

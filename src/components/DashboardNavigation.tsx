@@ -196,7 +196,7 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
           }}
           transition={{ duration: 0.3 }}
         >
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-black/90 border-t border-gray-800">
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-black/90 border-t border-gray-950">
             {navigationItems.map((item, index) => (
               <motion.div
                 key={item.id}

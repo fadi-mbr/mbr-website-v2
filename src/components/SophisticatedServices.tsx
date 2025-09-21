@@ -112,7 +112,7 @@ export default function SophisticatedServices() {
               whileHover={{ y: -10 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900/50 to-gray-800/30 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-500">
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-black/50 to-gray-950/30 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-500">
 
                 {/* Service Image */}
                 <div className="relative h-64 overflow-hidden">
@@ -204,7 +204,7 @@ export default function SophisticatedServices() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center space-x-8 bg-gradient-to-r from-gray-800/40 to-gray-900/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:border-white/20 transition-all duration-500">
+          <div className="inline-flex items-center space-x-8 bg-gradient-to-r from-gray-950/40 to-black/40 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:border-white/20 transition-all duration-500">
             <Image
               src="/images/Bosch_Logo24.webp"
               alt="Bosch Authorized Service"

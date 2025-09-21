@@ -174,7 +174,7 @@ export default function SophisticatedHero({
       </section>
 
       {/* Content Section Below Video */}
-      <section className="relative bg-gradient-to-b from-black via-gray-900 to-black py-20">
+      <section className="relative bg-gradient-to-b from-black via-black to-gray-950 py-20">
         <div className="container-luxury">
 
           {/* Main Hero Content */}
@@ -234,7 +234,7 @@ export default function SophisticatedHero({
             viewport={{ once: true }}
           >
             <div className="text-center group cursor-pointer">
-              <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
+              <div className="bg-gradient-to-br from-gray-950/50 to-black/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
                 <div className="text-4xl font-light text-white mb-4">15+</div>
                 <div className="text-lg text-gray-300 mb-2">Years</div>
                 <div className="text-sm text-gray-500">Excellence in Dubai</div>
@@ -242,7 +242,7 @@ export default function SophisticatedHero({
             </div>
 
             <div className="text-center group cursor-pointer">
-              <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
+              <div className="bg-gradient-to-br from-gray-950/50 to-black/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
                 <div className="text-4xl font-light text-white mb-4">5000+</div>
                 <div className="text-lg text-gray-300 mb-2">Customers</div>
                 <div className="text-sm text-gray-500">Trust Our Service</div>
@@ -250,7 +250,7 @@ export default function SophisticatedHero({
             </div>
 
             <div className="text-center group cursor-pointer">
-              <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
+              <div className="bg-gradient-to-br from-gray-950/50 to-black/50 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:border-white/20 transition-all duration-500 hover:scale-105">
                 <div className="text-4xl font-light text-white mb-4">24/7</div>
                 <div className="text-lg text-gray-300 mb-2">Support</div>
                 <div className="text-sm text-gray-500">Always Available</div>
@@ -266,7 +266,7 @@ export default function SophisticatedHero({
             transition={{ duration: 1, ease: "easeOut", delay: 0.6 }}
             viewport={{ once: true }}
           >
-            <div className="inline-flex items-center space-x-6 bg-gradient-to-r from-gray-800/30 to-gray-900/30 backdrop-blur-sm border border-white/10 p-8 rounded-3xl">
+            <div className="inline-flex items-center space-x-6 bg-gradient-to-r from-gray-950/30 to-black/30 backdrop-blur-sm border border-white/10 p-8 rounded-3xl">
               <Image
                 src="/images/Bosch_Logo24.webp"
                 alt="Bosch Authorized Service"
