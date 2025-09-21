@@ -112,7 +112,7 @@ export default function LuxuryHero({
           className="col-span-4 col-start-9 row-span-1 flex items-center justify-end"
           variants={itemVariants}
         >
-          <div className="glass-card p-4 flex items-center space-x-6">
+          <div className="glass-card p-4 flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
             {/* Google Reviews */}
             <div className="text-center">
               <div className="flex items-center space-x-1 mb-1">

@@ -120,7 +120,7 @@ export default function MinimalHero({
 
             {/* Reviews Badge - Minimal */}
             <motion.div
-              className="mt-8 flex items-center justify-center space-x-4 text-sm"
+              className="mt-8 flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 text-sm px-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.5, duration: 0.8 }}
@@ -143,11 +143,11 @@ export default function MinimalHero({
                 </span>
               </div>
 
-              <div className="text-gray-300">
+              <div className="text-gray-300 text-center sm:text-left">
                 {(googleReviews?.totalReviews || 883).toLocaleString()} reviews
               </div>
 
-              <div className="text-gray-400">
+              <div className="text-gray-400 text-center sm:text-left">
                 Google Reviews
               </div>
             </motion.div>
