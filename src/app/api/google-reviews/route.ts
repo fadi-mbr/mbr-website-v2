@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 interface GoogleReview {
   author_name: string;
@@ -91,7 +91,7 @@ async function fetchGoogleReviews(): Promise<ReviewsData> {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const currentTime = Date.now();
 
@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Optional: POST endpoint to force refresh
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const reviewsData = await fetchGoogleReviews();
 

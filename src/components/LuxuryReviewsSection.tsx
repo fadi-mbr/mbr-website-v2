@@ -239,7 +239,7 @@ export default function LuxuryReviewsSection() {
 
                   {/* Review Text */}
                   <blockquote className="text-body text-gray-300 mb-6 leading-relaxed">
-                    "{reviewsData.reviews && reviewsData.reviews[currentReview] ? reviewsData.reviews[currentReview].text : ''}"
+                    &ldquo;{reviewsData.reviews && reviewsData.reviews[currentReview] ? reviewsData.reviews[currentReview].text : ''}&rdquo;
                   </blockquote>
 
                   {/* Author */}

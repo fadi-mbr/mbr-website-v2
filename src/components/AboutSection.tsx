@@ -86,7 +86,7 @@ export default function AboutSection() {
           </h2>
           <p className="text-body text-center max-w-3xl mx-auto">
             Founded on the principles of excellence and integrity, MBR Auto Services has been
-            Dubai's trusted automotive partner for over 15 years. We combine traditional
+            Dubai&apos;s trusted automotive partner for over 15 years. We combine traditional
             craftsmanship with cutting-edge technology to deliver unparalleled service quality.
           </p>
         </motion.div>
@@ -108,7 +108,7 @@ export default function AboutSection() {
             <div>
               <h3 className="text-heading mb-6 text-white">Our Story</h3>
               <p className="text-body text-gray-300 leading-relaxed mb-6">
-                What began as a small workshop in Al Quoz has evolved into one of Dubai's
+                What began as a small workshop in Al Quoz has evolved into one of Dubai&apos;s
                 most respected automotive service centers. Our journey is built on a simple
                 philosophy: treat every vehicle as if it were our own.
               </p>

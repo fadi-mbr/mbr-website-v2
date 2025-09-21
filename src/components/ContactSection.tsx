@@ -328,7 +328,7 @@ export default function ContactSection() {
 
                 {submitStatus === 'success' && (
                   <p className="text-green-400 text-center">
-                    Message sent successfully! We'll get back to you soon.
+                    Message sent successfully! We&apos;ll get back to you soon.
                   </p>
                 )}
 

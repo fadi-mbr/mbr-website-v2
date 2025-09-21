@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { FaVolumeUp, FaVolumeMute, FaPlay, FaPause, FaStar } from 'react-icons/fa';
 
 interface SophisticatedHeroProps {
@@ -88,9 +89,11 @@ export default function SophisticatedHero({
           animate={{ opacity: 0.6, x: 0 }}
           transition={{ delay: 1, duration: 0.8 }}
         >
-          <img
+          <Image
             src="/images/Logo_horizontal.svg"
             alt="MBR Auto Services"
+            width={140}
+            height={32}
             className="h-8 w-auto opacity-60"
           />
         </motion.div>
@@ -248,9 +251,11 @@ export default function SophisticatedHero({
             viewport={{ once: true }}
           >
             <div className="inline-flex items-center space-x-6 bg-gradient-to-r from-gray-800/30 to-gray-900/30 backdrop-blur-sm border border-white/10 p-8 rounded-3xl">
-              <img
+              <Image
                 src="/images/Bosch_Logo24.webp"
                 alt="Bosch Authorized Service"
+                width={120}
+                height={64}
                 className="h-16 w-auto opacity-80"
               />
               <div className="text-left">

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
 
 interface MinimalHeroProps {
@@ -172,9 +173,11 @@ export default function MinimalHero({
         animate={{ opacity: 0.3, x: 0 }}
         transition={{ delay: 0.8, duration: 0.8 }}
       >
-        <img
+        <Image
           src="/images/Logo_horizontal.svg"
           alt="MBR Auto Services"
+          width={120}
+          height={24}
           className="h-6 w-auto"
         />
       </motion.div>

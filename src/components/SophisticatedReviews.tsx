@@ -233,7 +233,7 @@ export default function SophisticatedReviews() {
 
                 {/* Review Text */}
                 <blockquote className="text-gray-300 mb-6 leading-relaxed text-sm">
-                  "{review.text}"
+                  &ldquo;{review.text}&rdquo;
                 </blockquote>
 
                 {/* Author Info */}
