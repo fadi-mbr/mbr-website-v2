@@ -90,7 +90,7 @@ export default function SophisticatedServices() {
           <h2 className="text-5xl md:text-6xl font-extralight text-white mb-8 tracking-tight">
             Premium Services
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-body-enhanced max-w-3xl mx-auto leading-relaxed">
             Comprehensive automotive solutions backed by 15+ years of expertise,
             certified technicians, and state-of-the-art equipment.
           </p>
@@ -159,14 +159,14 @@ export default function SophisticatedServices() {
                     </p>
                   </div>
 
-                  <p className="text-gray-300 leading-relaxed mb-6">
+                  <p className="text-body-enhanced leading-relaxed mb-6">
                     {service.description}
                   </p>
 
                   {/* Features */}
                   <div className="grid grid-cols-2 gap-3 mb-8">
                     {service.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center text-sm text-gray-400">
+                      <div key={idx} className="flex items-center text-sm text-muted-enhanced">
                         <div className="w-1.5 h-1.5 rounded-full bg-red-600 mr-3"></div>
                         {feature}
                       </div>
@@ -215,10 +215,10 @@ export default function SophisticatedServices() {
               <h3 className="text-2xl font-light text-white mb-3">
                 Bosch Authorized Service Partner
               </h3>
-              <p className="text-gray-400 mb-4">
+              <p className="text-muted-enhanced mb-4">
                 Certified quality, genuine parts, and manufacturer-level diagnostics
               </p>
-              <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-6 text-sm text-gray-500">
+              <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-6 text-sm text-subtle-enhanced">
                 <span>• Genuine Parts</span>
                 <span>• Certified Technicians</span>
                 <span>• Warranty Coverage</span>

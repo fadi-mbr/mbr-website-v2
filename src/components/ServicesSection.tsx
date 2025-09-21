@@ -108,7 +108,7 @@ export default function ServicesSection() {
                     {service.title}
                   </h3>
 
-                  <p className="text-body text-gray-400 mb-6 leading-relaxed">
+                  <p className="text-body text-muted-enhanced mb-6 leading-relaxed">
                     {service.description}
                   </p>
 
@@ -153,7 +153,7 @@ export default function ServicesSection() {
               <h3 className="text-subheading text-white mb-2">
                 Bosch Authorized Service
               </h3>
-              <p className="text-caption text-gray-400">
+              <p className="text-caption text-muted-enhanced">
                 Certified quality and genuine parts
               </p>
             </div>

@@ -143,11 +143,11 @@ export default function MinimalHero({
                 </span>
               </div>
 
-              <div className="text-gray-300 text-center sm:text-left">
+              <div className="text-body-enhanced text-center sm:text-left">
                 {(googleReviews?.totalReviews || 883).toLocaleString()} reviews
               </div>
 
-              <div className="text-gray-400 text-center sm:text-left">
+              <div className="text-muted-enhanced text-center sm:text-left">
                 Google Reviews
               </div>
             </motion.div>

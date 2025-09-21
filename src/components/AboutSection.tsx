@@ -101,12 +101,12 @@ export default function AboutSection() {
           >
             <div>
               <h3 className="text-heading mb-6 text-white">Our Story</h3>
-              <p className="text-body text-gray-300 leading-relaxed mb-6">
+              <p className="text-body text-body-enhanced leading-relaxed mb-6">
                 What began as a small workshop in Al Quoz has evolved into one of Dubai&apos;s
                 most respected automotive service centers. Our journey is built on a simple
                 philosophy: treat every vehicle as if it were our own.
               </p>
-              <p className="text-body text-gray-300 leading-relaxed">
+              <p className="text-body text-body-enhanced leading-relaxed">
                 Today, we serve a diverse clientele of automotive enthusiasts, luxury car
                 owners, and everyday drivers who demand nothing but the best for their vehicles.
               </p>
@@ -114,7 +114,7 @@ export default function AboutSection() {
 
             <div>
               <h3 className="text-heading mb-6 text-white">Our Mission</h3>
-              <p className="text-body text-gray-300 leading-relaxed">
+              <p className="text-body text-body-enhanced leading-relaxed">
                 To provide exceptional automotive services that exceed expectations while
                 building lasting relationships with our customers through transparency,
                 expertise, and unwavering commitment to quality.
@@ -174,7 +174,7 @@ export default function AboutSection() {
                 <h4 className="text-subheading text-white mb-2">
                   {achievement.label}
                 </h4>
-                <p className="text-caption text-gray-400">
+                <p className="text-caption text-muted-enhanced">
                   {achievement.description}
                 </p>
               </div>
@@ -194,7 +194,7 @@ export default function AboutSection() {
             <h3 className="text-heading text-center mb-6 text-white">
               Certified Excellence
             </h3>
-            <p className="text-body text-center text-gray-300">
+            <p className="text-body text-center text-body-enhanced">
               Our certifications and partnerships ensure you receive the highest
               standard of automotive care available in Dubai.
             </p>
@@ -224,7 +224,7 @@ export default function AboutSection() {
                   <h4 className="text-subheading text-white mb-2">
                     {cert.title}
                   </h4>
-                  <p className="text-body text-gray-400">
+                  <p className="text-body text-muted-enhanced">
                     {cert.description}
                   </p>
                 </div>
@@ -245,7 +245,7 @@ export default function AboutSection() {
             <h3 className="text-subheading text-white mb-4">
               Ready to Experience the Difference?
             </h3>
-            <p className="text-body text-gray-400 mb-6 max-w-md">
+            <p className="text-body text-muted-enhanced mb-6 max-w-md">
               Join thousands of satisfied customers who trust MBR Auto Services
               with their valuable vehicles.
             </p>

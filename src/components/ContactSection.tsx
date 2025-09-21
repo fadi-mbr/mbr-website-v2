@@ -201,10 +201,10 @@ export default function ContactSection() {
                     <p className="text-body text-white mb-1">
                       {info.primary}
                     </p>
-                    <p className="text-caption text-gray-400 mb-1">
+                    <p className="text-caption text-muted-enhanced mb-1">
                       {info.secondary}
                     </p>
-                    <p className="text-caption text-gray-500">
+                    <p className="text-caption text-muted-enhanced">
                       {info.description}
                     </p>
                   </div>
@@ -218,10 +218,10 @@ export default function ContactSection() {
                   <p className="text-body text-white mb-1">
                     {info.primary}
                   </p>
-                  <p className="text-caption text-gray-400 mb-1">
+                  <p className="text-caption text-muted-enhanced mb-1">
                     {info.secondary}
                   </p>
-                  <p className="text-caption text-gray-500">
+                  <p className="text-caption text-muted-enhanced">
                     {info.description}
                   </p>
                 </div>
@@ -249,7 +249,7 @@ export default function ContactSection() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="name" className="block text-caption text-gray-400 mb-2">
+                    <label htmlFor="name" className="block text-caption text-muted-enhanced mb-2">
                       Full Name *
                     </label>
                     <input
@@ -264,7 +264,7 @@ export default function ContactSection() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="phone" className="block text-caption text-gray-400 mb-2">
+                    <label htmlFor="phone" className="block text-caption text-muted-enhanced mb-2">
                       Phone Number
                     </label>
                     <input
@@ -280,7 +280,7 @@ export default function ContactSection() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-caption text-gray-400 mb-2">
+                  <label htmlFor="email" className="block text-caption text-muted-enhanced mb-2">
                     Email Address *
                   </label>
                   <input
@@ -296,7 +296,7 @@ export default function ContactSection() {
                 </div>
 
                 <div>
-                  <label htmlFor="service" className="block text-caption text-gray-400 mb-2">
+                  <label htmlFor="service" className="block text-caption text-muted-enhanced mb-2">
                     Service Required
                   </label>
                   <select
@@ -316,7 +316,7 @@ export default function ContactSection() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-caption text-gray-400 mb-2">
+                  <label htmlFor="message" className="block text-caption text-muted-enhanced mb-2">
                     Message
                   </label>
                   <textarea
@@ -391,7 +391,7 @@ export default function ContactSection() {
                 )}
               </div>
               <div className="text-center">
-                <p className="text-body text-gray-300 mb-2">
+                <p className="text-body text-body-enhanced mb-2">
                   {locationData?.address || "Al Quoz Industrial Area 4, Dubai, UAE"}
                 </p>
                 {locationData && (
@@ -415,7 +415,7 @@ export default function ContactSection() {
               <div className="space-y-3">
                 {workingHours.map((schedule) => (
                   <div key={schedule.day} className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0">
-                    <span className="text-body text-gray-300">
+                    <span className="text-body text-body-enhanced">
                       {schedule.day}
                     </span>
                     <span className={`text-body ${schedule.hours === 'Closed' ? 'text-red-400' : 'text-white'}`}>
@@ -425,7 +425,7 @@ export default function ContactSection() {
                 ))}
               </div>
               <div className="mt-6 pt-6 border-t border-gray-700 text-center">
-                <p className="text-caption text-gray-400 mb-2">
+                <p className="text-caption text-muted-enhanced mb-2">
                   Emergency Services Available
                 </p>
                 <a

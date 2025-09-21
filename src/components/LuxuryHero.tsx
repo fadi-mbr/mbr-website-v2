@@ -121,7 +121,7 @@ export default function LuxuryHero({
                   {googleReviews?.overallRating || 4.8}
                 </span>
               </div>
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-muted-enhanced">
                 {googleReviews?.totalReviews || 883} reviews
               </div>
             </div>
@@ -132,7 +132,7 @@ export default function LuxuryHero({
                 <div className={`w-2 h-2 rounded-full ${isOpen ? 'bg-green-400' : 'bg-red-400'}`}></div>
                 <span className="luxury-text text-sm">{isOpen ? 'Open' : 'Closed'}</span>
               </div>
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-muted-enhanced">
                 {currentTime.toLocaleTimeString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -215,7 +215,7 @@ export default function LuxuryHero({
             <div className="pt-4 border-t border-gray-700">
               <div className="text-center">
                 <div className="luxury-text text-2xl font-light">15+</div>
-                <div className="text-xs text-gray-400">Years Excellence</div>
+                <div className="text-xs text-muted-enhanced">Years Excellence</div>
               </div>
             </div>
           </div>
@@ -237,7 +237,7 @@ export default function LuxuryHero({
                 <FaPhone className="text-gold text-sm" />
                 <div>
                   <div className="text-white text-sm group-hover:text-gold transition-colors">800-MBR-AUTO</div>
-                  <div className="text-xs text-gray-400">24/7 Support</div>
+                  <div className="text-xs text-muted-enhanced">24/7 Support</div>
                 </div>
               </a>
 
@@ -250,7 +250,7 @@ export default function LuxuryHero({
                 <FaMapMarkerAlt className="text-gold text-sm" />
                 <div>
                   <div className="text-white text-sm group-hover:text-gold transition-colors">Al Quoz Industrial 4</div>
-                  <div className="text-xs text-gray-400">Dubai, UAE</div>
+                  <div className="text-xs text-muted-enhanced">Dubai, UAE</div>
                 </div>
               </a>
 
@@ -258,7 +258,7 @@ export default function LuxuryHero({
                 <FaClock className="text-gold text-sm" />
                 <div>
                   <div className="text-white text-sm">Mon - Sat</div>
-                  <div className="text-xs text-gray-400">8:30 AM - 7:30 PM</div>
+                  <div className="text-xs text-muted-enhanced">8:30 AM - 7:30 PM</div>
                 </div>
               </div>
             </div>
@@ -292,7 +292,7 @@ export default function LuxuryHero({
                 priority
               />
             </div>
-            <p className="text-gray-400 text-sm mt-1">
+            <p className="text-muted-enhanced text-sm mt-1">
               Expert Car Care in Dubai • Premium Automotive Excellence
             </p>
           </div>

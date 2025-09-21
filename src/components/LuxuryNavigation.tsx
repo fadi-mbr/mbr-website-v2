@@ -133,14 +133,14 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
                     className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-white/5"
                   >
                     {/* Icon */}
-                    <item.icon className="h-4 w-4 text-gray-400 group-hover:text-gold transition-colors duration-300" />
+                    <item.icon className="h-4 w-4 text-muted-enhanced group-hover:text-gold transition-colors duration-300" />
 
                     {/* Label */}
                     <div className="text-left">
                       <div className="text-sm font-medium text-white group-hover:text-gold transition-colors duration-300">
                         {item.label}
                       </div>
-                      <div className="text-xs text-gray-500 group-hover:text-gray-300 transition-colors duration-300">
+                      <div className="text-xs text-subtle-enhanced group-hover:text-gray-300 transition-colors duration-300">
                         {item.description}
                       </div>
                     </div>
@@ -215,10 +215,10 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
                   className="flex items-center space-x-4 px-4 py-3 rounded-lg transition-all duration-300 hover:bg-white/5"
                   onClick={() => setIsOpen(false)}
                 >
-                  <item.icon className="h-5 w-5 text-gray-400" />
+                  <item.icon className="h-5 w-5 text-muted-enhanced" />
                   <div>
                     <div className="text-white font-medium">{item.label}</div>
-                    <div className="text-xs text-gray-500">{item.description}</div>
+                    <div className="text-xs text-subtle-enhanced">{item.description}</div>
                   </div>
                 </Link>
               </motion.div>
