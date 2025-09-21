@@ -56,27 +56,12 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
 
   const navVariants = {
     hidden: { y: -100, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
+    visible: { y: 0, opacity: 1 }
   };
 
   const itemVariants = {
     hidden: { opacity: 0, x: -20 },
-    visible: (i: number) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.4,
-        ease: "easeOut"
-      }
-    })
+    visible: { opacity: 1, x: 0 }
   };
 
   return (
@@ -117,7 +102,7 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
-                  custom={index}
+                  transition={{ delay: index * 0.1, duration: 0.4, ease: "easeOut" }}
                   className="nav-item group"
                 >
                   <Link
