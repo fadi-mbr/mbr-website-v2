@@ -175,7 +175,7 @@ export default function SophisticatedReviews() {
 
         {/* Google Rating Summary */}
         <motion.div
-          className="text-center mb-20"
+          className="text-center mb-20 px-4"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
@@ -185,30 +185,30 @@ export default function SophisticatedReviews() {
             href="https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"
             target="_blank"
             rel="noopener noreferrer"
-            className="block"
+            className="block w-full max-w-4xl mx-auto"
           >
-            <div className="inline-flex items-center space-x-8 glass-card-premium p-8 cursor-pointer hover:scale-105 transition-transform duration-300">
-              <FaGoogle className="text-6xl text-red-500" />
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 glass-card-premium p-4 md:p-8 cursor-pointer hover:scale-105 transition-transform duration-300">
+              <FaGoogle className="text-4xl md:text-6xl text-red-500 flex-shrink-0" />
 
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <span className="text-5xl font-light text-white mr-4">
+              <div className="text-center flex-1">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-2">
+                  <span className="text-4xl md:text-5xl font-light text-white">
                     {reviewsData?.overallRating || 4.8}
                   </span>
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <FaStar key={i} className="w-6 h-6 text-luxury-gold mx-1" />
+                      <FaStar key={i} className="w-5 h-5 md:w-6 md:h-6 text-luxury-gold mx-0.5 md:mx-1" />
                     ))}
                   </div>
                 </div>
-                <p className="text-body-enhanced text-lg">
+                <p className="text-body-enhanced text-sm md:text-lg">
                   Based on {(reviewsData?.totalReviews || 883).toLocaleString()} Google Reviews
                 </p>
               </div>
 
-              <div className="text-center">
-                <div className="text-3xl font-light text-white mb-2">98%</div>
-                <p className="text-muted-enhanced">Satisfaction Rate</p>
+              <div className="text-center flex-shrink-0">
+                <div className="text-2xl md:text-3xl font-light text-white mb-2">98%</div>
+                <p className="text-muted-enhanced text-sm md:text-base">Satisfaction Rate</p>
               </div>
             </div>
           </a>
