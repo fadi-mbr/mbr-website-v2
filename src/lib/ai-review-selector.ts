@@ -125,15 +125,31 @@ export async function analyzeReviewValue(review: Review): Promise<number> {
 }
 
 /**
- * Select top N reviews using AI analysis
+ * Select top N reviews using AI analysis with variety
+ * Ensures different reviews are selected by avoiding duplicates
  */
 export async function selectBestReviews(
   reviews: Review[],
-  count: number = 5
+  count: number = 5,
+  excludeReviewIds?: Set<string>
 ): Promise<ReviewScore[]> {
+  // Filter out excluded reviews if provided
+  let filteredReviews = reviews;
+  if (excludeReviewIds && excludeReviewIds.size > 0) {
+    filteredReviews = reviews.filter(review => {
+      const reviewId = `${review.author_name}_${review.time}`;
+      return !excludeReviewIds.has(reviewId);
+    });
+  }
+
+  // If we don't have enough reviews after filtering, use all available
+  if (filteredReviews.length < count) {
+    filteredReviews = reviews;
+  }
+
   // Score all reviews
   const scoredReviews: ReviewScore[] = await Promise.all(
-    reviews.map(async (review) => {
+    filteredReviews.map(async (review) => {
       const score = await analyzeReviewValue(review);
       const reasons: string[] = [];
       
@@ -159,8 +175,68 @@ export async function selectBestReviews(
   // Sort by score (highest first)
   scoredReviews.sort((a, b) => b.score - a.score);
 
-  // Return top N
-  return scoredReviews.slice(0, count);
+  // Add variety bonus: slightly shuffle top reviews to ensure variety
+  // Take top candidates (more than count) and select diverse ones
+  const topCandidates = scoredReviews.slice(0, Math.min(count * 2, scoredReviews.length));
+  
+  // Select diverse reviews: prioritize high scores but ensure variety
+  const selected: ReviewScore[] = [];
+  const selectedAuthors = new Set<string>();
+  
+  for (const candidate of topCandidates) {
+    if (selected.length >= count) break;
+    
+    // Prefer reviews from different authors for variety
+    const authorKey = candidate.review.author_name.toLowerCase();
+    if (!selectedAuthors.has(authorKey) || selected.length < count * 0.6) {
+      selected.push(candidate);
+      selectedAuthors.add(authorKey);
+    }
+  }
+  
+  // Fill remaining slots if needed
+  if (selected.length < count) {
+    for (const candidate of topCandidates) {
+      if (selected.length >= count) break;
+      if (!selected.find(s => s.review.time === candidate.review.time)) {
+        selected.push(candidate);
+      }
+    }
+  }
+
+  return selected.slice(0, count);
+}
+
+/**
+ * Ensure variety in selected reviews by avoiding duplicate authors
+ */
+function ensureVariety(reviews: ReviewScore[], count: number): ReviewScore[] {
+  if (reviews.length <= count) return reviews;
+  
+  const selected: ReviewScore[] = [];
+  const selectedAuthors = new Set<string>();
+  
+  // First pass: prioritize different authors
+  for (const review of reviews) {
+    if (selected.length >= count) break;
+    const authorKey = review.review.author_name.toLowerCase();
+    if (!selectedAuthors.has(authorKey) || selected.length < count * 0.6) {
+      selected.push(review);
+      selectedAuthors.add(authorKey);
+    }
+  }
+  
+  // Second pass: fill remaining slots
+  if (selected.length < count) {
+    for (const review of reviews) {
+      if (selected.length >= count) break;
+      if (!selected.find(s => s.review.time === review.review.time)) {
+        selected.push(review);
+      }
+    }
+  }
+  
+  return selected.slice(0, count);
 }
 
 /**
@@ -169,11 +245,12 @@ export async function selectBestReviews(
 export async function selectBestReviewsWithAI(
   reviews: Review[],
   count: number = 5,
-  openaiApiKey?: string
+  openaiApiKey?: string,
+  excludeReviewIds?: Set<string>
 ): Promise<ReviewScore[]> {
   // If no OpenAI API key, fall back to rule-based selection
   if (!openaiApiKey) {
-    return selectBestReviews(reviews, count);
+    return selectBestReviews(reviews, count, excludeReviewIds);
   }
 
   try {
@@ -230,11 +307,13 @@ export async function selectBestReviewsWithAI(
 
     // Sort and return top N
     scoredReviews.sort((a, b) => b.score - a.score);
-    return scoredReviews.slice(0, count);
+    
+    // Ensure variety in results
+    return ensureVariety(scoredReviews.slice(0, count * 2), count);
 
   } catch (error) {
     console.error('AI review selection failed, using fallback:', error);
-    return selectBestReviews(reviews, count);
+    return selectBestReviews(reviews, count, excludeReviewIds);
   }
 }
 
@@ -244,11 +323,12 @@ export async function selectBestReviewsWithAI(
 export async function selectBestReviewsWithGemini(
   reviews: Review[],
   count: number = 5,
-  geminiApiKey?: string
+  geminiApiKey?: string,
+  excludeReviewIds?: Set<string>
 ): Promise<ReviewScore[]> {
   // If no Gemini API key, fall back to rule-based selection
   if (!geminiApiKey) {
-    return selectBestReviews(reviews, count);
+    return selectBestReviews(reviews, count, excludeReviewIds);
   }
 
   try {
@@ -323,27 +403,46 @@ ${JSON.stringify(reviews.map((r, i) => ({
 
     // Sort and return top N
     scoredReviews.sort((a, b) => b.score - a.score);
-    return scoredReviews.slice(0, count);
+    
+    // Ensure variety in results
+    return ensureVariety(scoredReviews.slice(0, count * 2), count);
 
   } catch (error) {
     console.error('Gemini AI review selection failed, using fallback:', error);
-    return selectBestReviews(reviews, count);
+    return selectBestReviews(reviews, count, excludeReviewIds);
   }
 }
 
 /**
  * Smart AI selection - tries Gemini first, then OpenAI, then rule-based
+ * Supports excluding previous reviews to ensure variety
  */
 export async function selectBestReviewsWithSmartAI(
   reviews: Review[],
   count: number = 5,
   geminiApiKey?: string,
-  openaiApiKey?: string
+  openaiApiKey?: string,
+  excludeReviewIds?: Set<string>
 ): Promise<ReviewScore[]> {
+  // Filter out excluded reviews if provided
+  let filteredReviews = reviews;
+  if (excludeReviewIds && excludeReviewIds.size > 0) {
+    filteredReviews = reviews.filter(review => {
+      const reviewId = `${review.author_name}_${review.time}`;
+      return !excludeReviewIds.has(reviewId);
+    });
+    
+    // If filtering left us with too few reviews, use all available
+    if (filteredReviews.length < count) {
+      filteredReviews = reviews;
+    }
+  }
+
   // Try Gemini first (preferred)
   if (geminiApiKey) {
     try {
-      return await selectBestReviewsWithGemini(reviews, count, geminiApiKey);
+      const results = await selectBestReviewsWithGemini(filteredReviews, count, geminiApiKey, excludeReviewIds);
+      return ensureVariety(results, count);
     } catch (error) {
       console.warn('Gemini failed, trying OpenAI:', error);
     }
@@ -352,13 +451,14 @@ export async function selectBestReviewsWithSmartAI(
   // Try OpenAI as fallback
   if (openaiApiKey) {
     try {
-      return await selectBestReviewsWithAI(reviews, count, openaiApiKey);
+      const results = await selectBestReviewsWithAI(filteredReviews, count, openaiApiKey, excludeReviewIds);
+      return ensureVariety(results, count);
     } catch (error) {
       console.warn('OpenAI failed, using rule-based:', error);
     }
   }
 
   // Fall back to rule-based
-  return selectBestReviews(reviews, count);
+  return selectBestReviews(filteredReviews, count, excludeReviewIds);
 }
 

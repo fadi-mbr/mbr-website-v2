@@ -95,7 +95,11 @@ async function fetchGoogleReviews(useDatabase: boolean = true): Promise<ReviewsD
   }
 
   // Fetch from Google Places API
-  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=rating,reviews,user_ratings_total&key=${API_KEY}`;
+  // Note: Google Places API only returns max 5 reviews per call
+  // We use the database to accumulate more reviews over time
+  // Optional: Add language parameter to get reviews in specific language
+  const language = 'en'; // Optional: can be made configurable
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=rating,reviews,user_ratings_total&language=${language}&key=${API_KEY}`;
 
   try {
     const response = await fetch(url);
@@ -131,16 +135,23 @@ async function fetchGoogleReviews(useDatabase: boolean = true): Promise<ReviewsD
     const fiveStarReviews = allReviews.filter((review) => review.rating === 5);
 
     // Use AI to select the best 5 reviews from 5-star reviews
+    // The selection algorithm ensures variety by avoiding duplicate authors
     let selectedReviews: ProcessedReview[];
     if (fiveStarReviews.length > 5) {
       const geminiApiKey = process.env.GOOGLE_AI_STUDIO_API_KEY;
       const openaiApiKey = process.env.OPENAI_API_KEY;
       
+      // Get previously selected reviews from cache to avoid showing same ones
+      const previousReviewIds = cachedReviews?.reviews 
+        ? new Set(cachedReviews.reviews.map(r => `${r.author_name}_${r.time}`))
+        : undefined;
+      
       const scoredReviews = await selectBestReviewsWithSmartAI(
         fiveStarReviews,
         5,
         geminiApiKey,
-        openaiApiKey
+        openaiApiKey,
+        previousReviewIds
       );
       selectedReviews = scoredReviews.map((sr: { review: ProcessedReview }) => sr.review);
     } else {

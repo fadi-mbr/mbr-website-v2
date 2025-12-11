@@ -63,7 +63,11 @@ export async function GET(request: Request) {
     }
 
     // Fetch reviews from Google Places API
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=rating,reviews,user_ratings_total&key=${API_KEY}`;
+    // Note: Google Places API only returns max 5 reviews per call
+    // We accumulate these over time in the database
+    // Language parameter can help get reviews in specific language
+    const language = 'en'; // Optional: can be made configurable
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=rating,reviews,user_ratings_total&language=${language}&key=${API_KEY}`;
     
     const response = await fetch(url);
     const data: GooglePlacesResponse = await response.json();
