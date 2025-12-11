@@ -44,12 +44,9 @@ export function useGoogleReviews(): UseGoogleReviewsReturn {
       }
 
       if (result.success) {
-        // Filter to show only 5-star reviews
-        const filteredData = {
-          ...result.data,
-          reviews: result.data.reviews.filter((review: GoogleReview) => review.rating === 5)
-        };
-        setData(filteredData);
+        // Data is already filtered to 5-star reviews by the API
+        // But totalReviews should remain the actual total from Google
+        setData(result.data);
       } else {
         throw new Error(result.error || 'API returned unsuccessful response');
       }

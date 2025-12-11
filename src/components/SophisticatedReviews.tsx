@@ -32,12 +32,9 @@ export default function SophisticatedReviews() {
         const result = await response.json();
 
         if (result.success && result.data) {
-          // Filter to show only 5-star reviews
-          const filteredData = {
-            ...result.data,
-            reviews: result.data.reviews.filter((review: Review) => review.rating === 5)
-          };
-          setReviewsData(filteredData);
+          // Data is already filtered to 5-star reviews by the API
+          // But totalReviews shows the actual total from Google
+          setReviewsData(result.data);
         } else {
           // Fallback data
           setReviewsData({
@@ -200,6 +197,9 @@ export default function SophisticatedReviews() {
               </div>
               <p className="text-body-enhanced text-lg">
                 Based on {(reviewsData?.totalReviews || 883).toLocaleString()} Google Reviews
+              </p>
+              <p className="text-muted-enhanced text-sm mt-1">
+                Showing {reviewsData?.reviews?.length || 0} 5-star reviews
               </p>
             </div>
 

@@ -79,15 +79,11 @@ async function fetchGoogleReviews(): Promise<ReviewsData> {
         profile_photo_url: review.profile_photo_url
       }));
 
-    // Calculate 5-star only statistics
-    const fiveStarReviews = data.result.reviews.filter((review) => review.rating === 5);
-    const fiveStarCount = fiveStarReviews.length;
-
     const reviewsData: ReviewsData = {
       overallRating: data.result.rating,
-      totalReviews: fiveStarCount, // Show count of 5-star reviews
+      totalReviews: data.result.user_ratings_total, // Keep actual total reviews from Google
       lastUpdated: new Date().toISOString(),
-      reviews: processedReviews
+      reviews: processedReviews // Only 5-star reviews are included here
     };
 
     return reviewsData;
