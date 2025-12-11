@@ -6,7 +6,9 @@ import {
   FaPhone,
   FaWhatsapp,
   FaMapMarkerAlt,
-  FaClock
+  FaClock,
+  FaInstagram,
+  FaFacebook
 } from 'react-icons/fa';
 
 const contactInfo = [
@@ -277,7 +279,7 @@ export default function ContactSection() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex flex-col sm:flex-row gap-4">
+          <div className="inline-flex flex-col sm:flex-row gap-4 mb-8">
             <a
               href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20immediate%20automotive%20assistance"
               target="_blank"
@@ -295,6 +297,35 @@ export default function ContactSection() {
               <span>Call 800-MBRAuto</span>
             </a>
           </div>
+
+          {/* Social Media Links */}
+          <motion.div
+            className="flex justify-center items-center gap-6 pt-8 border-t border-white/10"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-muted-enhanced text-sm mr-4">Follow Us:</p>
+            <a
+              href="https://www.instagram.com/mbr.auto/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center justify-center w-12 h-12 rounded-full glass-card hover:bg-white/10 transition-all duration-300 hover:scale-110"
+              aria-label="Follow us on Instagram"
+            >
+              <FaInstagram className="w-5 h-5 text-pink-500 group-hover:text-pink-400 transition-colors" />
+            </a>
+            <a
+              href="https://www.facebook.com/mbrautoservices/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center justify-center w-12 h-12 rounded-full glass-card hover:bg-white/10 transition-all duration-300 hover:scale-110"
+              aria-label="Follow us on Facebook"
+            >
+              <FaFacebook className="w-5 h-5 text-blue-500 group-hover:text-blue-400 transition-colors" />
+            </a>
+          </motion.div>
         </motion.div>
 
       </div>
