@@ -152,31 +152,47 @@ export default function SophisticatedHero({
           </button>
         </motion.div>
 
-        {/* Reviews Badge - Bottom Left */}
-        <motion.div
-          className="absolute bottom-4 left-4 z-20"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.5, duration: 0.8 }}
-        >
-          <div className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-3xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg max-w-full overflow-hidden">
-            <div className="flex items-center space-x-1 md:space-x-2">
-              <FaGoogle className="text-red-500 text-sm md:text-base" />
-              <FaStar className="text-luxury-gold text-sm md:text-base" />
-              <span className="text-white font-bold text-sm md:text-lg">
-                {reviewsLoading ? '4.8' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.8)}
-              </span>
-            </div>
-            <div className="text-left">
-              <div className="text-white font-semibold text-xs md:text-sm">
-                {reviewsLoading ? '883' : (reviewsData?.totalReviews || googleReviews?.totalReviews || 883).toLocaleString()}
+        {/* Reviews Badge & Instagram - Bottom Left */}
+        <div className="absolute bottom-4 left-4 z-20 flex flex-col gap-3">
+          {/* Instagram Icon */}
+          <motion.a
+            href="https://www.instagram.com/mbr.auto/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-full p-3 md:p-4 flex items-center justify-center shadow-lg hover:bg-black/40 transition-all duration-300 hover:scale-110"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.3, duration: 0.8 }}
+            aria-label="Follow us on Instagram"
+          >
+            <FaInstagram className="text-pink-500 text-xl md:text-2xl" />
+          </motion.a>
+
+          {/* Google Reviews Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.5, duration: 0.8 }}
+          >
+            <div className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-3xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg max-w-full overflow-hidden">
+              <div className="flex items-center space-x-1 md:space-x-2">
+                <FaGoogle className="text-red-500 text-sm md:text-base" />
+                <FaStar className="text-luxury-gold text-sm md:text-base" />
+                <span className="text-white font-bold text-sm md:text-lg">
+                  {reviewsLoading ? '4.8' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.8)}
+                </span>
               </div>
-              <div className="text-red-400 text-xs font-medium uppercase tracking-wide">
-                Reviews
+              <div className="text-left">
+                <div className="text-white font-semibold text-xs md:text-sm">
+                  {reviewsLoading ? '883' : (reviewsData?.totalReviews || googleReviews?.totalReviews || 883).toLocaleString()}
+                </div>
+                <div className="text-red-400 text-xs font-medium uppercase tracking-wide">
+                  Reviews
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Content Section Below Video */}
