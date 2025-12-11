@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { selectBestReviews } from '@/lib/ai-review-selector';
 
 interface GoogleReview {
   author_name: string;
@@ -66,24 +67,36 @@ async function fetchGoogleReviews(): Promise<ReviewsData> {
       throw new Error('No reviews data found');
     }
 
-    // Process and format reviews - filter to show only 5-star reviews
-    const processedReviews: ProcessedReview[] = data.result.reviews
-      .filter((review) => review.rating === 5)
-      .map((review) => ({
-        author_name: review.author_name,
-        author_url: review.author_url,
-        rating: review.rating,
-        relative_time_description: review.relative_time_description,
-        text: review.text,
-        time: review.time,
-        profile_photo_url: review.profile_photo_url
-      }));
+    // Process and format all reviews
+    const allReviews: ProcessedReview[] = data.result.reviews.map((review) => ({
+      author_name: review.author_name,
+      author_url: review.author_url,
+      rating: review.rating,
+      relative_time_description: review.relative_time_description,
+      text: review.text,
+      time: review.time,
+      profile_photo_url: review.profile_photo_url
+    }));
+
+    // Filter to 5-star reviews
+    const fiveStarReviews = allReviews.filter((review) => review.rating === 5);
+
+    // Use AI to select the best 5 reviews from 5-star reviews
+    // If we have more than 5 five-star reviews, select the best ones
+    let selectedReviews: ProcessedReview[];
+    if (fiveStarReviews.length > 5) {
+      const scoredReviews = await selectBestReviews(fiveStarReviews, 5);
+      selectedReviews = scoredReviews.map(sr => sr.review);
+    } else {
+      // If 5 or fewer, use all of them
+      selectedReviews = fiveStarReviews;
+    }
 
     const reviewsData: ReviewsData = {
       overallRating: data.result.rating,
       totalReviews: data.result.user_ratings_total, // Keep actual total reviews from Google
       lastUpdated: new Date().toISOString(),
-      reviews: processedReviews // Only 5-star reviews are included here
+      reviews: selectedReviews // Best 5-star reviews selected by AI
     };
 
     return reviewsData;

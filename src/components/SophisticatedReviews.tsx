@@ -199,7 +199,7 @@ export default function SophisticatedReviews() {
                 Based on {(reviewsData?.totalReviews || 883).toLocaleString()} Google Reviews
               </p>
               <p className="text-muted-enhanced text-sm mt-1">
-                Showing {reviewsData?.reviews?.length || 0} 5-star reviews
+                Showing top {reviewsData?.reviews?.length || 0} curated 5-star reviews
               </p>
             </div>
 
