@@ -21,7 +21,12 @@ export function getTeamMembers(): TeamMember[] {
       const lines = csvContent.trim().split('\n');
       // Skip header line
 
-      const teamMembers: TeamMember[] = lines.slice(1).map((line: string) => {
+      const teamMembers: TeamMember[] = lines.slice(1)
+        .filter((line: string) => {
+          // Skip commented lines (lines starting with #)
+          return line.trim().length > 0 && !line.trim().startsWith('#');
+        })
+        .map((line: string) => {
         // Parse CSV line handling commas within quoted fields
         const values = parseCSVLine(line);
 
@@ -70,45 +75,46 @@ function getStaticTeamMembers(): TeamMember[] {
       description: "Experienced workshop manager ensuring smooth operations and quality control across all automotive services.",
       socialType: "instagram",
       socialUrl: "https://www.instagram.com/michael_touma/"
-    },
-    {
-      name: "Ahmad Hassan",
-      position: "Senior Mechanic",
-      image: "/images/team-photos/image00003.webp",
-      description: "Master technician specializing in engine diagnostics and complex automotive repairs with 10+ years experience.",
-      socialType: "linkedin"
-    },
-    {
-      name: "Khalil Mansour",
-      position: "Electrical Specialist",
-      image: "/images/team-photos/image00004.webp",
-      description: "Expert in automotive electrical systems and computer diagnostics for all vehicle makes and models."
-    },
-    {
-      name: "Omar Farah",
-      position: "Suspension Expert",
-      image: "/images/team-photos/image00005.webp",
-      description: "Specialist in suspension systems and steering components with precision alignment expertise."
-    },
-    {
-      name: "Mahmoud Ali",
-      position: "Service Advisor",
-      image: "/images/team-photos/image00006.webp",
-      description: "Customer service specialist helping clients understand their vehicle needs and service recommendations.",
-      socialType: "linkedin"
-    },
-    {
-      name: "Yussef Khalil",
-      position: "Brake Specialist",
-      image: "/images/team-photos/image00007.webp",
-      description: "Certified brake system expert ensuring your safety with professional brake service and repairs."
-    },
-    {
-      name: "Tariq Nasser",
-      position: "Maintenance Technician",
-      image: "/images/team-photos/image00008.webp",
-      description: "Skilled in routine maintenance services including oil changes, tune-ups and preventive care."
     }
+    // Commented out team members - uncomment to add them back
+    // {
+    //   name: "Ahmad Hassan",
+    //   position: "Senior Mechanic",
+    //   image: "/images/team-photos/image00003.webp",
+    //   description: "Master technician specializing in engine diagnostics and complex automotive repairs with 10+ years experience.",
+    //   socialType: "linkedin"
+    // },
+    // {
+    //   name: "Khalil Mansour",
+    //   position: "Electrical Specialist",
+    //   image: "/images/team-photos/image00004.webp",
+    //   description: "Expert in automotive electrical systems and computer diagnostics for all vehicle makes and models."
+    // },
+    // {
+    //   name: "Omar Farah",
+    //   position: "Suspension Expert",
+    //   image: "/images/team-photos/image00005.webp",
+    //   description: "Specialist in suspension systems and steering components with precision alignment expertise."
+    // },
+    // {
+    //   name: "Mahmoud Ali",
+    //   position: "Service Advisor",
+    //   image: "/images/team-photos/image00006.webp",
+    //   description: "Customer service specialist helping clients understand their vehicle needs and service recommendations.",
+    //   socialType: "linkedin"
+    // },
+    // {
+    //   name: "Yussef Khalil",
+    //   position: "Brake Specialist",
+    //   image: "/images/team-photos/image00007.webp",
+    //   description: "Certified brake system expert ensuring your safety with professional brake service and repairs."
+    // },
+    // {
+    //   name: "Tariq Nasser",
+    //   position: "Maintenance Technician",
+    //   image: "/images/team-photos/image00008.webp",
+    //   description: "Skilled in routine maintenance services including oil changes, tune-ups and preventive care."
+    // }
   ];
 }
 

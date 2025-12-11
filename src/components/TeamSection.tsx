@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import { FaInstagram, FaLinkedin, FaAward, FaUsers, FaHandshake } from 'react-icons/fa';
 import { type TeamMember } from '@/lib/team-data';
@@ -43,14 +43,14 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut"
+        ease: [0.4, 0, 0.2, 1] as [number, number, number, number]
       }
     }
   };

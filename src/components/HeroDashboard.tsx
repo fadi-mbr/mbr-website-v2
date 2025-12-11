@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import {
   FaVolumeUp,
@@ -61,7 +61,7 @@ export default function HeroDashboard({
     }
   };
 
-  const hudVariants = {
+  const hudVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
       opacity: 1,
@@ -69,12 +69,12 @@ export default function HeroDashboard({
       transition: {
         delay: i * 0.2,
         duration: 0.8,
-        ease: "easeOut"
+        ease: [0.4, 0, 0.2, 1] as [number, number, number, number]
       }
     })
   };
 
-  const gaugeVariants = {
+  const gaugeVariants: Variants = {
     hidden: { scale: 0, rotate: -180 },
     visible: {
       scale: 1,
@@ -82,7 +82,7 @@ export default function HeroDashboard({
       transition: {
         delay: 1,
         duration: 1,
-        ease: "easeOut"
+        ease: [0.4, 0, 0.2, 1] as [number, number, number, number]
       }
     }
   };

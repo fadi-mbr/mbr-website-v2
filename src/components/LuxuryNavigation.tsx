@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import {
   FaCog,
   FaAward,
@@ -54,19 +54,19 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navVariants = {
+  const navVariants: Variants = {
     hidden: { y: -100, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
         duration: 0.8,
-        ease: "easeOut"
+        ease: [0.4, 0, 0.2, 1] as [number, number, number, number]
       }
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: -20 },
     visible: (i: number) => ({
       opacity: 1,
@@ -74,7 +74,7 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
       transition: {
         delay: i * 0.1,
         duration: 0.6,
-        ease: "easeOut"
+        ease: [0.4, 0, 0.2, 1] as [number, number, number, number]
       }
     })
   };
