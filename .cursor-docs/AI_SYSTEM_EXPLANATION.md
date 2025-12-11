@@ -2,7 +2,53 @@
 
 ## Current AI Implementation
 
-### 1. Rule-Based AI (Default - No External API Required)
+The system uses a **smart fallback strategy** with three tiers:
+
+1. **Google Gemini** (preferred) - Fast, cost-effective AI analysis
+2. **OpenAI** (fallback) - Advanced AI analysis  
+3. **Rule-based** (final fallback) - No API required, free
+
+### 1. Google Gemini Integration (Primary)
+
+**Model Used:** `gemini-1.5-flash`
+- **Provider:** Google AI Studio
+- **API Key:** `GOOGLE_AI_STUDIO_API_KEY`
+- **Cost:** Generous free tier
+- **Why this model:** Fast, cost-effective, reliable
+
+**How it works:**
+1. Sends all 5-star reviews to Gemini API
+2. Gemini analyzes each review for:
+   - Detail and specificity
+   - Authenticity and personal experience
+   - Positive sentiment and recommendation strength
+   - Comprehensiveness and helpfulness
+3. Returns scores (0-1) for each review with reasoning
+4. Falls back to OpenAI or rule-based if API fails
+
+**When to use:**
+- Set `GOOGLE_AI_STUDIO_API_KEY` environment variable
+- Automatically used if available (preferred method)
+
+### 2. OpenAI Integration (Fallback)
+
+**Model Used:** `gpt-4o-mini`
+- **Cost:** ~$0.15 per 1M input tokens, ~$0.60 per 1M output tokens
+- **Why this model:** Fast, cost-effective, good for structured tasks
+- **Temperature:** 0.3 (low randomness, more consistent)
+
+**How it works:**
+1. Used if Gemini is unavailable
+2. Sends all reviews to OpenAI API
+3. AI analyzes each review (same criteria as Gemini)
+4. Returns scores (0-1) for each review
+5. Falls back to rule-based if API fails
+
+**When to use:**
+- Set `OPENAI_API_KEY` environment variable
+- Automatically used as fallback if Gemini fails
+
+### 3. Rule-Based AI (Final Fallback - No External API Required)
 
 **How it works:**
 - Uses a **rule-based scoring algorithm** (no external AI model)
@@ -42,32 +88,15 @@
 
 **Total Score:** Sum of all factors (capped at 1.0)
 
-### 2. OpenAI Integration (Optional - Requires API Key)
-
-**Model Used:** `gpt-4o-mini`
-- **Cost:** ~$0.15 per 1M input tokens, ~$0.60 per 1M output tokens
-- **Why this model:** Fast, cost-effective, good for structured tasks
-- **Temperature:** 0.3 (low randomness, more consistent)
-
-**How it works:**
-1. Sends all reviews to OpenAI API
-2. AI analyzes each review for:
-   - Detail and specificity
-   - Authenticity and personal experience
-   - Positive sentiment and recommendation strength
-   - Comprehensiveness and helpfulness
-3. Returns scores (0-1) for each review
-4. Falls back to rule-based if API fails
-
 **When to use:**
-- Set `OPENAI_API_KEY` environment variable
-- Call with `useAI=true` parameter
-- Better understanding of context and nuance
-- Costs money per API call
+- No API keys available
+- API calls fail
+- Always available as final fallback
 
 **Current Status:**
-- Rule-based is **active by default** (no setup needed)
-- OpenAI is **optional** (requires API key)
+- **Gemini is preferred** (if `GOOGLE_AI_STUDIO_API_KEY` is set)
+- **OpenAI is fallback** (if Gemini fails and `OPENAI_API_KEY` is set)
+- **Rule-based is final fallback** (always available, no setup needed)
 
 ---
 

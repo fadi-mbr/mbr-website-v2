@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { selectBestReviews } from '@/lib/ai-review-selector';
+import { selectBestReviews, selectBestReviewsWithSmartAI } from '@/lib/ai-review-selector';
 import { getFiveStarReviews, getDatabaseStats, addReviewsToDatabase } from '@/lib/reviews-database';
 
 interface GoogleReview {
@@ -62,8 +62,11 @@ async function fetchGoogleReviews(useDatabase: boolean = true): Promise<ReviewsD
       
       // If we have reviews in database, use them
       if (dbFiveStarReviews.length > 0) {
-        // Select best reviews from database
-        const selectedReviews = await selectBestReviews(
+        // Select best reviews from database using AI (Gemini preferred)
+        const geminiApiKey = process.env.GOOGLE_AI_STUDIO_API_KEY;
+        const openaiApiKey = process.env.OPENAI_API_KEY;
+        
+        const selectedReviews = await selectBestReviewsWithSmartAI(
           dbFiveStarReviews.map(r => ({
             author_name: r.author_name,
             author_url: r.author_url,
@@ -73,7 +76,9 @@ async function fetchGoogleReviews(useDatabase: boolean = true): Promise<ReviewsD
             time: r.time,
             profile_photo_url: r.profile_photo_url
           })),
-          5
+          5,
+          geminiApiKey,
+          openaiApiKey
         );
 
         return {
@@ -128,8 +133,16 @@ async function fetchGoogleReviews(useDatabase: boolean = true): Promise<ReviewsD
     // Use AI to select the best 5 reviews from 5-star reviews
     let selectedReviews: ProcessedReview[];
     if (fiveStarReviews.length > 5) {
-      const scoredReviews = await selectBestReviews(fiveStarReviews, 5);
-      selectedReviews = scoredReviews.map(sr => sr.review);
+      const geminiApiKey = process.env.GOOGLE_AI_STUDIO_API_KEY;
+      const openaiApiKey = process.env.OPENAI_API_KEY;
+      
+      const scoredReviews = await selectBestReviewsWithSmartAI(
+        fiveStarReviews,
+        5,
+        geminiApiKey,
+        openaiApiKey
+      );
+      selectedReviews = scoredReviews.map((sr: { review: ProcessedReview }) => sr.review);
     } else {
       selectedReviews = fiveStarReviews;
     }

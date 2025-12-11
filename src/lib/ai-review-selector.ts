@@ -238,3 +238,127 @@ export async function selectBestReviewsWithAI(
   }
 }
 
+/**
+ * Enhanced AI selection using Google Gemini API (if available)
+ */
+export async function selectBestReviewsWithGemini(
+  reviews: Review[],
+  count: number = 5,
+  geminiApiKey?: string
+): Promise<ReviewScore[]> {
+  // If no Gemini API key, fall back to rule-based selection
+  if (!geminiApiKey) {
+    return selectBestReviews(reviews, count);
+  }
+
+  try {
+    // Use Google Gemini to analyze and rank reviews
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `You are an expert at analyzing customer reviews for an automotive service business.
+
+Analyze these ${reviews.length} reviews and score each one on a scale of 0-1 based on:
+1. Detail and specificity (mentions specific services, vehicles, or staff)
+2. Authenticity and personal experience
+3. Positive sentiment and recommendation strength
+4. Comprehensiveness and helpfulness
+
+Return a JSON object with this structure:
+{
+  "reviews": [
+    {"index": 0, "score": 0.85, "reasons": ["Detailed", "Specific", "Strong recommendation"]},
+    {"index": 1, "score": 0.72, "reasons": ["Good detail", "Positive"]},
+    ...
+  ]
+}
+
+Reviews to analyze:
+${JSON.stringify(reviews.map((r, i) => ({
+  index: i,
+  text: r.text,
+  rating: r.rating,
+  time: r.relative_time_description
+})), null, 2)}`
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.3,
+            responseMimeType: 'application/json'
+          }
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!content) {
+      throw new Error('No content in Gemini response');
+    }
+
+    const scores = JSON.parse(content);
+
+    // Map scores to reviews
+    const scoredReviews: ReviewScore[] = reviews.map((review, index) => {
+      const reviewScore = scores.reviews?.find((r: { index: number }) => r.index === index);
+      return {
+        review,
+        score: reviewScore?.score || 0.5,
+        reasons: reviewScore?.reasons || ['AI analyzed']
+      };
+    });
+
+    // Sort and return top N
+    scoredReviews.sort((a, b) => b.score - a.score);
+    return scoredReviews.slice(0, count);
+
+  } catch (error) {
+    console.error('Gemini AI review selection failed, using fallback:', error);
+    return selectBestReviews(reviews, count);
+  }
+}
+
+/**
+ * Smart AI selection - tries Gemini first, then OpenAI, then rule-based
+ */
+export async function selectBestReviewsWithSmartAI(
+  reviews: Review[],
+  count: number = 5,
+  geminiApiKey?: string,
+  openaiApiKey?: string
+): Promise<ReviewScore[]> {
+  // Try Gemini first (preferred)
+  if (geminiApiKey) {
+    try {
+      return await selectBestReviewsWithGemini(reviews, count, geminiApiKey);
+    } catch (error) {
+      console.warn('Gemini failed, trying OpenAI:', error);
+    }
+  }
+
+  // Try OpenAI as fallback
+  if (openaiApiKey) {
+    try {
+      return await selectBestReviewsWithAI(reviews, count, openaiApiKey);
+    } catch (error) {
+      console.warn('OpenAI failed, using rule-based:', error);
+    }
+  }
+
+  // Fall back to rule-based
+  return selectBestReviews(reviews, count);
+}
+

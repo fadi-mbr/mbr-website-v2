@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { selectBestReviews, selectBestReviewsWithAI } from '@/lib/ai-review-selector';
+import { selectBestReviews, selectBestReviewsWithSmartAI } from '@/lib/ai-review-selector';
 
 const PLACE_ID = process.env.GOOGLE_PLACE_ID;
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
@@ -91,8 +91,14 @@ export async function POST(request: Request) {
     }
 
     // Step 3: Use AI to select the best reviews
-    const selectedReviews = useAI && OPENAI_API_KEY
-      ? await selectBestReviewsWithAI(fiveStarReviews, count, OPENAI_API_KEY)
+    const GEMINI_API_KEY = process.env.GOOGLE_AI_STUDIO_API_KEY;
+    const selectedReviews = useAI
+      ? await selectBestReviewsWithSmartAI(
+          fiveStarReviews,
+          count,
+          GEMINI_API_KEY,
+          OPENAI_API_KEY
+        )
       : await selectBestReviews(fiveStarReviews, count);
 
     // Step 4: Return curated selection
@@ -111,7 +117,10 @@ export async function POST(request: Request) {
           totalFetched: allReviews.length,
           fiveStarCount: fiveStarReviews.length,
           selectedCount: selectedReviews.length,
-          selectionMethod: useAI && OPENAI_API_KEY ? 'AI (OpenAI)' : 'Rule-based'
+          selectionMethod: useAI 
+            ? (process.env.GOOGLE_AI_STUDIO_API_KEY ? 'AI (Google Gemini)' : 
+               OPENAI_API_KEY ? 'AI (OpenAI)' : 'Rule-based')
+            : 'Rule-based'
         },
         lastUpdated: new Date().toISOString()
       }

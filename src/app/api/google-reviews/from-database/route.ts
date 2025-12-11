@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getFiveStarReviews, getDatabaseStats } from '@/lib/reviews-database';
-import { selectBestReviews } from '@/lib/ai-review-selector';
+import { selectBestReviews, selectBestReviewsWithSmartAI } from '@/lib/ai-review-selector';
 
 /**
  * GET /api/google-reviews/from-database
@@ -28,11 +28,16 @@ export async function GET(request: Request) {
       }, { status: 404 });
     }
 
-    // Select best reviews using AI
+    // Select best reviews using AI (Gemini preferred, OpenAI fallback)
+    const geminiApiKey = process.env.GOOGLE_AI_STUDIO_API_KEY;
     const openaiApiKey = process.env.OPENAI_API_KEY;
-    const selectedReviews = useAI && openaiApiKey
-      ? await import('@/lib/ai-review-selector').then(m => 
-          m.selectBestReviewsWithAI(fiveStarReviews, count, openaiApiKey)
+    
+    const selectedReviews = useAI
+      ? await selectBestReviewsWithSmartAI(
+          fiveStarReviews,
+          count,
+          geminiApiKey,
+          openaiApiKey
         )
       : await selectBestReviews(fiveStarReviews, count);
 
@@ -62,7 +67,10 @@ export async function GET(request: Request) {
           totalInDatabase: stats.totalReviews,
           fiveStarInDatabase: stats.fiveStarCount,
           selectedCount: reviews.length,
-          selectionMethod: useAI && openaiApiKey ? 'AI (OpenAI)' : 'Rule-based'
+          selectionMethod: useAI
+            ? (geminiApiKey ? 'AI (Google Gemini)' : 
+               openaiApiKey ? 'AI (OpenAI)' : 'Rule-based')
+            : 'Rule-based'
         },
         lastUpdated: stats.metadata.lastUpdated
       }
