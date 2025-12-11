@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# reviews database (stored data, not committed)
+data/reviews-database.json

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { selectBestReviews } from '@/lib/ai-review-selector';
+import { getFiveStarReviews, getDatabaseStats, addReviewsToDatabase } from '@/lib/reviews-database';
 
 interface GoogleReview {
   author_name: string;
@@ -48,11 +49,47 @@ let cachedReviews: ReviewsData | null = null;
 let lastFetchTime: number = 0;
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-async function fetchGoogleReviews(): Promise<ReviewsData> {
+async function fetchGoogleReviews(useDatabase: boolean = true): Promise<ReviewsData> {
   if (!PLACE_ID || !API_KEY) {
     throw new Error('Google Places API configuration missing');
   }
 
+  // Try to use database first if available
+  if (useDatabase) {
+    try {
+      const dbStats = await getDatabaseStats();
+      const dbFiveStarReviews = await getFiveStarReviews();
+      
+      // If we have reviews in database, use them
+      if (dbFiveStarReviews.length > 0) {
+        // Select best reviews from database
+        const selectedReviews = await selectBestReviews(
+          dbFiveStarReviews.map(r => ({
+            author_name: r.author_name,
+            author_url: r.author_url,
+            rating: r.rating,
+            relative_time_description: r.relative_time_description,
+            text: r.text,
+            time: r.time,
+            profile_photo_url: r.profile_photo_url
+          })),
+          5
+        );
+
+        return {
+          overallRating: dbStats.metadata.overallRating || 4.8,
+          totalReviews: dbStats.metadata.totalReviews || 883,
+          lastUpdated: dbStats.metadata.lastUpdated,
+          reviews: selectedReviews.map(sr => sr.review)
+        };
+      }
+    } catch (error) {
+      console.warn('Database not available, fetching from Google:', error);
+      // Fall through to fetch from Google
+    }
+  }
+
+  // Fetch from Google Places API
   const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=rating,reviews,user_ratings_total&key=${API_KEY}`;
 
   try {
@@ -78,25 +115,30 @@ async function fetchGoogleReviews(): Promise<ReviewsData> {
       profile_photo_url: review.profile_photo_url
     }));
 
+    // Store in database (async, don't wait)
+    addReviewsToDatabase(allReviews, {
+      placeId: PLACE_ID,
+      overallRating: data.result.rating,
+      totalReviews: data.result.user_ratings_total
+    }).catch(err => console.error('Failed to store reviews:', err));
+
     // Filter to 5-star reviews
     const fiveStarReviews = allReviews.filter((review) => review.rating === 5);
 
     // Use AI to select the best 5 reviews from 5-star reviews
-    // If we have more than 5 five-star reviews, select the best ones
     let selectedReviews: ProcessedReview[];
     if (fiveStarReviews.length > 5) {
       const scoredReviews = await selectBestReviews(fiveStarReviews, 5);
       selectedReviews = scoredReviews.map(sr => sr.review);
     } else {
-      // If 5 or fewer, use all of them
       selectedReviews = fiveStarReviews;
     }
 
     const reviewsData: ReviewsData = {
       overallRating: data.result.rating,
-      totalReviews: data.result.user_ratings_total, // Keep actual total reviews from Google
+      totalReviews: data.result.user_ratings_total,
       lastUpdated: new Date().toISOString(),
-      reviews: selectedReviews // Best 5-star reviews selected by AI
+      reviews: selectedReviews
     };
 
     return reviewsData;
