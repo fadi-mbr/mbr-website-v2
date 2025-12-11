@@ -181,33 +181,37 @@ export default function SophisticatedReviews() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center space-x-8 glass-card-premium p-8">
-            <FaGoogle className="text-6xl text-red-500" />
+          <a
+            href="https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <div className="inline-flex items-center space-x-8 glass-card-premium p-8 cursor-pointer hover:scale-105 transition-transform duration-300">
+              <FaGoogle className="text-6xl text-red-500" />
 
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <span className="text-5xl font-light text-white mr-4">
-                  {reviewsData?.overallRating || 4.8}
-                </span>
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar key={i} className="w-6 h-6 text-luxury-gold mx-1" />
-                  ))}
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <span className="text-5xl font-light text-white mr-4">
+                    {reviewsData?.overallRating || 4.8}
+                  </span>
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className="w-6 h-6 text-luxury-gold mx-1" />
+                    ))}
+                  </div>
                 </div>
+                <p className="text-body-enhanced text-lg">
+                  Based on {(reviewsData?.totalReviews || 883).toLocaleString()} Google Reviews
+                </p>
               </div>
-              <p className="text-body-enhanced text-lg">
-                Based on {(reviewsData?.totalReviews || 883).toLocaleString()} Google Reviews
-              </p>
-              <p className="text-muted-enhanced text-sm mt-1">
-                Showing top {reviewsData?.reviews?.length || 0} curated 5-star reviews
-              </p>
-            </div>
 
-            <div className="text-center">
-              <div className="text-3xl font-light text-white mb-2">98%</div>
-              <p className="text-muted-enhanced">Satisfaction Rate</p>
+              <div className="text-center">
+                <div className="text-3xl font-light text-white mb-2">98%</div>
+                <p className="text-muted-enhanced">Satisfaction Rate</p>
+              </div>
             </div>
-          </div>
+          </a>
         </motion.div>
 
         {/* Reviews Grid */}
