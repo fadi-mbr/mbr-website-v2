@@ -66,20 +66,26 @@ async function fetchGoogleReviews(): Promise<ReviewsData> {
       throw new Error('No reviews data found');
     }
 
-    // Process and format reviews
-    const processedReviews: ProcessedReview[] = data.result.reviews.map((review) => ({
-      author_name: review.author_name,
-      author_url: review.author_url,
-      rating: review.rating,
-      relative_time_description: review.relative_time_description,
-      text: review.text,
-      time: review.time,
-      profile_photo_url: review.profile_photo_url
-    }));
+    // Process and format reviews - filter to show only 5-star reviews
+    const processedReviews: ProcessedReview[] = data.result.reviews
+      .filter((review) => review.rating === 5)
+      .map((review) => ({
+        author_name: review.author_name,
+        author_url: review.author_url,
+        rating: review.rating,
+        relative_time_description: review.relative_time_description,
+        text: review.text,
+        time: review.time,
+        profile_photo_url: review.profile_photo_url
+      }));
+
+    // Calculate 5-star only statistics
+    const fiveStarReviews = data.result.reviews.filter((review) => review.rating === 5);
+    const fiveStarCount = fiveStarReviews.length;
 
     const reviewsData: ReviewsData = {
       overallRating: data.result.rating,
-      totalReviews: data.result.user_ratings_total,
+      totalReviews: fiveStarCount, // Show count of 5-star reviews
       lastUpdated: new Date().toISOString(),
       reviews: processedReviews
     };

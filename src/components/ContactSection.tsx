@@ -1,23 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   FaPhone,
   FaWhatsapp,
   FaMapMarkerAlt,
-  FaClock,
-  FaEnvelope,
-  FaPaperPlane
+  FaClock
 } from 'react-icons/fa';
 
 const contactInfo = [
   {
     icon: FaPhone,
     title: "Call Us",
-    primary: "800-MBR-AUTO",
-    secondary: "+971 4 123 4567",
-    description: "24/7 Customer Support",
+    primary: "800-MBRAuto",
+    secondary: "800-627-2886",
+    description: "Emergency Support Available",
     action: "tel:8006272886",
     color: "text-blue-400"
   },
@@ -73,15 +71,6 @@ interface LocationData {
 }
 
 export default function ContactSection() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    service: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [locationData, setLocationData] = useState<LocationData | null>(null);
 
   useEffect(() => {
@@ -99,40 +88,6 @@ export default function ContactSection() {
 
     fetchLocationData();
   }, []);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus('idle');
-
-    try {
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', phone: '', service: '', message: '' });
-      } else {
-        setSubmitStatus('error');
-      }
-    } catch (error) {
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -238,131 +193,6 @@ export default function ContactSection() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-
-          {/* Contact Form */}
-          <motion.div variants={itemVariants}>
-            <div className="glass-card p-8">
-              <h3 className="text-heading text-white mb-6">
-                Send us a Message
-              </h3>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="name" className="block text-caption text-muted-enhanced mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 bg-surface border border-gray-600 rounded-xl text-white focus:border-primary focus:outline-none transition-colors"
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="phone" className="block text-caption text-muted-enhanced mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-surface border border-gray-600 rounded-xl text-white focus:border-primary focus:outline-none transition-colors"
-                      placeholder="+971 XX XXX XXXX"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-caption text-muted-enhanced mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 bg-surface border border-gray-600 rounded text-white focus:border-primary focus:outline-none transition-colors"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="service" className="block text-caption text-muted-enhanced mb-2">
-                    Service Required
-                  </label>
-                  <select
-                    id="service"
-                    name="service"
-                    value={formData.service}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-surface border border-gray-600 rounded text-white focus:border-primary focus:outline-none transition-colors"
-                  >
-                    <option value="">Select a service</option>
-                    <option value="mechanical">Mechanical Repairs</option>
-                    <option value="electrical">Electrical & Diagnostics</option>
-                    <option value="suspension">Suspension & Steering</option>
-                    <option value="maintenance">Maintenance Services</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-caption text-muted-enhanced mb-2">
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    rows={4}
-                    className="w-full px-4 py-3 bg-surface border border-gray-600 rounded-xl text-white focus:border-primary focus:outline-none transition-colors resize-none"
-                    placeholder="Tell us about your vehicle and service requirements..."
-                  ></textarea>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Sending...</span>
-                    </>
-                  ) : (
-                    <>
-                      <FaPaperPlane className="w-4 h-4" />
-                      <span>Send Message</span>
-                    </>
-                  )}
-                </button>
-
-                {submitStatus === 'success' && (
-                  <p className="text-green-400 text-center">
-                    Message sent successfully! We&apos;ll get back to you soon.
-                  </p>
-                )}
-
-                {submitStatus === 'error' && (
-                  <p className="text-red-400 text-center">
-                    Failed to send message. Please try again or contact us directly.
-                  </p>
-                )}
-              </form>
-            </div>
-          </motion.div>
-
           {/* Location & Hours */}
           <motion.div variants={itemVariants} className="space-y-8">
 
@@ -462,7 +292,7 @@ export default function ContactSection() {
               className="liquid-glass-btn liquid-glass-btn-secondary flex items-center space-x-2"
             >
               <FaPhone className="w-4 h-4" />
-              <span>Call 800-MBR-AUTO</span>
+              <span>Call 800-MBRAuto</span>
             </a>
           </div>
         </motion.div>

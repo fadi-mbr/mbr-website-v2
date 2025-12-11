@@ -236,8 +236,8 @@ export default function LuxuryHero({
               >
                 <FaPhone className="text-gold text-sm" />
                 <div>
-                  <div className="text-white text-sm group-hover:text-gold transition-colors">800-MBR-AUTO</div>
-                  <div className="text-xs text-muted-enhanced">24/7 Support</div>
+                  <div className="text-white text-sm group-hover:text-gold transition-colors">800-MBRAuto</div>
+                  <div className="text-xs text-muted-enhanced">Emergency Support Available</div>
                 </div>
               </a>
 

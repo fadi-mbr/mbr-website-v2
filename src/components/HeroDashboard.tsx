@@ -244,7 +244,7 @@ export default function HeroDashboard({
               <div className="flex items-center justify-center space-x-2">
                 <FaPhone className="text-blue-400" />
                 <a href="tel:8006272886" className="hud-text text-sm hover:text-white transition-colors">
-                  800-MBR-AUTO
+                  800-MBRAuto
                 </a>
               </div>
 

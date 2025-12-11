@@ -31,12 +31,17 @@ export default function SophisticatedHero({
       const now = new Date();
       setCurrentTime(now);
       const hour = now.getHours();
+      const minute = now.getMinutes();
       const day = now.getDay();
       // Monday-Saturday 8:30-19:30, Sunday closed
       if (day === 0) {
         setIsOpen(false);
       } else {
-        setIsOpen(hour >= 8 && hour < 19);
+        // Check if current time is between 8:30 AM and 7:30 PM
+        const currentMinutes = hour * 60 + minute;
+        const openMinutes = 8 * 60 + 30; // 8:30 AM
+        const closeMinutes = 19 * 60 + 30; // 7:30 PM
+        setIsOpen(currentMinutes >= openMinutes && currentMinutes < closeMinutes);
       }
     };
 
@@ -252,8 +257,8 @@ export default function SophisticatedHero({
             <div className="text-center group cursor-pointer">
               <div className="glass-card p-8">
                 <div className="text-4xl font-light text-white mb-4">24/7</div>
-                <div className="text-lg text-luxury-silver mb-2">Support</div>
-                <div className="text-sm text-muted-enhanced">Always Available</div>
+                <div className="text-lg text-luxury-silver mb-2">Emergency</div>
+                <div className="text-sm text-muted-enhanced">Support Available</div>
               </div>
             </div>
           </motion.div>

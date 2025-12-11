@@ -32,7 +32,12 @@ export default function SophisticatedReviews() {
         const result = await response.json();
 
         if (result.success && result.data) {
-          setReviewsData(result.data);
+          // Filter to show only 5-star reviews
+          const filteredData = {
+            ...result.data,
+            reviews: result.data.reviews.filter((review: Review) => review.rating === 5)
+          };
+          setReviewsData(filteredData);
         } else {
           // Fallback data
           setReviewsData({

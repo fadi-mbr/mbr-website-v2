@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface GoogleReview {
   author_name: string;
@@ -44,7 +44,12 @@ export function useGoogleReviews(): UseGoogleReviewsReturn {
       }
 
       if (result.success) {
-        setData(result.data);
+        // Filter to show only 5-star reviews
+        const filteredData = {
+          ...result.data,
+          reviews: result.data.reviews.filter((review: GoogleReview) => review.rating === 5)
+        };
+        setData(filteredData);
       } else {
         throw new Error(result.error || 'API returned unsuccessful response');
       }
