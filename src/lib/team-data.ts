@@ -62,16 +62,16 @@ function getStaticTeamMembers(): TeamMember[] {
   return [
     {
       name: "Basel Kelzia",
-      position: "Owner & CEO",
-      image: "/images/team-photos/image00012.webp", // Updated to match CSV
-      description: "Passionate automotive expert with 15+ years leading MBR Auto Services. Committed to quality service and customer satisfaction.",
+      position: "Owner & CEO - MBR Leader",
+      image: "/images/team-photos/Basel.webp", // Updated to match CSV
+      description: "Passionate automotive expert leading MBR Auto Services. Committed to quality service and customer satisfaction.",
       socialType: "instagram",
       socialUrl: "https://www.instagram.com/dr.abu.adam/"
     },
     {
       name: "Michael Touma",
       position: "Workshop Manager",
-      image: "/images/team-photos/image00002.webp",
+      image: "/images/team-photos/Michael.webp",
       description: "Experienced workshop manager ensuring smooth operations and quality control across all automotive services.",
       socialType: "instagram",
       socialUrl: "https://www.instagram.com/michael_touma/"
