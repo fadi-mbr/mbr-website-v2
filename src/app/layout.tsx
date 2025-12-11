@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MBR Auto Services - Premium Car Care in Dubai | Expert Automotive Service",
+  title: "MBR Making Better Rides",
   description: "Professional automotive services in Dubai. 15+ years experience, Bosch authorized service, expert technicians. Mechanical repairs, electrical diagnostics, suspension & maintenance.",
   keywords: "car service Dubai, automotive repair, Bosch service center, car maintenance Dubai, auto repair Al Quoz, vehicle diagnostics",
   authors: [{ name: "MBR Auto Services" }],
@@ -31,23 +31,23 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
   },
   openGraph: {
-    title: "MBR Auto Services - Premium Car Care in Dubai",
+    title: "MBR Making Better Rides - Premium Car Care in Dubai",
     description: "Professional automotive services with 15+ years experience. Expert technicians, Bosch authorized service center in Al Quoz, Dubai.",
     type: "website",
     locale: "en_US",
-    siteName: "MBR Auto Services",
+    siteName: "MBR Making Better Rides",
     images: [
       {
         url: '/images/Logo_MBRauto_noWhite_small.png',
         width: 1200,
         height: 630,
-        alt: 'MBR Auto Services Logo',
+        alt: 'MBR Making Better Rides Logo',
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MBR Auto Services - Premium Car Care in Dubai",
+    title: "MBR Making Better Rides - Premium Car Care in Dubai",
     description: "Professional automotive services with 15+ years experience in Dubai.",
     images: ['/images/Logo_MBRauto_noWhite_small.png'],
   },
