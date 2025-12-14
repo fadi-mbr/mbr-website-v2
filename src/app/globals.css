@@ -155,47 +155,189 @@ body {
   margin-bottom: var(--space-content);
 }
 
-/* Navigation - BMW/Mercedes Style */
-.nav-luxury {
+/* Navigation - Enhanced Vibrant Style */
+.nav-luxury-enhanced {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(20px);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.nav-link {
+.nav-luxury-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(227, 6, 19, 0.3),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.nav-luxury-enhanced.nav-scrolled {
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(227, 6, 19, 0.1);
+}
+
+.nav-luxury-enhanced.nav-scrolled::before {
+  opacity: 1;
+}
+
+/* Enhanced Nav Links */
+.nav-link-enhanced {
   color: var(--text-secondary);
   text-decoration: none;
   font-weight: 400;
   font-size: var(--text-body);
-  letter-spacing: 0.01em;
-  transition: color 0.3s ease;
-  padding: 0.5rem 0;
+  letter-spacing: 0.02em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.5rem 0.75rem;
   position: relative;
+  display: inline-block;
+  overflow: hidden;
 }
 
-.nav-link:hover {
+.nav-link-text {
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.nav-link-enhanced:hover .nav-link-text {
   color: var(--text-primary);
 }
 
-.nav-link::after {
+.nav-link-enhanced::before {
   content: '';
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--primary);
-  transition: width 0.3s ease;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(227, 6, 19, 0.1) 0%,
+    rgba(255, 26, 46, 0.15) 50%,
+    rgba(227, 6, 19, 0.1) 100%
+  );
+  background-size: 200% 200%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 0.5rem;
+  z-index: 0;
+  animation: gradient-shift 3s ease infinite;
 }
 
-.nav-link:hover::after {
-  width: 100%;
+.nav-link-enhanced:hover::before {
+  opacity: 1;
+}
+
+.nav-link-underline {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--primary),
+    rgba(255, 26, 46, 1),
+    var(--primary),
+    transparent
+  );
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(227, 6, 19, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-link-enhanced:hover .nav-link-underline {
+  width: 100% !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 15px rgba(227, 6, 19, 0.7);
+}
+
+.nav-link-active .nav-link-text {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.nav-link-active .nav-link-underline {
+  width: 100% !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 15px rgba(227, 6, 19, 0.7);
+}
+
+/* Mobile Nav Links */
+.nav-link-mobile {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 1.125rem;
+  letter-spacing: 0.01em;
+  transition: all 0.3s ease;
+  padding: 0.75rem 1rem;
+  position: relative;
+  display: block;
+  border-radius: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.nav-link-mobile::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: linear-gradient(
+    180deg,
+    var(--primary),
+    rgba(255, 26, 46, 1)
+  );
+  border-radius: 0 2px 2px 0;
+  transition: height 0.3s ease;
+}
+
+.nav-link-mobile:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  padding-left: 1.5rem;
+}
+
+.nav-link-mobile:hover::before {
+  height: 60%;
+}
+
+.nav-link-mobile-active {
+  color: var(--text-primary);
+  background: rgba(227, 6, 19, 0.1);
+  padding-left: 1.5rem;
+  font-weight: 500;
+}
+
+.nav-link-mobile-active::before {
+  height: 60%;
+  box-shadow: 0 0 10px rgba(227, 6, 19, 0.5);
 }
 
 /* Hero Section - Minimal Overlay */

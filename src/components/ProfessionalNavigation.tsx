@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavigationProps {
   currentSection?: string;
@@ -20,19 +20,45 @@ const navigationItems = [
 export default function ProfessionalNavigation({ currentSection = 'home' }: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
+      
+      // Detect active section based on scroll position
+      const sections = navigationItems.map(item => {
+        const element = document.getElementById(item.id);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          return {
+            id: item.id,
+            top: rect.top,
+            bottom: rect.bottom,
+          };
+        }
+        return null;
+      }).filter(Boolean);
+
+      const current = sections.find(
+        section => section && section.top <= 100 && section.bottom >= 100
+      );
+      
+      if (current) {
+        setActiveSection(current.id);
+      } else if (window.scrollY < 100) {
+        setActiveSection('');
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <motion.nav
-      className={`nav-luxury ${scrolled ? 'bg-black/98' : 'bg-black/95'}`}
+      className={`nav-luxury-enhanced ${scrolled ? 'nav-scrolled' : ''}`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -40,107 +66,156 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
       <div className="container-luxury">
         <div className="flex items-center justify-between h-20">
 
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <Image
-              src="/images/Logo_horizontal.svg"
-              alt="MBR Auto Services"
-              width={140}
-              height={45}
-              className="h-8 w-auto opacity-95 transition-opacity hover:opacity-100"
-              priority
-            />
-          </Link>
+          {/* Logo with enhanced hover effect */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Link href="/" className="flex-shrink-0 relative group">
+              <Image
+                src="/images/Logo_horizontal.svg"
+                alt="MBR Auto Services"
+                width={140}
+                height={45}
+                className="h-8 w-auto opacity-95 transition-all duration-300 group-hover:opacity-100 group-hover:brightness-110"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
+            </Link>
+          </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-12">
-            {navigationItems.map((item) => (
-              <Link
+          <div className="hidden md:flex items-center space-x-8">
+            {navigationItems.map((item, index) => (
+              <motion.div
                 key={item.id}
-                href={`#${item.id}`}
-                className="nav-link"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 + 0.3, duration: 0.4 }}
               >
-                {item.label}
-              </Link>
+                <Link
+                  href={`#${item.id}`}
+                  className={`nav-link-enhanced ${activeSection === item.id ? 'nav-link-active' : ''}`}
+                >
+                  <span className="nav-link-text">{item.label}</span>
+                  <motion.div
+                    className="nav-link-underline"
+                    initial={false}
+                    animate={{
+                      width: activeSection === item.id ? '100%' : '0%',
+                      opacity: activeSection === item.id ? 1 : 0
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Link>
+              </motion.div>
             ))}
           </div>
 
           {/* CTA Button */}
-          <div className="hidden md:block">
+          <motion.div
+            className="hidden md:block"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+          >
             <a
               href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
               target="_blank"
               rel="noopener noreferrer"
-              className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small"
+              className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small"
             >
               Book Service
             </a>
-          </div>
+          </motion.div>
 
           {/* Mobile Menu Button */}
-          <button
+          <motion.button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 text-white hover:text-gray-300 transition-colors"
+            className="md:hidden p-2 text-white hover:text-red-400 transition-colors relative z-50"
             aria-label="Toggle menu"
+            whileTap={{ scale: 0.9 }}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+            <div className="relative w-6 h-6">
+              <motion.svg
+                className="w-6 h-6 absolute inset-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                initial={false}
+                animate={isOpen ? { rotate: 90 } : { rotate: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {isOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </motion.svg>
+            </div>
+          </motion.button>
         </div>
 
         {/* Mobile Navigation */}
-        {isOpen && (
-          <motion.div
-            className="md:hidden py-6 border-t border-white/10"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="space-y-4">
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="block nav-link text-lg"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              className="md:hidden py-6 border-t border-white/20 backdrop-blur-xl bg-black/50"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="space-y-2">
+                {navigationItems.map((item, index) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ delay: index * 0.1, duration: 0.2 }}
+                  >
+                    <Link
+                      href={`#${item.id}`}
+                      className={`block nav-link-mobile ${activeSection === item.id ? 'nav-link-mobile-active' : ''}`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.div>
+                ))}
 
-              <a
-                href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block liquid-glass-btn liquid-glass-btn-primary text-center mt-6"
-                onClick={() => setIsOpen(false)}
-              >
-                Book Service
-              </a>
-            </div>
-          </motion.div>
-        )}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.2 }}
+                  className="pt-4"
+                >
+                  <a
+                    href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block liquid-glass-btn liquid-glass-btn-primary text-center"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Book Service
+                  </a>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.nav>
   );
