@@ -85,10 +85,10 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-5xl md:text-6xl font-extralight text-white mb-8 tracking-tight">
+          <h2 className="text-display font-light gradient-text mb-8 tracking-tight">
             Meet Our Expert Team
           </h2>
-          <p className="text-xl text-body-enhanced max-w-3xl mx-auto leading-relaxed">
+          <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
             Passionate automotive professionals dedicated to delivering exceptional service
             and building lasting relationships with every customer.
           </p>

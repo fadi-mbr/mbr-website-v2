@@ -119,10 +119,10 @@ export default function ContactSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-display text-center mb-6 gradient-text">
+          <h2 className="text-display font-light text-center mb-8 tracking-tight gradient-text">
             Get in Touch
           </h2>
-          <p className="text-body text-center max-w-2xl mx-auto">
+          <p className="text-subheading text-center text-body-enhanced max-w-3xl mx-auto leading-relaxed">
             Ready to experience premium automotive service? Contact us today
             for expert consultation and professional car care solutions.
           </p>

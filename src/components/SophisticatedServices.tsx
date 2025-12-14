@@ -88,10 +88,10 @@ export default function SophisticatedServices() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-5xl md:text-6xl font-extralight gradient-text mb-8 tracking-tight">
+          <h2 className="text-display font-light gradient-text mb-8 tracking-tight">
             Premium Services
           </h2>
-          <p className="text-xl text-body-enhanced max-w-3xl mx-auto leading-relaxed">
+          <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
             Comprehensive automotive solutions backed by 15+ years of expertise,
             certified technicians, and state-of-the-art equipment.
           </p>

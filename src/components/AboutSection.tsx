@@ -68,16 +68,16 @@ export default function AboutSection() {
 
         {/* Section Header */}
         <motion.div
-          className="content-block mb-16"
+          className="text-center mb-20"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-display text-center mb-6 gradient-text">
+          <h2 className="text-display font-light gradient-text mb-8 tracking-tight">
             About MBR Auto Services
           </h2>
-          <p className="text-body text-center max-w-3xl mx-auto">
+          <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
             Founded on the principles of excellence and integrity, MBR Auto Services has been
             Dubai&apos;s trusted automotive partner for over 15 years. We combine traditional
             craftsmanship with cutting-edge technology to deliver unparalleled service quality.
@@ -100,7 +100,7 @@ export default function AboutSection() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <div>
-              <h3 className="text-heading mb-6 text-white">Our Story</h3>
+              <h3 className="text-heading font-light text-white mb-6">Our Story</h3>
               <p className="text-body text-body-enhanced leading-relaxed mb-6">
                 What began as a small workshop in Al Quoz has evolved into one of Dubai&apos;s
                 most respected automotive service centers. Our journey is built on a simple
@@ -113,7 +113,7 @@ export default function AboutSection() {
             </div>
 
             <div>
-              <h3 className="text-heading mb-6 text-white">Our Mission</h3>
+              <h3 className="text-heading font-light text-white mb-6">Our Mission</h3>
               <p className="text-body text-body-enhanced leading-relaxed">
                 To provide exceptional automotive services that exceed expectations while
                 building lasting relationships with our customers through transparency,
@@ -139,10 +139,10 @@ export default function AboutSection() {
 
               {/* Overlay Content */}
               <div className="absolute bottom-6 left-6 right-6">
-                <h4 className="text-subheading text-white mb-2">
+                <h4 className="text-subheading font-medium text-white mb-2">
                   State-of-the-Art Facility
                 </h4>
-                <p className="text-body text-gray-200">
+                <p className="text-body text-white/90">
                   Modern equipment meets traditional expertise in our Al Quoz workshop
                 </p>
               </div>
@@ -166,15 +166,15 @@ export default function AboutSection() {
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="glass-card glass-shimmer p-6 h-full hover:glow-red transition-all duration-300">
-                <achievement.icon className="w-8 h-8 text-primary mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" />
-                <div className="text-3xl font-light gradient-text-vibrant mb-2">
+              <div className="glass-card glass-shimmer p-8 h-full hover:glow-red transition-all duration-300">
+                <achievement.icon className="w-10 h-10 text-primary mx-auto mb-6 group-hover:scale-110 transition-transform duration-300" />
+                <div className="text-4xl font-light gradient-text-vibrant mb-3">
                   {achievement.number}
                 </div>
-                <h4 className="text-subheading text-white mb-2">
+                <h4 className="text-subheading font-medium text-white mb-2">
                   {achievement.label}
                 </h4>
-                <p className="text-caption text-muted-enhanced">
+                <p className="text-body text-muted-enhanced">
                   {achievement.description}
                 </p>
               </div>
@@ -190,11 +190,11 @@ export default function AboutSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <div className="content-block mb-12">
-            <h3 className="text-heading text-center mb-6 text-white">
+          <div className="text-center mb-12">
+            <h3 className="text-heading font-light text-center mb-6 text-white">
               Certified Excellence
             </h3>
-            <p className="text-body text-center text-body-enhanced">
+            <p className="text-subheading text-center text-body-enhanced max-w-3xl mx-auto">
               Our certifications and partnerships ensure you receive the highest
               standard of automotive care available in Dubai.
             </p>
@@ -221,10 +221,10 @@ export default function AboutSection() {
                   />
                 </div>
                 <div>
-                  <h4 className="text-subheading text-white mb-2">
+                  <h4 className="text-subheading font-medium text-white mb-3">
                     {cert.title}
                   </h4>
-                  <p className="text-body text-muted-enhanced">
+                  <p className="text-body text-body-enhanced leading-relaxed">
                     {cert.description}
                   </p>
                 </div>
@@ -241,11 +241,11 @@ export default function AboutSection() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
           viewport={{ once: true }}
         >
-          <div className="glass-card-premium p-8 inline-block">
-            <h3 className="text-subheading text-white mb-4">
+          <div className="glass-card-premium glass-shimmer p-10 inline-block max-w-2xl">
+            <h3 className="text-heading font-light text-white mb-6">
               Ready to Experience the Difference?
             </h3>
-            <p className="text-body text-muted-enhanced mb-6 max-w-md">
+            <p className="text-subheading text-body-enhanced mb-8 leading-relaxed">
               Join thousands of satisfied customers who trust MBR Auto Services
               with their valuable vehicles.
             </p>

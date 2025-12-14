@@ -166,10 +166,10 @@ export default function SophisticatedReviews() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-5xl md:text-6xl font-extralight gradient-text mb-8 tracking-tight">
+          <h2 className="text-display font-light gradient-text mb-8 tracking-tight">
             Customer Stories
           </h2>
-          <p className="text-xl text-body-enhanced max-w-3xl mx-auto">
+          <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
             Real experiences from our valued customers across Dubai
           </p>
         </motion.div>
