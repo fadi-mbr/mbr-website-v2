@@ -63,7 +63,7 @@ export default function AboutSection() {
   };
 
   return (
-    <section id="about" className="section-horizontal section-elevated">
+    <section id="about" className="section-horizontal section-elevated vibrant-bg-gradient">
       <div className="container-luxury">
 
         {/* Section Header */}
@@ -74,7 +74,7 @@ export default function AboutSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-display text-center mb-6">
+          <h2 className="text-display text-center mb-6 gradient-text">
             About MBR Auto Services
           </h2>
           <p className="text-body text-center max-w-3xl mx-auto">
@@ -166,9 +166,9 @@ export default function AboutSection() {
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="glass-card p-6 h-full">
-                <achievement.icon className="w-8 h-8 text-primary mx-auto mb-4" />
-                <div className="text-3xl font-light text-white mb-2">
+              <div className="glass-card glass-shimmer p-6 h-full hover:glow-red transition-all duration-300">
+                <achievement.icon className="w-8 h-8 text-primary mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" />
+                <div className="text-3xl font-light gradient-text-vibrant mb-2">
                   {achievement.number}
                 </div>
                 <h4 className="text-subheading text-white mb-2">

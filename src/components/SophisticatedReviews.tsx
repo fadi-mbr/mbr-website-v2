@@ -147,12 +147,13 @@ export default function SophisticatedReviews() {
   }
 
   return (
-    <section id="reviews" className="relative py-24 bg-gradient-to-b from-black to-gray-950 overflow-hidden">
+    <section id="reviews" className="relative py-24 bg-gradient-to-b from-black to-gray-950 overflow-hidden vibrant-bg-gradient">
 
-      {/* Background Elements */}
+      {/* Background Elements - Enhanced */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/3 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-600/5 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative container-luxury">
@@ -165,7 +166,7 @@ export default function SophisticatedReviews() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-5xl md:text-6xl font-extralight text-white mb-8 tracking-tight">
+          <h2 className="text-5xl md:text-6xl font-extralight gradient-text mb-8 tracking-tight">
             Customer Stories
           </h2>
           <p className="text-xl text-body-enhanced max-w-3xl mx-auto">
@@ -187,7 +188,7 @@ export default function SophisticatedReviews() {
             rel="noopener noreferrer"
             className="block w-full max-w-4xl mx-auto"
           >
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 glass-card-premium p-4 md:p-8 cursor-pointer hover:scale-105 transition-transform duration-300">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 glass-card-premium glass-shimmer p-4 md:p-8 cursor-pointer hover:scale-105 hover:glow-red transition-all duration-300">
               <FaGoogle className="text-4xl md:text-6xl text-red-500 flex-shrink-0" />
 
               <div className="text-center flex-1">
@@ -236,7 +237,7 @@ export default function SophisticatedReviews() {
                 rel="noopener noreferrer"
                 className="block h-full"
               >
-                <div className="glass-card glass-shimmer p-8 h-full cursor-pointer">
+                <div className="glass-card glass-shimmer p-8 h-full cursor-pointer hover:glow-red transition-all duration-300">
 
                 {/* Quote Icon */}
                 <FaQuoteLeft className="text-red-600/60 text-2xl mb-6" />

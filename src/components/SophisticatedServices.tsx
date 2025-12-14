@@ -69,12 +69,13 @@ export default function SophisticatedServices() {
   };
 
   return (
-    <section id="services" className="relative py-24 bg-black overflow-hidden">
+    <section id="services" className="relative py-24 bg-black overflow-hidden vibrant-bg-gradient">
 
-      {/* Background Elements */}
+      {/* Background Elements - Enhanced */}
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-red-600/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/3 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-600/5 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative container-luxury">
@@ -87,7 +88,7 @@ export default function SophisticatedServices() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-5xl md:text-6xl font-extralight text-white mb-8 tracking-tight">
+          <h2 className="text-5xl md:text-6xl font-extralight gradient-text mb-8 tracking-tight">
             Premium Services
           </h2>
           <p className="text-xl text-body-enhanced max-w-3xl mx-auto leading-relaxed">
@@ -112,7 +113,7 @@ export default function SophisticatedServices() {
               whileHover={{ y: -10 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="relative overflow-hidden glass-card glass-shimmer">
+              <div className="relative overflow-hidden glass-card glass-shimmer hover:glow-red transition-all duration-500">
 
                 {/* Service Image */}
                 <div className="relative h-64 overflow-hidden">
@@ -130,8 +131,8 @@ export default function SophisticatedServices() {
 
                   {/* Service Icon */}
                   <div className="absolute top-6 left-6">
-                    <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                      <service.icon className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-red-600/20 group-hover:border-red-500/40 group-hover:glow-red transition-all duration-300">
+                      <service.icon className="w-6 h-6 text-white group-hover:text-red-400 transition-colors duration-300" />
                     </div>
                   </div>
 

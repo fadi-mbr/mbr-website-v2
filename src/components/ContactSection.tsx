@@ -108,7 +108,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="section-horizontal section-dark">
+    <section id="contact" className="section-horizontal section-dark vibrant-bg-gradient">
       <div className="container-luxury">
 
         {/* Section Header */}
@@ -119,7 +119,7 @@ export default function ContactSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-display text-center mb-6">
+          <h2 className="text-display text-center mb-6 gradient-text">
             Get in Touch
           </h2>
           <p className="text-body text-center max-w-2xl mx-auto">
@@ -150,7 +150,7 @@ export default function ContactSection() {
                   rel={info.action.startsWith('http') ? 'noopener noreferrer' : undefined}
                   className="block h-full"
                 >
-                  <div className="glass-card p-6 h-full text-center group hover:bg-surface transition-colors">
+                  <div className="glass-card glass-shimmer p-6 h-full text-center group hover:bg-surface hover:glow-red transition-all duration-300">
                     <info.icon className={`w-8 h-8 mx-auto mb-4 ${info.color} group-hover:scale-110 transition-transform`} />
                     <h3 className="text-subheading text-white mb-2">
                       {info.title}
@@ -167,7 +167,7 @@ export default function ContactSection() {
                   </div>
                 </a>
               ) : (
-                <div className="glass-card p-6 h-full text-center">
+                <div className="glass-card glass-shimmer p-6 h-full text-center hover:glow-red transition-all duration-300">
                   <info.icon className={`w-8 h-8 mx-auto mb-4 ${info.color}`} />
                   <h3 className="text-subheading text-white mb-2">
                     {info.title}

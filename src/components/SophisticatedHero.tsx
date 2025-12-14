@@ -196,7 +196,7 @@ export default function SophisticatedHero({
       </section>
 
       {/* Content Section Below Video */}
-      <section className="relative bg-gradient-to-b from-black via-black to-gray-950 py-20">
+      <section className="relative bg-gradient-to-b from-black via-black to-gray-950 py-20 vibrant-bg-gradient">
         <div className="container-luxury">
 
           {/* Main Hero Content */}
@@ -218,7 +218,7 @@ export default function SophisticatedHero({
               />
             </div>
             <div className="max-w-4xl mx-auto">
-              <p className="text-xl md:text-2xl font-light text-body-enhanced mb-4">
+              <p className="text-xl md:text-2xl font-light gradient-text mb-4">
                 Expert Car Care in Dubai
               </p>
               <p className="text-lg text-muted-enhanced mb-12">
@@ -283,24 +283,24 @@ export default function SophisticatedHero({
             viewport={{ once: true }}
           >
             <div className="text-center group cursor-pointer">
-              <div className="glass-card p-8">
-                <div className="text-4xl font-light text-white mb-4">15+</div>
+              <div className="glass-card glass-shimmer p-8 hover:glow-red transition-all duration-300">
+                <div className="text-4xl font-light gradient-text-vibrant mb-4">15+</div>
                 <div className="text-lg text-luxury-silver mb-2">Years</div>
                 <div className="text-sm text-muted-enhanced">Excellence in Dubai</div>
               </div>
             </div>
 
             <div className="text-center group cursor-pointer">
-              <div className="glass-card p-8">
-                <div className="text-4xl font-light text-white mb-4">5000+</div>
+              <div className="glass-card glass-shimmer p-8 hover:glow-red transition-all duration-300">
+                <div className="text-4xl font-light gradient-text-vibrant mb-4">5000+</div>
                 <div className="text-lg text-luxury-silver mb-2">Customers</div>
                 <div className="text-sm text-muted-enhanced">Trust Our Service</div>
               </div>
             </div>
 
             <div className="text-center group cursor-pointer">
-              <div className="glass-card p-8">
-                <div className="text-4xl font-light text-white mb-4">24/7</div>
+              <div className="glass-card glass-shimmer p-8 hover:glow-red transition-all duration-300">
+                <div className="text-4xl font-light gradient-text-vibrant mb-4">24/7</div>
                 <div className="text-lg text-luxury-silver mb-2">Emergency</div>
                 <div className="text-sm text-muted-enhanced">Support Available</div>
               </div>
