@@ -12,6 +12,7 @@ import {
   FaBars,
   FaTimes
 } from 'react-icons/fa';
+import { trackWhatsAppClick, trackNavigation } from '@/lib/analytics';
 
 interface NavigationProps {
   currentSection?: string;
@@ -131,6 +132,7 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
                   <Link
                     href={`#${item.id}`}
                     className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-white/5"
+                    onClick={() => trackNavigation(item.id, 'desktop')}
                   >
                     {/* Icon */}
                     <item.icon className="h-4 w-4 text-muted-enhanced group-hover:text-gold transition-colors duration-300" />
@@ -171,6 +173,7 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
               className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => trackWhatsAppClick('navigation_desktop', 'Book Service')}
             >
               <span className="luxury-text">Book Service</span>
             </motion.a>
@@ -236,6 +239,7 @@ export default function LuxuryNavigation({ currentSection = 'services' }: Naviga
                 target="_blank"
                 rel="noopener noreferrer"
                 className="liquid-glass-btn liquid-glass-btn-secondary block w-full text-center"
+                onClick={() => trackWhatsAppClick('navigation_mobile', 'Book Premium Service')}
               >
                 <span className="luxury-text">Book Premium Service</span>
               </a>

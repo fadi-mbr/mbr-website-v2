@@ -33,9 +33,9 @@ export default async function AppleIcon() {
             fontWeight: 'bold',
             fontFamily: 'monospace',
             letterSpacing: '2px',
-          }}
-        >
-          MBR
+        }}
+      >
+        MBR
         </div>
       </div>
     ),

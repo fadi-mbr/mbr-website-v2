@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
+import { trackWhatsAppClick, trackServiceClick } from '@/lib/analytics';
 
 const services = [
   {
@@ -119,6 +120,10 @@ export default function ServicesSection() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="liquid-glass-btn liquid-glass-btn-primary flex-1"
+                      onClick={() => {
+                        trackWhatsAppClick('services_section', 'Book Service', service.title);
+                        trackServiceClick(service.title, service.title, 'whatsapp');
+                      }}
                     >
                       Book Service
                     </a>

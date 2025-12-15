@@ -10,6 +10,7 @@ import {
   FaInstagram,
   FaFacebook
 } from 'react-icons/fa';
+import { trackWhatsAppClick, trackPhoneCall, trackMapClick, trackSocialMediaClick } from '@/lib/analytics';
 
 const contactInfo = [
   {
@@ -149,6 +150,15 @@ export default function ContactSection() {
                   target={info.action.startsWith('http') ? '_blank' : undefined}
                   rel={info.action.startsWith('http') ? 'noopener noreferrer' : undefined}
                   className="block h-full"
+                  onClick={() => {
+                    if (info.action?.includes('wa.me')) {
+                      trackWhatsAppClick('contact_section', info.title);
+                    } else if (info.action?.startsWith('tel:')) {
+                      trackPhoneCall('contact_section', info.action.replace('tel:', ''));
+                    } else if (info.action?.includes('maps')) {
+                      trackMapClick('contact_section');
+                    }
+                  }}
                 >
                   <div className="glass-card glass-shimmer p-6 h-full text-center group hover:bg-surface hover:glow-red transition-all duration-300">
                     <info.icon className={`w-8 h-8 mx-auto mb-4 ${info.color} group-hover:scale-110 transition-transform`} />
@@ -232,6 +242,7 @@ export default function ContactSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block mt-2 text-primary hover:text-red-400 transition-colors"
+                    onClick={() => trackMapClick('contact_section_map_embed')}
                   >
                     View on Google Maps
                   </a>
@@ -263,6 +274,7 @@ export default function ContactSection() {
                 <a
                   href="tel:+971565015800"
                   className="text-primary hover:text-red-400 transition-colors"
+                  onClick={() => trackPhoneCall('contact_section_emergency', '+971565015800')}
                 >
                   Call +971 56 501 5800
                 </a>
@@ -285,6 +297,7 @@ export default function ContactSection() {
               target="_blank"
               rel="noopener noreferrer"
               className="liquid-glass-btn liquid-glass-btn-primary flex items-center space-x-2"
+              onClick={() => trackWhatsAppClick('contact_section_cta', 'WhatsApp Now')}
             >
               <FaWhatsapp className="w-5 h-5" />
               <span>WhatsApp Now</span>
@@ -292,6 +305,7 @@ export default function ContactSection() {
             <a
               href="tel:8006272886"
               className="liquid-glass-btn liquid-glass-btn-secondary flex items-center space-x-2"
+              onClick={() => trackPhoneCall('contact_section_cta', '8006272886')}
             >
               <FaPhone className="w-4 h-4" />
               <span>Call 800-MBRAuto</span>
@@ -313,6 +327,7 @@ export default function ContactSection() {
               rel="noopener noreferrer"
               className="group flex items-center justify-center w-12 h-12 rounded-full glass-card hover:bg-white/10 transition-all duration-300 hover:scale-110"
               aria-label="Follow us on Instagram"
+              onClick={() => trackSocialMediaClick('instagram', 'contact_section')}
             >
               <FaInstagram className="w-5 h-5 text-pink-500 group-hover:text-pink-400 transition-colors" />
             </a>
@@ -322,6 +337,7 @@ export default function ContactSection() {
               rel="noopener noreferrer"
               className="group flex items-center justify-center w-12 h-12 rounded-full glass-card hover:bg-white/10 transition-all duration-300 hover:scale-110"
               aria-label="Follow us on Facebook"
+              onClick={() => trackSocialMediaClick('facebook', 'contact_section')}
             >
               <FaFacebook className="w-5 h-5 text-blue-500 group-hover:text-blue-400 transition-colors" />
             </a>

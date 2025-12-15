@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { FaAward, FaUsers, FaCog, FaShieldAlt } from 'react-icons/fa';
+import { trackWhatsAppClick } from '@/lib/analytics';
 
 const achievements = [
   {
@@ -255,6 +256,7 @@ export default function AboutSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="liquid-glass-btn liquid-glass-btn-primary"
+                onClick={() => trackWhatsAppClick('about_section', 'Get Started')}
               >
                 Get Started
               </a>

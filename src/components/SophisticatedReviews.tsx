@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import { FaStar, FaGoogle, FaQuoteLeft } from 'react-icons/fa';
+import { trackWhatsAppClick } from '@/lib/analytics';
 
 interface Review {
   author_name: string;
@@ -306,6 +307,7 @@ export default function SophisticatedReviews() {
               target="_blank"
               rel="noopener noreferrer"
               className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-large"
+              onClick={() => trackWhatsAppClick('reviews_section', 'Book Service')}
             >
               Join Our Happy Customers
             </a>

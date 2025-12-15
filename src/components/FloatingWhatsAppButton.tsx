@@ -3,9 +3,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaWhatsapp } from 'react-icons/fa';
+import { trackWhatsAppClick } from '@/lib/analytics';
 
 export default function FloatingWhatsAppButton() {
   const whatsappUrl = "https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service";
+
+  const handleClick = () => {
+    trackWhatsAppClick('floating_button', 'Chat with us on WhatsApp');
+  };
 
   return (
     <motion.a
@@ -23,6 +28,7 @@ export default function FloatingWhatsAppButton() {
       }}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
+      onClick={handleClick}
       aria-label="Chat with us on WhatsApp"
     >
       {/* Main Button */}

@@ -5,6 +5,7 @@ import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import { FaInstagram, FaLinkedin, FaAward, FaUsers, FaHandshake } from 'react-icons/fa';
 import { type TeamMember } from '@/lib/team-data';
+import { trackWhatsAppClick } from '@/lib/analytics';
 
 interface TeamSectionProps {
   teamMembers: TeamMember[];
@@ -221,6 +222,7 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large"
+                onClick={() => trackWhatsAppClick('team_section', 'Meet Our Team')}
               >
                 Meet Our Team
               </a>

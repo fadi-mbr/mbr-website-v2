@@ -12,6 +12,7 @@ import {
   FaMapMarkerAlt,
   FaAward
 } from 'react-icons/fa';
+import { trackWhatsAppClick, trackPhoneCall, trackMapClick } from '@/lib/analytics';
 
 interface LuxuryHeroProps {
   googleReviews?: {
@@ -233,6 +234,7 @@ export default function LuxuryHero({
               <a
                 href="tel:8006272886"
                 className="flex items-center space-x-3 group transition-all duration-300 hover:text-gold"
+                onClick={() => trackPhoneCall('hero_luxury', '8006272886')}
               >
                 <FaPhone className="text-gold text-sm" />
                 <div>
@@ -246,6 +248,7 @@ export default function LuxuryHero({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-3 group transition-all duration-300 hover:text-gold"
+                onClick={() => trackMapClick('hero_luxury')}
               >
                 <FaMapMarkerAlt className="text-gold text-sm" />
                 <div>
@@ -269,6 +272,7 @@ export default function LuxuryHero({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center py-3 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                onClick={() => trackWhatsAppClick('hero_luxury', 'Book Service')}
               >
                 Book Service
               </a>

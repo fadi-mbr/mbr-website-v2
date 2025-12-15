@@ -12,6 +12,7 @@ import {
   FaBars,
   FaTimes
 } from 'react-icons/fa';
+import { trackWhatsAppClick, trackNavigation } from '@/lib/analytics';
 
 interface NavigationProps {
   currentSection?: string;
@@ -108,6 +109,7 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
                   <Link
                     href={`#${item.id}`}
                     className="flex items-center space-x-2 relative"
+                    onClick={() => trackNavigation(item.id, 'desktop')}
                   >
                     {/* Icon with Gauge */}
                     <div className="relative">
@@ -165,6 +167,7 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
               className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => trackWhatsAppClick('navigation_desktop', 'Book Service')}
             >
               <span className="hud-text">Book Service</span>
             </motion.a>
@@ -207,7 +210,10 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
                 <Link
                   href={`#${item.id}`}
                   className="nav-item flex items-center space-x-3 block px-3 py-2 text-base font-medium"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false);
+                    trackNavigation(item.id, 'mobile');
+                  }}
                 >
                   <item.icon className="h-5 w-5" />
                   <span>{item.label}</span>
@@ -230,6 +236,7 @@ export default function DashboardNavigation({ currentSection = 'services' }: Nav
                 target="_blank"
                 rel="noopener noreferrer"
                 className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small block w-full text-center"
+                onClick={() => trackWhatsAppClick('navigation_mobile', 'Book Service via WhatsApp')}
               >
                 <span className="hud-text">Book Service via WhatsApp</span>
               </a>

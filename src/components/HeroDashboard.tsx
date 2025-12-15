@@ -13,6 +13,7 @@ import {
   FaPhone,
   FaMapMarkerAlt
 } from 'react-icons/fa';
+import { trackWhatsAppClick, trackPhoneCall, trackMapClick } from '@/lib/analytics';
 
 interface HeroDashboardProps {
   googleReviews?: {
@@ -216,6 +217,7 @@ export default function HeroDashboard({
               className="inline-block bg-gradient-to-r from-red-600 to-red-500 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-lg"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => trackWhatsAppClick('hero_dashboard', 'INITIATE SERVICE REQUEST')}
             >
               INITIATE SERVICE REQUEST
             </motion.a>
@@ -243,7 +245,11 @@ export default function HeroDashboard({
               {/* Phone */}
               <div className="flex items-center justify-center space-x-2">
                 <FaPhone className="text-blue-400" />
-                <a href="tel:8006272886" className="hud-text text-sm hover:text-white transition-colors">
+                <a 
+                  href="tel:8006272886" 
+                  className="hud-text text-sm hover:text-white transition-colors"
+                  onClick={() => trackPhoneCall('hero_dashboard', '8006272886')}
+                >
                   800-MBRAuto
                 </a>
               </div>
@@ -256,6 +262,7 @@ export default function HeroDashboard({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hud-text text-sm hover:text-white transition-colors"
+                  onClick={() => trackMapClick('hero_dashboard')}
                 >
                   AL QUOZ, DUBAI
                 </a>

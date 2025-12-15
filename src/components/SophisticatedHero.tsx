@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { FaVolumeUp, FaVolumeMute, FaPlay, FaPause, FaStar, FaGoogle, FaInstagram, FaFacebook } from 'react-icons/fa';
 import { useGoogleReviews } from './GoogleReviewsHook';
+import { trackWhatsAppClick } from '@/lib/analytics';
 
 interface SophisticatedHeroProps {
   googleReviews?: {
@@ -169,29 +170,29 @@ export default function SophisticatedHero({
           </motion.a>
 
           {/* Google Reviews Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.5, duration: 0.8 }}
-          >
-            <div className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-3xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg max-w-full overflow-hidden">
-              <div className="flex items-center space-x-1 md:space-x-2">
-                <FaGoogle className="text-red-500 text-sm md:text-base" />
-                <FaStar className="text-luxury-gold text-sm md:text-base" />
-                <span className="text-white font-bold text-sm md:text-lg">
-                  {reviewsLoading ? '4.8' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.8)}
-                </span>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.5, duration: 0.8 }}
+        >
+          <div className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-3xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg max-w-full overflow-hidden">
+            <div className="flex items-center space-x-1 md:space-x-2">
+              <FaGoogle className="text-red-500 text-sm md:text-base" />
+              <FaStar className="text-luxury-gold text-sm md:text-base" />
+              <span className="text-white font-bold text-sm md:text-lg">
+                {reviewsLoading ? '4.8' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.8)}
+              </span>
+            </div>
+            <div className="text-left">
+              <div className="text-white font-semibold text-xs md:text-sm">
+                {reviewsLoading ? '883' : (reviewsData?.totalReviews || googleReviews?.totalReviews || 883).toLocaleString()}
               </div>
-              <div className="text-left">
-                <div className="text-white font-semibold text-xs md:text-sm">
-                  {reviewsLoading ? '883' : (reviewsData?.totalReviews || googleReviews?.totalReviews || 883).toLocaleString()}
-                </div>
-                <div className="text-red-400 text-xs font-medium uppercase tracking-wide">
-                  Reviews
-                </div>
+              <div className="text-red-400 text-xs font-medium uppercase tracking-wide">
+                Reviews
               </div>
             </div>
-          </motion.div>
+          </div>
+        </motion.div>
         </div>
       </section>
 
@@ -233,6 +234,7 @@ export default function SophisticatedHero({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large"
+                onClick={() => trackWhatsAppClick('hero_sophisticated', 'Book Premium Service')}
               >
                 Book Premium Service
               </a>

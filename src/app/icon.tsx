@@ -28,13 +28,13 @@ export default async function Icon() {
         <div
           style={{
             fontSize: 20,
-            color: '#E30613',
-            fontWeight: 'bold',
+          color: '#E30613',
+          fontWeight: 'bold',
             fontFamily: 'monospace',
             letterSpacing: '1px',
-          }}
-        >
-          MBR
+        }}
+      >
+        MBR
         </div>
       </div>
     ),

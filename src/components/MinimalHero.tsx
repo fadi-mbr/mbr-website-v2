@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { trackWhatsAppClick } from '@/lib/analytics';
 
 interface MinimalHeroProps {
   googleReviews?: {
@@ -106,6 +107,7 @@ export default function MinimalHero({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="liquid-glass-btn liquid-glass-btn-primary"
+                onClick={() => trackWhatsAppClick('hero_minimal', 'Book Service')}
               >
                 Book Service
               </a>

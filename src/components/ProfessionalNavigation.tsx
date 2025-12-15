@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { trackWhatsAppClick, trackNavigation } from '@/lib/analytics';
 
 interface NavigationProps {
   currentSection?: string;
@@ -73,16 +74,16 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
             transition={{ duration: 0.2 }}
           >
             <Link href="/" className="flex-shrink-0 relative group">
-              <Image
-                src="/images/Logo_horizontal.svg"
-                alt="MBR Auto Services"
-                width={140}
-                height={45}
+            <Image
+              src="/images/Logo_horizontal.svg"
+              alt="MBR Auto Services"
+              width={140}
+              height={45}
                 className="h-8 w-auto opacity-95 transition-all duration-300 group-hover:opacity-100 group-hover:brightness-110"
-                priority
-              />
+              priority
+            />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
-            </Link>
+          </Link>
           </motion.div>
 
           {/* Desktop Navigation */}
@@ -95,9 +96,10 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                 transition={{ delay: index * 0.1 + 0.3, duration: 0.4 }}
               >
                 <Link
-                  href={`#${item.id}`}
+                href={`#${item.id}`}
                   className={`nav-link-enhanced ${activeSection === item.id ? 'nav-link-active' : ''}`}
-                >
+                  onClick={() => trackNavigation(item.id, 'desktop')}
+              >
                   <span className="nav-link-text">{item.label}</span>
                   <motion.div
                     className="nav-link-underline"
@@ -108,7 +110,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                     }}
                     transition={{ duration: 0.3 }}
                   />
-                </Link>
+              </Link>
               </motion.div>
             ))}
           </div>
@@ -125,6 +127,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
               target="_blank"
               rel="noopener noreferrer"
               className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small"
+              onClick={() => trackWhatsAppClick('navigation_desktop', 'Book Service')}
             >
               Book Service
             </a>
@@ -140,28 +143,28 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
             <div className="relative w-6 h-6">
               <motion.svg
                 className="w-6 h-6 absolute inset-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
                 initial={false}
                 animate={isOpen ? { rotate: 90 } : { rotate: 0 }}
                 transition={{ duration: 0.3 }}
-              >
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
+            >
+              {isOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
               </motion.svg>
             </div>
           </motion.button>
@@ -169,14 +172,14 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
 
         {/* Mobile Navigation */}
         <AnimatePresence>
-          {isOpen && (
-            <motion.div
+        {isOpen && (
+          <motion.div
               className="md:hidden py-6 border-t border-white/20 backdrop-blur-xl bg-black/50"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-            >
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+          >
               <div className="space-y-2">
                 {navigationItems.map((item, index) => (
                   <motion.div
@@ -186,15 +189,18 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ delay: index * 0.1, duration: 0.2 }}
                   >
-                    <Link
-                      href={`#${item.id}`}
+                <Link
+                  href={`#${item.id}`}
                       className={`block nav-link-mobile ${activeSection === item.id ? 'nav-link-mobile-active' : ''}`}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.label}
-                    </Link>
+                  onClick={() => {
+                    setIsOpen(false);
+                    trackNavigation(item.id, 'mobile');
+                  }}
+                >
+                  {item.label}
+                </Link>
                   </motion.div>
-                ))}
+              ))}
 
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -202,19 +208,22 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                   transition={{ delay: 0.3, duration: 0.2 }}
                   className="pt-4"
                 >
-                  <a
-                    href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
-                    target="_blank"
-                    rel="noopener noreferrer"
+              <a
+                href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
+                target="_blank"
+                rel="noopener noreferrer"
                     className="block liquid-glass-btn liquid-glass-btn-primary text-center"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Book Service
-                  </a>
+                onClick={() => {
+                  setIsOpen(false);
+                  trackWhatsAppClick('navigation_mobile', 'Book Service');
+                }}
+              >
+                Book Service
+              </a>
                 </motion.div>
-              </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+        )}
         </AnimatePresence>
       </div>
     </motion.nav>

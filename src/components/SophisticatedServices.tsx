@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import { FaArrowRight, FaWhatsapp, FaCogs, FaBolt, FaWrench, FaOilCan } from 'react-icons/fa';
+import { trackWhatsAppClick, trackServiceClick } from '@/lib/analytics';
 
 const services = [
   {
@@ -143,6 +144,10 @@ export default function SophisticatedServices() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center hover:bg-green-500 transition-colors duration-300"
+                      onClick={() => {
+                        trackWhatsAppClick('services_sophisticated_quick', '', service.title);
+                        trackServiceClick(service.title, service.title, 'whatsapp_quick');
+                      }}
                     >
                       <FaWhatsapp className="w-6 h-6 text-white" />
                     </a>
@@ -181,6 +186,10 @@ export default function SophisticatedServices() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 liquid-glass-btn liquid-glass-btn-primary"
+                      onClick={() => {
+                        trackWhatsAppClick('services_sophisticated', 'Book Service', service.title);
+                        trackServiceClick(service.title, service.title, 'whatsapp');
+                      }}
                     >
                       Book Service
                     </a>
