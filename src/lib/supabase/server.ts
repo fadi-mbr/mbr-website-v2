@@ -40,7 +40,19 @@ export function createAdminClient() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
   if (!serviceRoleKey) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set. Required for admin operations.');
+    // Provide helpful debugging info
+    const envKeys = Object.keys(process.env).filter(k => k.includes('SUPABASE'));
+    console.error('SUPABASE_SERVICE_ROLE_KEY is not set. Available Supabase env vars:', envKeys);
+    console.error('Make sure you have:');
+    console.error('1. Added SUPABASE_SERVICE_ROLE_KEY to .env.local');
+    console.error('2. Restarted your dev server (Ctrl+C then npm run dev)');
+    console.error('3. The variable name is exactly: SUPABASE_SERVICE_ROLE_KEY (no typos)');
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set. Required for admin operations. Please add it to your .env.local file and restart the dev server.');
+  }
+  
+  // Log that we successfully loaded it (without exposing the key)
+  if (serviceRoleKey && serviceRoleKey.length > 0) {
+    console.log('✓ SUPABASE_SERVICE_ROLE_KEY loaded successfully');
   }
 
   return createSupabaseClient(
