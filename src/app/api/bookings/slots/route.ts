@@ -28,8 +28,9 @@ export async function GET(request: Request) {
     
   } catch (error) {
     console.error('Slot generation error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate available slots';
     return NextResponse.json(
-      { error: 'Failed to generate available slots' },
+      { error: errorMessage, details: error instanceof Error ? error.stack : undefined },
       { status: 500 }
     );
   }

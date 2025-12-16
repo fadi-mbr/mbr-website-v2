@@ -17,6 +17,16 @@ export async function generateAvailableSlots(
   const maxFutureDays = settings.max_future_days;
   const workingHours = settings.working_hours;
   
+  // Debug logging
+  console.log('Slot generation settings:', {
+    timezone,
+    slotDuration,
+    leadTimeHours,
+    maxFutureDays,
+    workingHoursKeys: Object.keys(workingHours),
+    workingHours,
+  });
+  
   // Get service-specific capacity if provided
   const serviceTypes = settings.service_types;
   const serviceType = serviceTypeId 
@@ -62,12 +72,23 @@ export async function generateAvailableSlots(
   let current = DateTime.fromJSDate(startDate).setZone(timezone);
   const end = DateTime.fromJSDate(endDate).setZone(timezone);
   
+  console.log('Generating slots from', current.toISO(), 'to', end.toISO());
+  console.log('Lead time cutoff:', leadTimeCutoff.toISO());
+  console.log('Max future date:', maxFutureDate.toISO());
+  
   while (current < end) {
     const dayOfWeek = current.toFormat('EEEE').toLowerCase();
     const dayHours = workingHours[dayOfWeek];
     
     // Skip if day is disabled
     if (!dayHours?.enabled) {
+      console.log(`Skipping ${dayOfWeek} - disabled`);
+      current = current.plus({ days: 1 }).startOf('day');
+      continue;
+    }
+    
+    if (!dayHours) {
+      console.log(`Skipping ${dayOfWeek} - no working hours configured`);
       current = current.plus({ days: 1 }).startOf('day');
       continue;
     }
@@ -98,6 +119,7 @@ export async function generateAvailableSlots(
       
       // Skip if beyond max future date
       if (slotStart > maxFutureDate) {
+        console.log(`Stopping slot generation - reached max future date: ${slotStart.toISO()}`);
         break;
       }
       
@@ -137,6 +159,7 @@ export async function generateAvailableSlots(
     current = current.plus({ days: 1 }).startOf('day');
   }
   
+  console.log(`Generated ${slots.length} available slots`);
   return slots;
 }
 
