@@ -24,8 +24,14 @@ export default function BookingWizard() {
     fetch('/api/bookings/services')
       .then(res => res.json())
       .then(data => {
+        console.log('Service types response:', data);
         if (data.success) {
-          setServiceTypes(data.service_types);
+          setServiceTypes(data.service_types || []);
+          if (!data.service_types || data.service_types.length === 0) {
+            setError('No services available. Please configure services in the admin panel.');
+          }
+        } else {
+          setError(data.error || 'Failed to load services');
         }
       })
       .catch(err => {
@@ -35,8 +41,11 @@ export default function BookingWizard() {
   }, []);
 
   const handleServiceSelect = (service: ServiceType) => {
+    console.log('BookingWizard - handleServiceSelect called with:', service);
     setSelectedService(service);
+    console.log('BookingWizard - Setting currentStep to 2');
     setCurrentStep(2);
+    console.log('BookingWizard - State updated');
   };
 
   const handleSlotSelect = (slot: { start: string; end: string }) => {

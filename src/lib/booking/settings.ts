@@ -34,7 +34,21 @@ export async function getSettings(): Promise<Settings> {
     email_include_google_calendar_link: Boolean(settingsMap.get('email_include_google_calendar_link') ?? true),
     email_include_google_maps_link: Boolean(settingsMap.get('email_include_google_maps_link') ?? true),
     working_hours: settingsMap.get('working_hours') as Record<string, { open: string; close: string; enabled: boolean }> || {},
-    service_types: (settingsMap.get('service_types') as ServiceType[]) || [],
+    service_types: (() => {
+      const st = settingsMap.get('service_types');
+      if (Array.isArray(st)) {
+        return st as ServiceType[];
+      }
+      // If it's a string (JSON), parse it
+      if (typeof st === 'string') {
+        try {
+          return JSON.parse(st) as ServiceType[];
+        } catch {
+          return [];
+        }
+      }
+      return [];
+    })(),
   };
 }
 
