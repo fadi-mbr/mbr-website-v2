@@ -85,34 +85,90 @@ export async function createCalendarEvent(booking: Booking): Promise<{
   // Use admin client to read settings (bypasses RLS)
   const settings = await getSettings(true);
   
-  if (!settings.google_calendar_id) {
-    console.warn('Google Calendar ID not configured - skipping calendar event creation');
-    return null;
-  }
-  
   try {
     const calendar = await getCalendarClient();
   
-  const start = DateTime.fromISO(booking.slot_start).setZone(settings.timezone);
-  const end = DateTime.fromISO(booking.slot_end).setZone(settings.timezone);
+    const start = DateTime.fromISO(booking.slot_start).setZone(settings.timezone);
+    const end = DateTime.fromISO(booking.slot_end).setZone(settings.timezone);
+    
+    // Determine which calendar to use
+    // If google_calendar_id is set and accessible, use it
+    // Otherwise, use the service account's primary calendar
+    let targetCalendarId = settings.google_calendar_id;
+    let useInviteOnly = false;
+    
+    // If no calendar ID configured, use service account's primary calendar
+    if (!targetCalendarId || targetCalendarId.trim() === '') {
+      // Get service account email from credentials
+      const credentialsStr = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS;
+      if (credentialsStr) {
+        try {
+          const credentials = JSON.parse(credentialsStr);
+          targetCalendarId = credentials.client_email; // Use service account's primary calendar
+          useInviteOnly = true;
+          console.log('No calendar ID configured, using service account primary calendar:', targetCalendarId);
+        } catch {
+          // Fallback to 'primary' if we can't parse credentials
+          targetCalendarId = 'primary';
+          useInviteOnly = true;
+        }
+      } else {
+        targetCalendarId = 'primary';
+        useInviteOnly = true;
+      }
+    }
   
-  const event = {
-    summary: `MBR Booking – ${booking.service_type}`,
-    description: `Booking ID: ${booking.id}\nCustomer: ${booking.customer_name}\nPhone: ${booking.customer_phone}\nEmail: ${booking.customer_email}${booking.customer_notes ? `\nNotes: ${booking.customer_notes}` : ''}`,
-    start: {
-      dateTime: start.toISO(),
-      timeZone: settings.timezone,
-    },
-    end: {
-      dateTime: end.toISO(),
-      timeZone: settings.timezone,
-    },
-    location: settings.business_address,
-    status: 'confirmed',
-  };
+    const event: {
+      summary: string;
+      description: string;
+      start: { dateTime: string; timeZone: string };
+      end: { dateTime: string; timeZone: string };
+      location: string;
+      status: string;
+      attendees?: Array<{ email: string; responseStatus?: string }>;
+    } = {
+      summary: `MBR Booking – ${booking.service_type}`,
+      description: `Booking ID: ${booking.id}\nCustomer: ${booking.customer_name}\nPhone: ${booking.customer_phone}\nEmail: ${booking.customer_email}${booking.customer_notes ? `\nNotes: ${booking.customer_notes}` : ''}`,
+      start: {
+        dateTime: start.toISO(),
+        timeZone: settings.timezone,
+      },
+      end: {
+        dateTime: end.toISO(),
+        timeZone: settings.timezone,
+      },
+      location: settings.business_address,
+      status: 'confirmed',
+    };
   
-    // Check for conflicts if enabled
-    if (settings.google_calendar_conflict_check) {
+    // Always add business email and customer email as attendees
+    // This ensures both receive calendar invites
+    const attendees: Array<{ email: string; responseStatus?: string }> = [
+      {
+        email: 'info@mbrme.com',
+        responseStatus: 'accepted',
+      },
+      {
+        email: booking.customer_email,
+      },
+    ];
+    
+    // If using a shared calendar, also add it as attendee
+    if (settings.google_calendar_id && !useInviteOnly) {
+      const calendarEmail = await getCalendarEmail(calendar, settings.google_calendar_id);
+      if (calendarEmail && !attendees.some(a => a.email === calendarEmail)) {
+        attendees.push({
+          email: calendarEmail,
+          responseStatus: 'accepted',
+        });
+      }
+    }
+    
+    event.attendees = attendees;
+    console.log('Creating calendar event with attendees:', attendees.map(a => a.email).join(', '));
+  
+    // Check for conflicts if enabled and we have a calendar ID
+    if (settings.google_calendar_conflict_check && settings.google_calendar_id && !useInviteOnly) {
       try {
         const freebusy = await calendar.freebusy.query({
           requestBody: {
@@ -133,24 +189,11 @@ export async function createCalendarEvent(booking: Booking): Promise<{
       }
     }
   
-    // Try to add calendar email as attendee (for restricted calendars)
-    // This sends an invite which might work even without direct write access
-    const calendarEmail = await getCalendarEmail(calendar, settings.google_calendar_id);
-    if (calendarEmail) {
-      event.attendees = [
-        {
-          email: calendarEmail,
-          responseStatus: 'accepted',
-        },
-      ];
-      console.log('Adding calendar email as attendee to send invite:', calendarEmail);
-    }
-  
-    // Try to create event - if direct write fails, we'll fall back to ICS file
+    // Create event in target calendar and send invites to all attendees
     const response = await calendar.events.insert({
-      calendarId: settings.google_calendar_id,
+      calendarId: targetCalendarId,
       requestBody: event,
-      sendUpdates: calendarEmail ? 'all' : 'none', // Send invites if calendar email found
+      sendUpdates: 'all', // Send calendar invites to all attendees
     });
     
     if (!response.data.id || !response.data.htmlLink) {
