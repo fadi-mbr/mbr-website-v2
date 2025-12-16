@@ -1,22 +1,22 @@
-import { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
+import NextAuth from 'next-auth';
+import Google from 'next-auth/providers/google';
 
-export const authOptions: NextAuthOptions = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       // Only allow @mbrme.com emails
       if (user.email && user.email.endsWith('@mbrme.com')) {
         return true;
       }
       return false;
     },
-    async session({ session, token }) {
+    async session({ session }) {
       return session;
     },
   },
@@ -24,5 +24,5 @@ export const authOptions: NextAuthOptions = {
     signIn: '/admin',
   },
   secret: process.env.NEXTAUTH_SECRET,
-};
+});
 

@@ -3,6 +3,7 @@ import { DateTime } from 'luxon';
 import { getSettings } from './settings';
 import type { Booking } from './types';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let calendarClient: any = null;
 
 async function getCalendarClient() {
@@ -85,9 +86,10 @@ export async function createCalendarEvent(booking: Booking): Promise<{
         if (busy.length > 0) {
           throw new Error('Time slot conflicts with existing calendar event');
         }
-      } catch (conflictError: any) {
+      } catch (conflictError: unknown) {
         // If conflict check fails, log but don't block booking
-        console.warn('Conflict check failed, proceeding with booking:', conflictError.message);
+        const errorMessage = conflictError instanceof Error ? conflictError.message : String(conflictError);
+        console.warn('Conflict check failed, proceeding with booking:', errorMessage);
       }
     }
   
@@ -104,17 +106,19 @@ export async function createCalendarEvent(booking: Booking): Promise<{
       eventId: response.data.id,
       htmlLink: response.data.htmlLink,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Log error but don't fail the booking
-    console.error('Failed to create Google Calendar event:', error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Failed to create Google Calendar event:', errorMessage);
     
     // Provide helpful error message for common issues
-    if (error.message?.includes('not found') || error.code === 404) {
+    const errorCode = (error as { code?: number })?.code;
+    if (errorMessage.includes('not found') || errorCode === 404) {
       console.error('Calendar not found. Make sure:');
       console.error('1. The calendar ID is correct in settings');
       console.error('2. The service account has been shared with the calendar');
       console.error('3. The service account email is: website-booking-system@gen-lang-client-0151249415.iam.gserviceaccount.com');
-    } else if (error.message?.includes('permission') || error.code === 403) {
+    } else if (errorMessage.includes('permission') || errorCode === 403) {
       console.error('Permission denied. Make sure the service account has "Make changes to events" permission on the calendar.');
     }
     
@@ -129,6 +133,10 @@ export async function deleteCalendarEvent(eventId: string): Promise<void> {
   
   if (!settings.google_calendar_id) {
     throw new Error('Google Calendar ID not configured');
+  }
+  
+  if (!calendar) {
+    throw new Error('Calendar client not initialized');
   }
   
   await calendar.events.delete({

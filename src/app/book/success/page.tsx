@@ -1,11 +1,11 @@
 "use client";
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-export default function BookingSuccessPage() {
+function BookingSuccessContent() {
   const searchParams = useSearchParams();
   const bookingId = searchParams.get('bookingId');
 
@@ -22,7 +22,7 @@ export default function BookingSuccessPage() {
             Booking Request Submitted!
           </h1>
           <p className="text-body-enhanced mb-8">
-            We've sent a confirmation email to your inbox. Please check your email and click the confirmation link to complete your booking.
+            We&apos;ve sent a confirmation email to your inbox. Please check your email and click the confirmation link to complete your booking.
           </p>
           
           {bookingId && (
@@ -54,6 +54,18 @@ export default function BookingSuccessPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function BookingSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <BookingSuccessContent />
+    </Suspense>
   );
 }
 

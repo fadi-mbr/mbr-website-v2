@@ -116,7 +116,7 @@ ${settings.business_address}
   });
 }
 
-export function generateICSFile(booking: Booking, settings: any): string {
+export function generateICSFile(booking: Booking, settings: { timezone: string; business_address: string }): string {
   const start = DateTime.fromISO(booking.slot_start).setZone(settings.timezone);
   const end = DateTime.fromISO(booking.slot_end).setZone(settings.timezone);
   
@@ -201,7 +201,11 @@ export async function sendConfirmedEmail(
     </html>
   `;
   
-  const attachments: nodemailer.Attachment[] = [];
+  const attachments: Array<{
+    filename: string;
+    content: string;
+    contentType: string;
+  }> = [];
   
   if (settings.email_include_ics) {
     const icsContent = generateICSFile(booking, settings);
