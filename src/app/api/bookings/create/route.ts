@@ -226,14 +226,27 @@ export async function POST(request: Request) {
     }
     
     // Create confirmation token
-    const confirmationToken = await createConfirmationToken(booking.id);
+    let confirmationToken;
+    try {
+      confirmationToken = await createConfirmationToken(booking.id);
+      console.log('Confirmation token created successfully');
+    } catch (tokenError) {
+      console.error('Failed to create confirmation token:', tokenError);
+      // Don't fail the booking if token creation fails - log it and continue
+      // The booking is still created, but confirmation won't work
+    }
     
     // Send confirmation email
-    try {
-      await sendConfirmationEmail(booking, confirmationToken);
-    } catch (emailError) {
-      console.error('Email sending error:', emailError);
-      // Don't fail the booking if email fails - log it
+    if (confirmationToken) {
+      try {
+        await sendConfirmationEmail(booking, confirmationToken);
+        console.log('Confirmation email sent successfully');
+      } catch (emailError) {
+        console.error('Email sending error:', emailError);
+        // Don't fail the booking if email fails - log it
+      }
+    } else {
+      console.warn('Skipping email send - no confirmation token');
     }
     
     return NextResponse.json({
