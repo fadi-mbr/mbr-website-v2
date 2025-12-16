@@ -120,7 +120,7 @@ export default function SophisticatedServices() {
                 <div className="relative h-64 overflow-hidden">
                   <Image
                     src={service.image}
-                    alt={service.title}
+                    alt={`${service.title} - ${service.subtitle} | Premium Car Service Dubai, UAE | MBR Auto Services`}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -216,7 +216,7 @@ export default function SophisticatedServices() {
           <div className="inline-flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8 glass-card-premium p-6 md:p-8">
             <Image
               src="/images/Bosch_Logo24.webp"
-              alt="Bosch Authorized Service"
+              alt="Bosch Authorized Service Partner - Certified Premium Car Service Dubai, UAE | MBR Auto Services"
               width={120}
               height={60}
               className="opacity-80"

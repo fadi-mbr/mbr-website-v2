@@ -4,12 +4,16 @@
  * This utility provides a centralized way to track user interactions
  * across the website using Google Analytics 4 (GA4).
  * 
+ * GDPR Compliant: Only tracks events if user has given analytics consent.
+ * 
  * Best Practices:
  * - Use lowercase with underscores for event names
  * - Include relevant parameters for better insights
  * - Track meaningful user interactions
  * - Avoid over-tracking to prevent data overload
  */
+
+import { hasAnalyticsConsent } from './cookie-consent';
 
 // Check if gtag is available (Google Analytics loaded)
 declare global {
@@ -25,6 +29,8 @@ declare global {
 /**
  * Track a custom event in Google Analytics 4
  * 
+ * GDPR Compliant: Only tracks if user has given analytics consent.
+ * 
  * @param eventName - Event name (lowercase with underscores, e.g., 'whatsapp_click')
  * @param parameters - Event parameters (optional)
  */
@@ -32,6 +38,15 @@ export function trackEvent(
   eventName: string,
   parameters?: Record<string, string | number | boolean>
 ): void {
+  // Check GDPR consent first
+  if (typeof window !== 'undefined' && !hasAnalyticsConsent()) {
+    // User has not consented to analytics, don't track
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 GA4 Event blocked (no consent):', eventName);
+    }
+    return;
+  }
+
   // Only track if gtag is available and we're not in development mode
   if (typeof window !== 'undefined' && window.gtag) {
     try {

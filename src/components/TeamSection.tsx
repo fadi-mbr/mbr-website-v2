@@ -149,7 +149,7 @@ export default function TeamSection({ teamMembers }: TeamSectionProps) {
                   <div className="relative aspect-square overflow-hidden">
                     <Image
                       src={member.image}
-                      alt={member.name}
+                      alt={`${member.name} - ${member.position} at MBR Auto Services Dubai, UAE | Premium Car Repair Expert`}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"

@@ -76,7 +76,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
             <Link href="/" className="flex-shrink-0 relative group">
             <Image
               src="/images/Logo_horizontal.svg"
-              alt="MBR Auto Services"
+              alt="MBR Making Better Rides - Premium Car Repair Dubai, Luxury Auto Service UAE"
               width={140}
               height={45}
                 className="h-8 w-auto opacity-95 transition-all duration-300 group-hover:opacity-100 group-hover:brightness-110"

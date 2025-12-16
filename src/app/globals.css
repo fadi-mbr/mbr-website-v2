@@ -1081,3 +1081,42 @@ body {
     box-shadow: 0 0 30px rgba(227, 6, 19, 0.7), 0 0 60px rgba(227, 6, 19, 0.5), 0 0 90px rgba(227, 6, 19, 0.3);
   }
 }
+
+/* Screen Reader Only - Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Premium Brands Carousel Animation */
+@keyframes brand-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.brand-carousel-scroll {
+  animation: brand-scroll 60s linear infinite;
+  display: flex;
+  width: fit-content;
+}
+
+.brand-carousel-scroll:hover {
+  animation-play-state: paused;
+}
+
+@media (max-width: 768px) {
+  .brand-carousel-scroll {
+    animation-duration: 40s;
+  }
+}

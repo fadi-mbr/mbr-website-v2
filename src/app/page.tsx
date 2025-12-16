@@ -4,6 +4,7 @@ import React from 'react';
 import ProfessionalNavigation from '@/components/ProfessionalNavigation';
 import SophisticatedHero from '@/components/SophisticatedHero';
 import SophisticatedServices from '@/components/SophisticatedServices';
+import PremiumBrandsCarousel from '@/components/PremiumBrandsCarousel';
 import SophisticatedReviews from '@/components/SophisticatedReviews';
 import AboutSection from '@/components/AboutSection';
 import SophisticatedTeam from '@/components/SophisticatedTeam';
@@ -15,6 +16,7 @@ export default function HomePage() {
       <ProfessionalNavigation />
       <SophisticatedHero />
       <SophisticatedServices />
+      <PremiumBrandsCarousel />
       <SophisticatedReviews />
       <AboutSection />
       <SophisticatedTeam />

@@ -1,0 +1,16 @@
+# robots.txt for MBR Auto Services
+
+User-agent: *
+Allow: /
+
+# Disallow API routes and internal paths
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://mbrme.com/sitemap.xml
+
+# Crawl-delay (optional, adjust if needed)
+# Crawl-delay: 1
+

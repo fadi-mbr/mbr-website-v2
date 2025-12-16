@@ -101,7 +101,7 @@ export default function SophisticatedHero({
         >
           <Image
             src="/images/Logo_horizontal.svg"
-            alt="MBR Auto Services"
+            alt="MBR Making Better Rides - Premium Car Repair Dubai, Luxury Auto Service UAE"
             width={140}
             height={32}
             className="h-8 w-auto opacity-60"
@@ -211,7 +211,7 @@ export default function SophisticatedHero({
             <div className="mb-8 flex justify-center">
               <Image
                 src="/images/Logo_horizontal.svg"
-                alt="MBR Auto Services"
+                alt="MBR Making Better Rides - Premium Car Repair Dubai, Luxury Auto Service UAE"
                 width={400}
                 height={150}
                 className="w-auto h-24 md:h-32 lg:h-40 object-contain filter brightness-100"
@@ -320,7 +320,7 @@ export default function SophisticatedHero({
             <div className="inline-flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 glass-card-premium p-6 md:p-8">
               <Image
                 src="/images/Bosch_Logo24.webp"
-                alt="Bosch Authorized Service"
+                alt="Bosch Authorized Service Partner - Certified Premium Car Service Dubai, UAE | MBR Auto Services"
                 width={120}
                 height={64}
                 className="h-12 md:h-16 w-auto opacity-80"

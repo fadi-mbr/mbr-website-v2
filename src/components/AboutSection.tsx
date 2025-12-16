@@ -131,7 +131,7 @@ export default function AboutSection() {
             <div className="relative h-96 overflow-hidden rounded-3xl">
               <Image
                 src="/images/mbr_mechanic.webp"
-                alt="MBR Auto Services Workshop"
+                alt="MBR Auto Services Workshop - State-of-the-Art Premium Car Repair Facility in Al Quoz, Dubai, UAE"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -215,7 +215,7 @@ export default function AboutSection() {
                 <div className="relative w-20 h-20 flex-shrink-0">
                   <Image
                     src={cert.image}
-                    alt={cert.title}
+                    alt={`${cert.title} - Certified Premium Car Service Dubai, UAE | MBR Auto Services`}
                     fill
                     className="object-contain opacity-80"
                     sizes="80px"

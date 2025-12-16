@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { GoogleAnalytics } from '@next/third-parties/google';
+import Script from 'next/script';
 import FloatingWhatsAppButton from "@/components/FloatingWhatsAppButton";
+import CookieConsentBanner from "@/components/CookieConsentBanner";
+import ConditionalGoogleAnalytics from "@/components/ConditionalGoogleAnalytics";
+import { autoRepairSchema, organizationSchema, aggregateRatingSchema } from '@/lib/structured-data';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,11 +18,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MBR Making Better Rides",
-  description: "Professional automotive services in Dubai. 15+ years experience, Bosch authorized service, expert technicians. Mechanical repairs, electrical diagnostics, suspension & maintenance.",
-  keywords: "car service Dubai, automotive repair, Bosch service center, car maintenance Dubai, auto repair Al Quoz, vehicle diagnostics",
+  title: "Premium Car Repair Dubai | Luxury Auto Service UAE | MBR Auto Services",
+  description: "Expert luxury car repair & premium auto service in Dubai, UAE. 15+ years experience servicing Mercedes, BMW, Audi, Porsche & all premium brands. Bosch authorized service center in Al Quoz. Expert technicians, genuine parts, warranty coverage.",
+  keywords: "luxury car repair Dubai, premium car service UAE, Mercedes repair Dubai, BMW service Dubai, Audi maintenance Dubai, Porsche service Dubai, Range Rover repair Dubai, Lexus service Dubai, luxury auto service Dubai, premium car maintenance UAE, car service Al Quoz, auto repair Dubai, Bosch service center Dubai, luxury car diagnostics Dubai, premium vehicle repair UAE, Mercedes mechanic Dubai, BMW service center Dubai, Audi repair shop Dubai, Porsche maintenance Dubai, luxury car electrical repair Dubai, premium car suspension service Dubai, expert car mechanic Dubai, certified auto service Dubai, 15 years experience car repair Dubai, best luxury car service Dubai",
   authors: [{ name: "MBR Auto Services" }],
   robots: "index, follow",
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://mbrme.com",
+  },
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
@@ -32,25 +38,25 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
   },
   openGraph: {
-    title: "MBR Making Better Rides - Premium Car Care in Dubai",
-    description: "Professional automotive services with 15+ years experience. Expert technicians, Bosch authorized service center in Al Quoz, Dubai.",
+    title: "Premium Car Repair Dubai | Luxury Auto Service UAE | MBR Auto Services",
+    description: "Expert luxury car repair & premium auto service in Dubai, UAE. 15+ years experience servicing Mercedes, BMW, Audi, Porsche & all premium brands. Bosch authorized service center in Al Quoz.",
     type: "website",
     locale: "en_US",
     siteName: "MBR Making Better Rides",
     images: [
       {
-        url: '/images/Logo_MBRauto_noWhite_small.png',
+        url: 'https://mbrme.com/images/Logo_MBRauto_noWhite_small.png',
         width: 1200,
         height: 630,
-        alt: 'MBR Making Better Rides Logo',
+        alt: 'MBR Making Better Rides - Premium Car Repair Dubai',
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MBR Making Better Rides - Premium Car Care in Dubai",
-    description: "Professional automotive services with 15+ years experience in Dubai.",
-    images: ['/images/Logo_MBRauto_noWhite_small.png'],
+    title: "Premium Car Repair Dubai | Luxury Auto Service UAE | MBR Auto Services",
+    description: "Expert luxury car repair & premium auto service in Dubai, UAE. 15+ years experience servicing Mercedes, BMW, Audi, Porsche & all premium brands.",
+    images: ['https://mbrme.com/images/Logo_MBRauto_noWhite_small.png'],
   },
 };
 
@@ -69,9 +75,35 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Structured Data for SEO */}
+        <Script
+          id="auto-repair-schema"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(autoRepairSchema)
+          }}
+        />
+        <Script
+          id="organization-schema"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema)
+          }}
+        />
+        <Script
+          id="aggregate-rating-schema"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(aggregateRatingSchema)
+          }}
+        />
         {children}
         <FloatingWhatsAppButton />
-        <GoogleAnalytics gaId="G-C3F0YSMRPM" />
+        <CookieConsentBanner />
+        <ConditionalGoogleAnalytics />
       </body>
     </html>
   );
