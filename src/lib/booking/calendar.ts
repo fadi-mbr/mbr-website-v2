@@ -43,7 +43,8 @@ export async function createCalendarEvent(booking: Booking): Promise<{
   eventId: string;
   htmlLink: string;
 } | null> {
-  const settings = await getSettings();
+  // Use admin client to read settings (bypasses RLS)
+  const settings = await getSettings(true);
   
   if (!settings.google_calendar_id) {
     console.warn('Google Calendar ID not configured - skipping calendar event creation');
@@ -128,7 +129,8 @@ export async function createCalendarEvent(booking: Booking): Promise<{
 }
 
 export async function deleteCalendarEvent(eventId: string): Promise<void> {
-  const settings = await getSettings();
+  // Use admin client to read settings (bypasses RLS)
+  const settings = await getSettings(true);
   const calendar = await getCalendarClient();
   
   if (!settings.google_calendar_id) {
