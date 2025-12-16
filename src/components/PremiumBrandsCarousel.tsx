@@ -135,7 +135,7 @@ function BrandLogo({ brand }: { brand: typeof premiumBrands[0] }) {
             alt={`${brand.name} repair and service in Dubai, UAE`}
             width={140}
             height={70}
-            className="object-contain opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+            className="object-contain opacity-90 group-hover:opacity-100 transition-opacity duration-300 brand-logo-halo"
             onError={() => setImageError(true)}
             style={{ 
               maxWidth: 'calc(100% - 32px)', 
