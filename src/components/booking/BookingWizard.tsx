@@ -162,14 +162,35 @@ export default function BookingWizard() {
       if (result.success) {
         // Log email status for debugging
         if (result.emailSent === false) {
-          console.warn('⚠️  Booking created but email was not sent:', result.emailError);
-          // Still redirect to success, but log the issue
+          const emailErrorMsg = result.emailError || 'Unknown error';
+          console.error('❌ Booking created but email was NOT sent!');
+          console.error('Email error:', emailErrorMsg);
+          console.error('Full response:', result);
+          
+          // Show warning to user before redirecting
+          const shouldContinue = confirm(
+            `⚠️ Booking created successfully (ID: ${result.booking.id})\n\n` +
+            `However, the confirmation email could not be sent.\n\n` +
+            `Error: ${emailErrorMsg}\n\n` +
+            `Would you like to continue anyway? You can contact support to confirm your booking.`
+          );
+          
+          if (!shouldContinue) {
+            setLoading(false);
+            return;
+          }
         } else if (result.emailSent === true) {
           console.log('✅ Email sent successfully');
         }
         
-        // Redirect to success page
-        window.location.href = `/book/success?bookingId=${result.booking.id}`;
+        // Redirect to success page with email status
+        const params = new URLSearchParams({
+          bookingId: result.booking.id,
+        });
+        if (result.emailSent === false) {
+          params.append('emailError', result.emailError || 'Email not sent');
+        }
+        window.location.href = `/book/success?${params.toString()}`;
       } else {
         let errorMsg = result.error || 'Failed to create booking. Please try again.';
         // Include error details if available
