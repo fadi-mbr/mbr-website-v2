@@ -86,13 +86,23 @@ export async function getSettings(useAdminClient = false): Promise<Settings> {
     return str;
   };
   
-  // Helper to get working hours
+  // Helper to get working hours with fallback defaults
   const getWorkingHours = (): Record<string, { open: string; close: string; enabled: boolean }> => {
     const value = extractValue(settingsMap.get('working_hours'));
     if (value && typeof value === 'object' && !Array.isArray(value)) {
       return value as Record<string, { open: string; close: string; enabled: boolean }>;
     }
-    return {};
+    // Fallback to default working hours if not configured
+    console.warn('Working hours not found in database, using defaults');
+    return {
+      monday: { open: '08:30', close: '19:30', enabled: true },
+      tuesday: { open: '08:30', close: '19:30', enabled: true },
+      wednesday: { open: '08:30', close: '19:30', enabled: true },
+      thursday: { open: '08:30', close: '19:30', enabled: true },
+      friday: { open: '08:30', close: '19:30', enabled: true },
+      saturday: { open: '08:30', close: '19:30', enabled: true },
+      sunday: { open: '08:30', close: '19:30', enabled: false },
+    };
   };
   
   // Helper to get service types

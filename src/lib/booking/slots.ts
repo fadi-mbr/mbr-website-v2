@@ -17,6 +17,13 @@ export async function generateAvailableSlots(
   const maxFutureDays = settings.max_future_days;
   const workingHours = settings.working_hours;
   
+  // Validate working hours
+  if (!workingHours || Object.keys(workingHours).length === 0) {
+    console.error('ERROR: Working hours are empty or not configured!');
+    console.error('Settings object:', JSON.stringify(settings, null, 2));
+    return [];
+  }
+  
   // Debug logging
   console.log('Slot generation settings:', {
     timezone,
@@ -25,6 +32,9 @@ export async function generateAvailableSlots(
     maxFutureDays,
     workingHoursKeys: Object.keys(workingHours),
     workingHours,
+    enabledDays: Object.entries(workingHours)
+      .filter(([_, hours]) => hours?.enabled)
+      .map(([day]) => day),
   });
   
   // Get service-specific capacity if provided
@@ -76,19 +86,23 @@ export async function generateAvailableSlots(
   console.log('Lead time cutoff:', leadTimeCutoff.toISO());
   console.log('Max future date:', maxFutureDate.toISO());
   
+  let daysProcessed = 0;
+  let slotsGenerated = 0;
+  
   while (current < end) {
+    daysProcessed++;
     const dayOfWeek = current.toFormat('EEEE').toLowerCase();
     const dayHours = workingHours[dayOfWeek];
     
     // Skip if day is disabled
     if (!dayHours?.enabled) {
-      console.log(`Skipping ${dayOfWeek} - disabled`);
+      console.log(`Skipping ${dayOfWeek} (${current.toFormat('yyyy-MM-dd')}) - disabled`);
       current = current.plus({ days: 1 }).startOf('day');
       continue;
     }
     
     if (!dayHours) {
-      console.log(`Skipping ${dayOfWeek} - no working hours configured`);
+      console.log(`Skipping ${dayOfWeek} (${current.toFormat('yyyy-MM-dd')}) - no working hours configured`);
       current = current.plus({ days: 1 }).startOf('day');
       continue;
     }
@@ -97,11 +111,20 @@ export async function generateAvailableSlots(
     const [openHour, openMinute] = dayHours.open.split(':').map(Number);
     const [closeHour, closeMinute] = dayHours.close.split(':').map(Number);
     
+    if (isNaN(openHour) || isNaN(openMinute) || isNaN(closeHour) || isNaN(closeMinute)) {
+      console.error(`Invalid working hours for ${dayOfWeek}:`, dayHours);
+      current = current.plus({ days: 1 }).startOf('day');
+      continue;
+    }
+    
     const dayStart = current.startOf('day').plus({ hours: openHour, minutes: openMinute });
     const dayEnd = current.startOf('day').plus({ hours: closeHour, minutes: closeMinute });
     
+    console.log(`Processing ${dayOfWeek} (${current.toFormat('yyyy-MM-dd')}): ${dayStart.toFormat('HH:mm')} - ${dayEnd.toFormat('HH:mm')}`);
+    
     // Generate slots for this day
     let slotStart = DateTime.max(current, dayStart);
+    let daySlotsCount = 0;
     
     while (slotStart < dayEnd) {
       const slotEnd = slotStart.plus({ minutes: serviceDuration });
@@ -150,14 +173,22 @@ export async function generateAvailableSlots(
           booked,
           status,
         });
+        daySlotsCount++;
+        slotsGenerated++;
       }
       
       slotStart = slotStart.plus({ minutes: slotDuration });
     }
     
+    if (daySlotsCount > 0) {
+      console.log(`  Generated ${daySlotsCount} slots for ${dayOfWeek}`);
+    }
+    
     // Move to next day
     current = current.plus({ days: 1 }).startOf('day');
   }
+  
+  console.log(`Total: Processed ${daysProcessed} days, generated ${slotsGenerated} slots`);
   
   console.log(`Generated ${slots.length} available slots`);
   return slots;
