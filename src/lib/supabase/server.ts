@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 export async function createClient() {
@@ -23,6 +24,32 @@ export async function createClient() {
             // user sessions.
           }
         },
+      },
+    }
+  );
+}
+
+/**
+ * Creates an admin Supabase client using the service role key.
+ * This bypasses RLS policies and should ONLY be used for admin operations
+ * that have already been authenticated via NextAuth.
+ * 
+ * WARNING: Never expose the service role key to the client!
+ */
+export function createAdminClient() {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!serviceRoleKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set. Required for admin operations.');
+  }
+
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    serviceRoleKey,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       },
     }
   );

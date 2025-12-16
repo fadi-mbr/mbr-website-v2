@@ -155,6 +155,11 @@ export default function AdminDashboard() {
           body: JSON.stringify({ key, value }),
         });
         
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+          throw new Error(errorData.error || `Failed to save ${key} (${response.status})`);
+        }
+        
         const data = await response.json();
         if (!data.success) {
           throw new Error(data.error || `Failed to save ${key}`);

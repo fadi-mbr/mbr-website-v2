@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import type { Settings, ServiceType } from './types';
 
 // Helper function to extract value from JSONB
@@ -59,8 +59,12 @@ function getBooleanValue(value: unknown, defaultValue: boolean = false): boolean
   return defaultValue;
 }
 
-export async function getSettings(): Promise<Settings> {
-  const supabase = await createClient();
+export async function getSettings(useAdminClient = false): Promise<Settings> {
+  // Use admin client if requested (for admin routes that bypass RLS)
+  // Otherwise use regular client (for public routes)
+  const supabase = useAdminClient 
+    ? createAdminClient()
+    : await createClient();
   
   const { data, error } = await supabase
     .from('settings')
@@ -130,7 +134,8 @@ export async function getServiceTypes(): Promise<ServiceType[]> {
 }
 
 export async function updateSetting(key: string, value: unknown): Promise<void> {
-  const supabase = await createClient();
+  // Use admin client to bypass RLS (we've already authenticated via NextAuth in the API route)
+  const supabase = createAdminClient();
   
   // Ensure value is properly formatted for JSONB
   // If it's already an object/array, it will be stored as JSONB

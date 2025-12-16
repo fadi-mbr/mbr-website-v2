@@ -24,7 +24,7 @@ export async function GET() {
     }
 
     console.log('Admin settings: Fetching settings for', session.user.email);
-    const settings = await getSettings();
+    const settings = await getSettings(true); // Use admin client to bypass RLS
     console.log('Admin settings: Settings fetched successfully');
     
     return NextResponse.json({
@@ -65,12 +65,14 @@ export async function PUT(request: Request) {
 
     if (!key) {
       return NextResponse.json(
-        { error: 'Setting key is required' },
+        { success: false, error: 'Setting key is required' },
         { status: 400 }
       );
     }
 
+    console.log('Admin settings: Updating', key, 'for', session.user.email);
     await updateSetting(key, value);
+    console.log('Admin settings: Successfully updated', key);
     
     return NextResponse.json({
       success: true,
@@ -78,8 +80,9 @@ export async function PUT(request: Request) {
     });
   } catch (error) {
     console.error('Admin settings update error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to update setting';
     return NextResponse.json(
-      { error: 'Failed to update setting' },
+      { success: false, error: errorMessage },
       { status: 500 }
     );
   }
