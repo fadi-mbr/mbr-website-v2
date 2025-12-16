@@ -197,8 +197,21 @@ export async function POST(request: Request) {
     
     if (bookingError || !booking) {
       console.error('Booking creation error:', bookingError);
+      console.error('Booking data attempted:', {
+        service_type: serviceType.name,
+        service_duration_minutes: serviceType.duration_minutes,
+        slot_start: data.slot_start,
+        slot_end: data.slot_end,
+        customer_name: data.customer_name,
+        customer_email: data.customer_email,
+        customer_phone: formattedPhone,
+      });
       return NextResponse.json(
-        { error: 'Failed to create booking. Please try again.' },
+        { 
+          error: 'Failed to create booking. Please try again.',
+          details: bookingError ? bookingError.message : 'Unknown error',
+          code: bookingError?.code,
+        },
         { status: 500 }
       );
     }
