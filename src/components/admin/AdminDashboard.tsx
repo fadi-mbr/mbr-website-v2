@@ -290,10 +290,18 @@ export default function AdminDashboard() {
         {/* Bookings Tab */}
         {activeTab === 'bookings' && (
           <div className="glass-card p-8">
-            <h2 className="text-heading font-light mb-6">Bookings</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-heading font-light">Bookings</h2>
+              <div className="text-body text-muted-enhanced">
+                Total: {bookings.length} {bookings.length === 1 ? 'booking' : 'bookings'}
+              </div>
+            </div>
             
             {bookingsLoading ? (
-              <div className="text-center py-8 text-muted-enhanced">Loading...</div>
+              <div className="text-center py-8 text-muted-enhanced">
+                <div className="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p>Loading bookings...</p>
+              </div>
             ) : bookings.length === 0 ? (
               <div className="text-center py-8 text-muted-enhanced">No bookings found</div>
             ) : (
@@ -304,6 +312,7 @@ export default function AdminDashboard() {
                       <th className="text-left py-3 px-4 text-subheading">Date/Time</th>
                       <th className="text-left py-3 px-4 text-subheading">Service</th>
                       <th className="text-left py-3 px-4 text-subheading">Customer</th>
+                      <th className="text-left py-3 px-4 text-subheading">Email</th>
                       <th className="text-left py-3 px-4 text-subheading">Phone</th>
                       <th className="text-left py-3 px-4 text-subheading">Status</th>
                       <th className="text-left py-3 px-4 text-subheading">Actions</th>
@@ -321,7 +330,24 @@ export default function AdminDashboard() {
                         </td>
                         <td className="py-3 px-4 text-body">{booking.service_type}</td>
                         <td className="py-3 px-4 text-body">{booking.customer_name}</td>
-                        <td className="py-3 px-4 text-body">{booking.customer_phone}</td>
+                        <td className="py-3 px-4 text-body">
+                          <a 
+                            href={`mailto:${booking.customer_email}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-primary hover:underline"
+                          >
+                            {booking.customer_email}
+                          </a>
+                        </td>
+                        <td className="py-3 px-4 text-body">
+                          <a 
+                            href={`tel:${booking.customer_phone}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-primary hover:underline"
+                          >
+                            {booking.customer_phone}
+                          </a>
+                        </td>
                         <td className="py-3 px-4">
                           <span
                             className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -329,7 +355,9 @@ export default function AdminDashboard() {
                                 ? 'bg-green-500/20 text-green-400'
                                 : booking.status === 'PENDING'
                                 ? 'bg-yellow-500/20 text-yellow-400'
-                                : 'bg-red-500/20 text-red-400'
+                                : booking.status === 'CANCELLED'
+                                ? 'bg-red-500/20 text-red-400'
+                                : 'bg-gray-500/20 text-gray-400'
                             }`}
                           >
                             {booking.status}
@@ -343,7 +371,7 @@ export default function AdminDashboard() {
                             }}
                             className="text-primary hover:text-primary-hover transition-colors"
                           >
-                            View
+                            View Details
                           </button>
                         </td>
                       </tr>
