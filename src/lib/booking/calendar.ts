@@ -91,6 +91,18 @@ export async function createCalendarEvent(booking: Booking): Promise<{
     const start = DateTime.fromISO(booking.slot_start).setZone(settings.timezone);
     const end = DateTime.fromISO(booking.slot_end).setZone(settings.timezone);
     
+    // Validate dates
+    if (!start.isValid || !end.isValid) {
+      throw new Error(`Invalid date/time: start=${start.invalidReason}, end=${end.invalidReason}`);
+    }
+    
+    const startISO = start.toISO();
+    const endISO = end.toISO();
+    
+    if (!startISO || !endISO) {
+      throw new Error('Failed to convert date/time to ISO format');
+    }
+    
     // Determine which calendar to use
     // If google_calendar_id is set and accessible, use it
     // Otherwise, use the service account's primary calendar
@@ -130,11 +142,11 @@ export async function createCalendarEvent(booking: Booking): Promise<{
       summary: `MBR Booking – ${booking.service_type}`,
       description: `Booking ID: ${booking.id}\nCustomer: ${booking.customer_name}\nPhone: ${booking.customer_phone}\nEmail: ${booking.customer_email}${booking.customer_notes ? `\nNotes: ${booking.customer_notes}` : ''}`,
       start: {
-        dateTime: start.toISO(),
+        dateTime: startISO,
         timeZone: settings.timezone,
       },
       end: {
-        dateTime: end.toISO(),
+        dateTime: endISO,
         timeZone: settings.timezone,
       },
       location: settings.business_address,

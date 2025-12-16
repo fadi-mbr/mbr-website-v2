@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { validateConfirmationToken } from '@/lib/booking/tokens';
 import { sendConfirmedEmail } from '@/lib/booking/email';
 import { createCalendarEvent } from '@/lib/booking/calendar';
