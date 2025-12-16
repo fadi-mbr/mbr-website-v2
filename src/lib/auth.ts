@@ -22,7 +22,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: '/admin',
+    error: '/admin?error=AccessDenied',
   },
   secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true, // Required for Vercel/production
 });
 

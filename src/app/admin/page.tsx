@@ -25,7 +25,7 @@ function AdminContent() {
 
 export default function AdminPage() {
   return (
-    <SessionProvider basePath="/api/auth">
+    <SessionProvider>
       <AdminContent />
     </SessionProvider>
   );

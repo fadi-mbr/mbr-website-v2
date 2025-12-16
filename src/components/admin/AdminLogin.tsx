@@ -14,7 +14,7 @@ export default function AdminLogin() {
           Sign in with your @mbrme.com Google account to access the admin dashboard.
         </p>
         <button
-          onClick={() => signIn('google')}
+          onClick={() => signIn('google', { callbackUrl: '/admin' })}
           className="liquid-glass-btn liquid-glass-btn-primary w-full"
         >
           Sign in with Google
