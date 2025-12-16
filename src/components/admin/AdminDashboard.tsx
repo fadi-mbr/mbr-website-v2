@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsMessage, setSettingsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeTab === 'bookings') {
@@ -58,6 +59,7 @@ export default function AdminDashboard() {
 
   const fetchSettings = async () => {
     setSettingsLoading(true);
+    setSettingsError(null);
     try {
       const response = await fetch('/api/admin/settings');
       const data = await response.json();
@@ -66,10 +68,14 @@ export default function AdminDashboard() {
         setFormSettings(data.settings);
         setHasUnsavedChanges(false);
       } else {
-        console.error('Failed to load settings:', data.error);
+        const errorMsg = data.error || 'Failed to load settings';
+        console.error('Failed to load settings:', errorMsg);
+        setSettingsError(errorMsg);
       }
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Failed to fetch settings';
       console.error('Failed to fetch settings:', error);
+      setSettingsError(errorMsg);
     } finally {
       setSettingsLoading(false);
     }
@@ -181,8 +187,16 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges]);
 
-  if (!formSettings) {
-    return null;
+  // Show loading state while settings are being fetched (only on initial load)
+  if (settingsLoading && !formSettings && !settingsError) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-body-enhanced text-muted-enhanced">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -381,7 +395,21 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {settingsLoading ? (
+            {settingsError ? (
+              <div className="glass-card p-8">
+                <div className="text-center py-12">
+                  <FaExclamationCircle className="text-red-400 text-4xl mx-auto mb-4" />
+                  <h3 className="text-heading font-light mb-2">Failed to Load Settings</h3>
+                  <p className="text-body text-muted-enhanced mb-6">{settingsError}</p>
+                  <button
+                    onClick={fetchSettings}
+                    className="liquid-glass-btn liquid-glass-btn-primary"
+                  >
+                    Retry
+                  </button>
+                </div>
+              </div>
+            ) : settingsLoading || !formSettings ? (
               <div className="text-center py-12 text-muted-enhanced">
                 <div className="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
                 <p>Loading settings...</p>
