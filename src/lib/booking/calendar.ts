@@ -103,31 +103,26 @@ export async function createCalendarEvent(booking: Booking): Promise<{
       throw new Error('Failed to convert date/time to ISO format');
     }
     
-    // Determine which calendar to use
-    // If google_calendar_id is set and accessible, use it
-    // Otherwise, use the service account's primary calendar
-    let targetCalendarId = settings.google_calendar_id;
-    let useInviteOnly = false;
+    // Always use service account's primary calendar for event creation
+    // Then send invites to attendees (business, customer, and shared calendar if configured)
+    // This avoids permission issues with shared calendars
+    let targetCalendarId: string;
     
-    // If no calendar ID configured, use service account's primary calendar
-    if (!targetCalendarId || targetCalendarId.trim() === '') {
-      // Get service account email from credentials
-      const credentialsStr = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS;
-      if (credentialsStr) {
-        try {
-          const credentials = JSON.parse(credentialsStr);
-          targetCalendarId = credentials.client_email; // Use service account's primary calendar
-          useInviteOnly = true;
-          console.log('No calendar ID configured, using service account primary calendar:', targetCalendarId);
-        } catch {
-          // Fallback to 'primary' if we can't parse credentials
-          targetCalendarId = 'primary';
-          useInviteOnly = true;
-        }
-      } else {
+    // Get service account email from credentials to use as calendar ID
+    const credentialsStr = process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS;
+    if (credentialsStr) {
+      try {
+        const credentials = JSON.parse(credentialsStr);
+        targetCalendarId = credentials.client_email; // Use service account's primary calendar
+        console.log('Using service account primary calendar:', targetCalendarId);
+      } catch {
+        // Fallback to 'primary' if we can't parse credentials
         targetCalendarId = 'primary';
-        useInviteOnly = true;
+        console.log('Using "primary" calendar (fallback)');
       }
+    } else {
+      targetCalendarId = 'primary';
+      console.log('Using "primary" calendar (no credentials found)');
     }
   
     const event: {
@@ -165,34 +160,46 @@ export async function createCalendarEvent(booking: Booking): Promise<{
       },
     ];
     
-    // If using a shared calendar, also add it as attendee
-    if (settings.google_calendar_id && !useInviteOnly) {
+    // If a shared calendar is configured, also add it as attendee
+    // This way the event appears in the shared calendar via invite
+    if (settings.google_calendar_id && settings.google_calendar_id.trim() !== '') {
       const calendarEmail = await getCalendarEmail(calendar, settings.google_calendar_id);
       if (calendarEmail && !attendees.some(a => a.email === calendarEmail)) {
         attendees.push({
           email: calendarEmail,
           responseStatus: 'accepted',
         });
+        console.log('Adding shared calendar as attendee:', calendarEmail);
+      } else if (settings.google_calendar_id.includes('@')) {
+        // If calendar ID itself looks like an email, use it directly
+        if (!attendees.some(a => a.email === settings.google_calendar_id)) {
+          attendees.push({
+            email: settings.google_calendar_id,
+            responseStatus: 'accepted',
+          });
+          console.log('Adding shared calendar ID as attendee:', settings.google_calendar_id);
+        }
       }
     }
     
     event.attendees = attendees;
-    console.log('Creating calendar event with attendees:', attendees.map(a => a.email).join(', '));
+    console.log('Creating calendar event in service account calendar with attendees:', attendees.map(a => a.email).join(', '));
   
-    // Check for conflicts if enabled and we have a calendar ID
-    if (settings.google_calendar_conflict_check && settings.google_calendar_id && !useInviteOnly) {
+    // Check for conflicts if enabled (check the shared calendar if configured)
+    if (settings.google_calendar_conflict_check && settings.google_calendar_id && settings.google_calendar_id.trim() !== '') {
       try {
         const freebusy = await calendar.freebusy.query({
           requestBody: {
-            timeMin: start.toISO(),
-            timeMax: end.toISO(),
+            timeMin: startISO,
+            timeMax: endISO,
             items: [{ id: settings.google_calendar_id }],
           },
         });
         
         const busy = freebusy.data.calendars?.[settings.google_calendar_id]?.busy || [];
         if (busy.length > 0) {
-          throw new Error('Time slot conflicts with existing calendar event');
+          console.warn('Time slot conflicts with existing calendar event in shared calendar');
+          // Don't throw - just warn, as we're creating in service account calendar anyway
         }
       } catch (conflictError: unknown) {
         // If conflict check fails, log but don't block booking
