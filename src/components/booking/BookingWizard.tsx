@@ -88,17 +88,48 @@ export default function BookingWizard() {
         body: JSON.stringify(bookingData),
       });
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError);
+        const text = await response.text();
+        console.error('Response text:', text);
+        setError('Server returned an invalid response. Please try again.');
+        setLoading(false);
+        return;
+      }
       
-      console.log('Booking creation response:', { status: response.status, result });
+      console.log('Booking creation response:', { 
+        status: response.status, 
+        statusText: response.statusText,
+        result 
+      });
 
       if (!response.ok) {
         // Handle validation errors with detailed messages
-        let errorMessage = result.error || 'Failed to create booking. Please try again.';
+        let errorMessage = result.error || result.message || result.primaryError || 'Failed to create booking. Please try again.';
+        
+        // Log full error details for debugging
+        console.error('Booking creation failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: result.error,
+          message: result.message,
+          primaryError: result.primaryError,
+          details: result.details,
+          allErrors: result.allErrors,
+          fullResponse: result,
+        });
         
         // If there are multiple errors, show them all
         if (result.allErrors && result.allErrors.length > 1) {
           errorMessage = 'Please fix the following errors:\n' + result.allErrors.map((err: string, i: number) => `${i + 1}. ${err}`).join('\n');
+        }
+        
+        // Use primaryError if available (includes helpful tips)
+        if (result.primaryError) {
+          errorMessage = result.primaryError;
         }
         
         // Add helpful context for common errors
@@ -112,14 +143,14 @@ export default function BookingWizard() {
             Array.isArray(d.path) && d.path.includes('customer_phone')
           );
           if (phoneError) {
-            errorMessage += '\n\nTip: UAE phone numbers should be in format +971XXXXXXXXX (e.g., +971501234567)';
+            errorMessage += '\n\n💡 Tip: UAE phone numbers should be in format +971XXXXXXXXX (e.g., +971501234567)';
           }
           
           const dateError = result.details.find((d: ValidationError) => 
             Array.isArray(d.path) && (d.path.includes('slot_start') || d.path.includes('slot_end'))
           );
           if (dateError) {
-            errorMessage += '\n\nTip: Please go back and select a date and time again.';
+            errorMessage += '\n\n💡 Tip: Please go back and select a date and time again.';
           }
         }
         
