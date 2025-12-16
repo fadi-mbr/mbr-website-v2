@@ -1156,3 +1156,9 @@ body {
           drop-shadow(0 0 9px rgba(255, 255, 255, 0.5));
   /* Stronger glow on hover */
 }
+
+/* Mobile Touch Targets - Minimum 44x44px for accessibility */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
