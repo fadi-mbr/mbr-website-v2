@@ -37,16 +37,9 @@ const premiumBrands = [
     color: "#000000"
   },
   {
-    name: "Range Rover",
-    slug: "range-rover",
-    keywords: "Range Rover repair Dubai, Range Rover service UAE",
-    logo: "/images/brands/range-rover.svg",
-    color: "#005A2B"
-  },
-  {
     name: "Land Rover",
     slug: "land-rover",
-    keywords: "Land Rover repair Dubai, Land Rover service UAE",
+    keywords: "Land Rover repair Dubai, Land Rover service UAE, Range Rover service Dubai",
     logo: "/images/brands/land-rover.svg",
     color: "#005A2B"
   },
@@ -136,14 +129,22 @@ function BrandLogo({ brand }: { brand: typeof premiumBrands[0] }) {
           {brand.name}
         </div>
       ) : (
-        <Image
-          src={brand.logo}
-          alt={`${brand.name} repair and service in Dubai, UAE`}
-          width={160}
-          height={80}
-          className="object-contain opacity-90 group-hover:opacity-100 transition-opacity duration-300 brand-logo-filter"
-          onError={() => setImageError(true)}
-        />
+        <div className="relative flex items-center justify-center" style={{ width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%' }}>
+          <Image
+            src={brand.logo}
+            alt={`${brand.name} repair and service in Dubai, UAE`}
+            width={140}
+            height={70}
+            className="object-contain opacity-90 group-hover:opacity-100 transition-opacity duration-300 brand-logo-filter"
+            onError={() => setImageError(true)}
+            style={{ 
+              maxWidth: 'calc(100% - 32px)', 
+              maxHeight: 'calc(100% - 32px)',
+              width: 'auto',
+              height: 'auto'
+            }}
+          />
+        </div>
       )}
     </div>
   );
@@ -193,8 +194,8 @@ export default function PremiumBrandsCarousel() {
                 transition={{ duration: 0.5, delay: index * 0.05 }}
                 viewport={{ once: true }}
               >
-                <div className="glass-card-brand-logo w-48 h-32 flex items-center justify-center p-6 transition-all duration-500 group">
-                  {/* Brand Logo from GitHub dataset */}
+                <div className="glass-card-brand-logo w-48 h-32 flex items-center justify-center p-4 transition-all duration-500 group overflow-hidden">
+                  {/* Brand Logo - SVG with proper containment */}
                   <BrandLogo brand={brand} />
                 </div>
               </motion.div>
@@ -216,8 +217,8 @@ export default function PremiumBrandsCarousel() {
             </h3>
             <p className="text-body-enhanced leading-relaxed mb-6">
               At MBR Auto Services, we specialize in servicing and repairing all premium and luxury car brands 
-              available in Dubai and the UAE. Whether you drive a Mercedes-Benz, BMW, Audi, Porsche, Range Rover, 
-              Lexus, Jaguar, Maserati, Bentley, Rolls-Royce, Lamborghini, Ferrari, McLaren, or any other premium 
+              available in Dubai and the UAE. Whether you drive a Mercedes-Benz, BMW, Audi, Porsche, Land Rover, 
+              Lexus, Jaguar, Maserati, Bentley, Rolls-Royce, Lamborghini, Ferrari, McLaren, Tesla, or any other premium 
               vehicle, our certified technicians have the expertise and genuine parts to keep your luxury car 
               performing at its best.
             </p>
