@@ -4,131 +4,112 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
-// GitHub repository base URL for car logos dataset
-// Source: https://github.com/filippofilip95/car-logos-dataset
-// Using optimized versions for better performance
-const LOGO_BASE_URL = "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/optimized";
-
-// Premium car brands data with GitHub logo URLs
+// Premium car brands data with local logo paths
+// All logos are hosted locally in /public/images/brands/
 const premiumBrands = [
   {
     name: "Mercedes-Benz",
     slug: "mercedes-benz",
-    datasetSlug: "mercedes-benz", // Slug used in GitHub dataset
     keywords: "Mercedes repair Dubai, Mercedes service UAE, Mercedes-Benz maintenance",
-    logo: `${LOGO_BASE_URL}/mercedes-benz.png`,
+    logo: "/images/brands/mercedes-benz.png",
     color: "#00ADEF"
   },
   {
     name: "BMW",
     slug: "bmw",
-    datasetSlug: "bmw",
     keywords: "BMW repair Dubai, BMW service UAE, BMW maintenance",
-    logo: `${LOGO_BASE_URL}/bmw.png`,
+    logo: "/images/brands/bmw.png",
     color: "#1C69D4"
   },
   {
     name: "Audi",
     slug: "audi",
-    datasetSlug: "audi",
     keywords: "Audi repair Dubai, Audi service UAE, Audi maintenance",
-    logo: `${LOGO_BASE_URL}/audi.png`,
+    logo: "/images/brands/audi.png",
     color: "#BB0A30"
   },
   {
     name: "Porsche",
     slug: "porsche",
-    datasetSlug: "porsche",
     keywords: "Porsche repair Dubai, Porsche service UAE, Porsche maintenance",
-    logo: `${LOGO_BASE_URL}/porsche.png`,
+    logo: "/images/brands/porsche.png",
     color: "#000000"
   },
   {
     name: "Range Rover",
     slug: "range-rover",
-    datasetSlug: "range-rover",
     keywords: "Range Rover repair Dubai, Range Rover service UAE",
-    logo: `${LOGO_BASE_URL}/range-rover.png`,
+    logo: "/images/brands/range-rover.png",
     color: "#005A2B"
   },
   {
     name: "Land Rover",
     slug: "land-rover",
-    datasetSlug: "land-rover",
     keywords: "Land Rover repair Dubai, Land Rover service UAE",
-    logo: `${LOGO_BASE_URL}/land-rover.png`,
+    logo: "/images/brands/land-rover.png",
     color: "#005A2B"
   },
   {
     name: "Lexus",
     slug: "lexus",
-    datasetSlug: "lexus",
     keywords: "Lexus repair Dubai, Lexus service UAE, Lexus maintenance",
-    logo: `${LOGO_BASE_URL}/lexus.png`,
+    logo: "/images/brands/lexus.png",
     color: "#000000"
   },
   {
     name: "Jaguar",
     slug: "jaguar",
-    datasetSlug: "jaguar",
     keywords: "Jaguar repair Dubai, Jaguar service UAE, Jaguar maintenance",
-    logo: `${LOGO_BASE_URL}/jaguar.png`,
+    logo: "/images/brands/jaguar.png",
     color: "#000000"
   },
   {
     name: "Maserati",
     slug: "maserati",
-    datasetSlug: "maserati",
     keywords: "Maserati repair Dubai, Maserati service UAE",
-    logo: `${LOGO_BASE_URL}/maserati.png`,
+    logo: "/images/brands/maserati.png",
     color: "#0C2340"
   },
   {
     name: "Bentley",
     slug: "bentley",
-    datasetSlug: "bentley",
     keywords: "Bentley repair Dubai, Bentley service UAE",
-    logo: `${LOGO_BASE_URL}/bentley.png`,
+    logo: "/images/brands/bentley.png",
     color: "#000000"
   },
   {
     name: "Rolls-Royce",
     slug: "rolls-royce",
-    datasetSlug: "rolls-royce",
     keywords: "Rolls-Royce repair Dubai, Rolls-Royce service UAE",
-    logo: `${LOGO_BASE_URL}/rolls-royce.png`,
+    logo: "/images/brands/rolls-royce.png",
     color: "#000000"
   },
   {
     name: "Lamborghini",
     slug: "lamborghini",
-    datasetSlug: "lamborghini",
     keywords: "Lamborghini repair Dubai, Lamborghini service UAE",
-    logo: `${LOGO_BASE_URL}/lamborghini.png`,
+    logo: "/images/brands/lamborghini.png",
     color: "#FFB800"
   },
   {
     name: "Ferrari",
     slug: "ferrari",
-    datasetSlug: "ferrari",
     keywords: "Ferrari repair Dubai, Ferrari service UAE",
-    logo: `${LOGO_BASE_URL}/ferrari.png`,
+    logo: "/images/brands/ferrari.png",
     color: "#DC143C"
   },
   {
     name: "McLaren",
     slug: "mclaren",
-    datasetSlug: "mclaren",
     keywords: "McLaren repair Dubai, McLaren service UAE",
-    logo: `${LOGO_BASE_URL}/mclaren.png`,
+    logo: "/images/brands/mclaren.png",
     color: "#FF8000"
   },
   {
     name: "Tesla",
     slug: "tesla",
-    datasetSlug: "tesla",
     keywords: "Tesla repair Dubai, Tesla service UAE, Tesla maintenance",
-    logo: `${LOGO_BASE_URL}/tesla.png`,
+    logo: "/images/brands/tesla.png",
     color: "#E31937"
   }
 ];
@@ -168,9 +149,6 @@ function BrandLogo({ brand }: { brand: typeof premiumBrands[0] }) {
         }`}
         onLoad={() => setImageLoaded(true)}
         onError={() => setImageError(true)}
-        unoptimized // External GitHub URLs - optimization handled by dataset
-        // Note: If images don't load, check dataset slug variations (e.g., "mercedes" vs "mercedes-benz")
-        // You may need to adjust datasetSlug values based on actual dataset structure
       />
       {!imageLoaded && !imageError && (
         <div className="text-xs text-muted-enhanced animate-pulse">Loading...</div>
