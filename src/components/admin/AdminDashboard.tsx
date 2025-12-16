@@ -40,11 +40,15 @@ export default function AdminDashboard() {
   };
 
   const fetchSettings = async () => {
+    setSettingsLoading(true);
     try {
       const response = await fetch('/api/admin/settings');
       const data = await response.json();
       if (data.success) {
+        console.log('Settings loaded:', data.settings);
         setSettings(data.settings);
+      } else {
+        console.error('Failed to load settings:', data.error);
       }
     } catch (error) {
       console.error('Failed to fetch settings:', error);
@@ -68,10 +72,8 @@ export default function AdminDashboard() {
       
       if (data.success) {
         setSettingsMessage({ type: 'success', text: 'Setting saved successfully' });
-        // Update local state
-        if (settings) {
-          setSettings({ ...settings, [key]: value });
-        }
+        // Refresh settings from database to ensure we have the latest values
+        await fetchSettings();
         setTimeout(() => setSettingsMessage(null), 3000);
       } else {
         setSettingsMessage({ type: 'error', text: data.error || 'Failed to save setting' });
