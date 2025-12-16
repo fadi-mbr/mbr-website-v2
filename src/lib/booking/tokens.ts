@@ -7,7 +7,8 @@ export async function createConfirmationToken(bookingId: string): Promise<string
   // Use admin client to bypass RLS for token creation
   const { createAdminClient } = await import('@/lib/supabase/server');
   const supabase = createAdminClient();
-  const settings = await getSettings();
+  // Use admin client to read settings (bypasses RLS)
+  const settings = await getSettings(true);
   
   console.log('Creating confirmation token for booking:', bookingId);
   

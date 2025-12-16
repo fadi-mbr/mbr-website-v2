@@ -10,7 +10,9 @@ async function getTransporter() {
     return transporter;
   }
   
-  const settings = await getSettings();
+  // Use admin client to read settings (bypasses RLS)
+  // This is safe because we're reading public configuration, not sensitive data
+  const settings = await getSettings(true);
   
   // Get SMTP configuration with fallbacks
   // Handle empty strings by treating them as missing
