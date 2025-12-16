@@ -8,7 +8,8 @@ export async function generateAvailableSlots(
   endDate: Date,
   serviceTypeId?: string
 ): Promise<SlotAvailability[]> {
-  const settings = await getSettings();
+  // Use admin client to read settings (bypasses RLS)
+  const settings = await getSettings(true);
   const supabase = await createClient();
   
   const timezone = settings.timezone;
