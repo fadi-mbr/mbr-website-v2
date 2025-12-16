@@ -193,7 +193,7 @@ export default function PremiumBrandsCarousel() {
                 transition={{ duration: 0.5, delay: index * 0.05 }}
                 viewport={{ once: true }}
               >
-                <div className="glass-card glass-card-subtle w-48 h-32 flex items-center justify-center p-6 hover:border-white/30 transition-all duration-500 group">
+                <div className="glass-card-brand-logo w-48 h-32 flex items-center justify-center p-6 transition-all duration-500 group">
                   {/* Brand Logo from GitHub dataset */}
                   <BrandLogo brand={brand} />
                 </div>
