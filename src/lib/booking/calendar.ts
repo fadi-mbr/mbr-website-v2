@@ -39,6 +39,45 @@ async function getCalendarClient() {
   return calendarClient;
 }
 
+/**
+ * Get the email address associated with a calendar
+ * This is useful for sending calendar invites when direct write access is restricted
+ */
+async function getCalendarEmail(
+  calendar: ReturnType<typeof google.calendar>,
+  calendarId: string
+): Promise<string | null> {
+  try {
+    const calendarInfo = await calendar.calendars.get({
+      calendarId: calendarId,
+    });
+    
+    // Check if calendar has an email address
+    if (calendarInfo.data.id && calendarInfo.data.id.includes('@')) {
+      return calendarInfo.data.id;
+    }
+    
+    // For group calendars, the ID itself might be the email
+    if (calendarId.includes('@group.calendar.google.com')) {
+      return calendarId;
+    }
+    
+    // Try to get from calendar list entry
+    const calendarList = await calendar.calendarList.get({
+      calendarId: calendarId,
+    });
+    
+    if (calendarList.data.id && calendarList.data.id.includes('@')) {
+      return calendarList.data.id;
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn('Could not get calendar email address:', error);
+    return null;
+  }
+}
+
 export async function createCalendarEvent(booking: Booking): Promise<{
   eventId: string;
   htmlLink: string;
