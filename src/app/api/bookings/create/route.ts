@@ -147,14 +147,34 @@ export async function POST(request: Request) {
     }
     
     // Get service details
-    const serviceTypes = await getServiceTypes();
+    // First try to get from database, fallback to hardcoded defaults
+    let serviceTypes = await getServiceTypes();
+    
+    // If no service types from database, use hardcoded defaults
+    if (!serviceTypes || serviceTypes.length === 0) {
+      console.log('No service types from database, using hardcoded defaults');
+      const { DEFAULT_SERVICE_TYPES } = await import('@/app/api/bookings/services/route');
+      serviceTypes = DEFAULT_SERVICE_TYPES;
+    }
+    
     const serviceType = serviceTypes.find(st => st.id === data.service_type);
     if (!serviceType) {
+      console.error('Service type not found:', {
+        requestedId: data.service_type,
+        availableIds: serviceTypes.map(st => st.id),
+        availableServices: serviceTypes,
+      });
       return NextResponse.json(
-        { error: 'Invalid service type' },
+        { 
+          error: `Invalid service type: "${data.service_type}". Available types: ${serviceTypes.map(st => st.id).join(', ')}`,
+          requestedId: data.service_type,
+          availableIds: serviceTypes.map(st => st.id),
+        },
         { status: 400 }
       );
     }
+    
+    console.log('Service type found:', serviceType);
     
     // Create booking
     const supabase = await createClient();
