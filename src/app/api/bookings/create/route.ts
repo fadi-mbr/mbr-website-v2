@@ -154,7 +154,7 @@ export async function POST(request: Request) {
     if (!serviceTypes || serviceTypes.length === 0) {
       console.log('No service types from database, using hardcoded defaults');
       const { DEFAULT_SERVICE_TYPES } = await import('@/app/api/bookings/services/route');
-      serviceTypes = DEFAULT_SERVICE_TYPES;
+      serviceTypes = DEFAULT_SERVICE_TYPES as ServiceType[];
     }
     
     const serviceType = serviceTypes.find(st => st.id === data.service_type);

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { ServiceType } from '@/lib/booking/types';
 
 // Hardcoded service types for MBR Auto Services
-const DEFAULT_SERVICE_TYPES: ServiceType[] = [
+export const DEFAULT_SERVICE_TYPES: ServiceType[] = [
   {
     id: 'inspection',
     name: 'Vehicle Inspection & Diagnosis',
