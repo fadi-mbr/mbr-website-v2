@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { bookingCreateSchema, formatUAEPhone } from '@/lib/booking/validation';
-import { generateCaptcha, validateCaptcha } from '@/lib/booking/captcha';
+import { generateCaptcha } from '@/lib/booking/captcha';
 import { createConfirmationToken } from '@/lib/booking/tokens';
 import { sendConfirmationEmail } from '@/lib/booking/email';
 import { generateAvailableSlots, isSlotAvailable } from '@/lib/booking/slots';

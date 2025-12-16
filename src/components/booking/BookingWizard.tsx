@@ -102,13 +102,22 @@ export default function BookingWizard() {
         }
         
         // Add helpful context for common errors
-        if (result.details) {
-          const phoneError = result.details.find((d: any) => d.path.includes('customer_phone'));
+        if (result.details && Array.isArray(result.details)) {
+          interface ValidationError {
+            path: (string | number)[];
+            message: string;
+          }
+          
+          const phoneError = result.details.find((d: ValidationError) => 
+            Array.isArray(d.path) && d.path.includes('customer_phone')
+          );
           if (phoneError) {
             errorMessage += '\n\nTip: UAE phone numbers should be in format +971XXXXXXXXX (e.g., +971501234567)';
           }
           
-          const dateError = result.details.find((d: any) => d.path.includes('slot_start') || d.path.includes('slot_end'));
+          const dateError = result.details.find((d: ValidationError) => 
+            Array.isArray(d.path) && (d.path.includes('slot_start') || d.path.includes('slot_end'))
+          );
           if (dateError) {
             errorMessage += '\n\nTip: Please go back and select a date and time again.';
           }
