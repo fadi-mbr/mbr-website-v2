@@ -304,17 +304,20 @@ export async function sendConfirmedEmail(
     });
   }
   
+  // Send to both customer and business email
+  const recipients = [booking.customer_email, 'info@mbrme.com'].filter(Boolean);
+  
   try {
     const result = await transporter.sendMail({
       from: settings.smtp_from,
-      to: booking.customer_email,
+      to: recipients.join(', '), // Send to multiple recipients
       subject: `Booking Confirmed - ${settings.business_name}`,
       html,
       attachments,
     });
     console.log('Confirmed email sent successfully:', {
       messageId: result.messageId,
-      to: booking.customer_email,
+      to: recipients.join(', '),
       from: settings.smtp_from,
       attachmentsCount: attachments.length,
     });
