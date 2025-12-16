@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/react';
 import FloatingWhatsAppButton from "@/components/FloatingWhatsAppButton";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import ConditionalGoogleAnalytics from "@/components/ConditionalGoogleAnalytics";
@@ -104,6 +105,7 @@ export default function RootLayout({
         <FloatingWhatsAppButton />
         <CookieConsentBanner />
         <ConditionalGoogleAnalytics />
+        <Analytics />
       </body>
     </html>
   );
