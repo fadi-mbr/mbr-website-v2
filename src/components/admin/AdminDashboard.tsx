@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   // Settings state
   const [originalSettings, setOriginalSettings] = useState<Settings | null>(null);
   const [formSettings, setFormSettings] = useState<Settings | null>(null);
-  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [settingsLoading, setSettingsLoading] = useState(false); // Start as false, only true when actively loading
   const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsMessage, setSettingsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -41,6 +41,7 @@ export default function AdminDashboard() {
     } else if (activeTab === 'settings') {
       fetchSettings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const fetchBookings = async () => {
@@ -62,14 +63,27 @@ export default function AdminDashboard() {
     setSettingsError(null);
     try {
       const response = await fetch('/api/admin/settings');
+      
+      // Check if response is ok
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: `HTTP ${response.status}: ${response.statusText}` }));
+        const errorMsg = errorData.error || `Failed to load settings (${response.status})`;
+        console.error('Settings API error:', response.status, errorMsg);
+        setSettingsError(errorMsg);
+        setSettingsLoading(false);
+        return;
+      }
+      
       const data = await response.json();
-      if (data.success) {
+      
+      if (data.success && data.settings) {
+        console.log('Settings loaded successfully:', data.settings);
         setOriginalSettings(data.settings);
         setFormSettings(data.settings);
         setHasUnsavedChanges(false);
       } else {
-        const errorMsg = data.error || 'Failed to load settings';
-        console.error('Failed to load settings:', errorMsg);
+        const errorMsg = data.error || 'Failed to load settings: Invalid response';
+        console.error('Failed to load settings:', errorMsg, data);
         setSettingsError(errorMsg);
       }
     } catch (error) {
@@ -187,13 +201,13 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges]);
 
-  // Show loading state while settings are being fetched (only on initial load)
-  if (settingsLoading && !formSettings && !settingsError) {
+  // Show loading state only when settings tab is active and loading
+  if (activeTab === 'settings' && settingsLoading && !formSettings && !settingsError) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-body-enhanced text-muted-enhanced">Loading admin dashboard...</p>
+          <p className="text-body-enhanced text-muted-enhanced">Loading settings...</p>
         </div>
       </div>
     );
