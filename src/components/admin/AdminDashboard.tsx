@@ -45,11 +45,15 @@ export default function AdminDashboard() {
   }, [activeTab]);
 
   const fetchBookings = async () => {
+    setBookingsLoading(true);
     try {
       const response = await fetch('/api/admin/bookings');
       const data = await response.json();
       if (data.success) {
+        console.log(`Loaded ${data.bookings.length} bookings`);
         setBookings(data.bookings);
+      } else {
+        console.error('Failed to fetch bookings:', data.error);
       }
     } catch (error) {
       console.error('Failed to fetch bookings:', error);

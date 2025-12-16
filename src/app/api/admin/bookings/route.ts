@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 
 export async function GET(request: Request) {
   try {
@@ -21,7 +21,8 @@ export async function GET(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    // Use admin client to bypass RLS and read all bookings
+    const supabase = createAdminClient();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const date = searchParams.get('date');
@@ -49,7 +50,13 @@ export async function GET(request: Request) {
     const { data: bookings, error } = await query;
 
     if (error) {
+      console.error('Failed to fetch bookings:', error);
       throw new Error(`Failed to fetch bookings: ${error.message}`);
+    }
+
+    console.log(`Fetched ${bookings?.length || 0} bookings for admin:`, session.user.email);
+    if (bookings && bookings.length > 0) {
+      console.log('Booking statuses:', bookings.map(b => b.status).join(', '));
     }
 
     return NextResponse.json({
