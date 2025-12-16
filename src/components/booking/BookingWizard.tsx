@@ -80,6 +80,8 @@ export default function BookingWizard() {
         captcha_answer: captchaAnswer,
       };
 
+      console.log('Submitting booking data:', bookingData);
+
       const response = await fetch('/api/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,6 +89,8 @@ export default function BookingWizard() {
       });
 
       const result = await response.json();
+      
+      console.log('Booking creation response:', { status: response.status, result });
 
       if (!response.ok) {
         // Handle validation errors with detailed messages

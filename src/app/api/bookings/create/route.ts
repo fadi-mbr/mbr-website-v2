@@ -43,9 +43,22 @@ export async function POST(request: Request) {
     
     const body = await request.json();
     
+    // Log the incoming request for debugging
+    console.log('Booking creation request:', {
+      service_type: body.service_type,
+      slot_start: body.slot_start,
+      slot_end: body.slot_end,
+      customer_name: body.customer_name,
+      customer_email: body.customer_email,
+      customer_phone: body.customer_phone,
+      has_notes: !!body.customer_notes,
+      captcha_answer: body.captcha_answer,
+    });
+    
     // Validate input
     const validationResult = bookingCreateSchema.safeParse(body);
     if (!validationResult.success) {
+      console.error('Validation errors:', validationResult.error.errors);
       // Format validation errors into user-friendly messages
       const errorMessages = validationResult.error.errors.map(err => {
         const field = err.path.join('.');
@@ -72,9 +85,31 @@ export async function POST(request: Request) {
       // Return the first error message (most relevant)
       const primaryError = errorMessages[0] || 'Please check your input and try again';
       
+      // Build a comprehensive error message
+      let fullErrorMessage = primaryError;
+      if (errorMessages.length > 1) {
+        fullErrorMessage += '\n\nAdditional issues:\n' + errorMessages.slice(1).map((err, i) => `${i + 1}. ${err}`).join('\n');
+      }
+      
+      // Add field-specific help
+      const hasSlotError = validationResult.error.errors.some(e => 
+        e.path.includes('slot_start') || e.path.includes('slot_end')
+      );
+      if (hasSlotError) {
+        fullErrorMessage += '\n\n💡 Tip: Please go back to Step 2 and select a date and time again.';
+      }
+      
+      const hasPhoneError = validationResult.error.errors.some(e => 
+        e.path.includes('customer_phone')
+      );
+      if (hasPhoneError) {
+        fullErrorMessage += '\n\n💡 Tip: UAE phone numbers must be in format +971XXXXXXXXX (e.g., +971501234567)';
+      }
+      
       return NextResponse.json(
         { 
-          error: primaryError,
+          error: fullErrorMessage,
+          primaryError,
           details: validationResult.error.errors,
           allErrors: errorMessages
         },
