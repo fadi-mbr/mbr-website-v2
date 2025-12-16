@@ -5,8 +5,22 @@ const uaePhoneRegex = /^\+971[0-9]{9}$/;
 
 export const bookingCreateSchema = z.object({
   service_type: z.string().min(1, 'Service type is required'),
-  slot_start: z.string().datetime('Invalid date format'),
-  slot_end: z.string().datetime('Invalid date format'),
+  slot_start: z.string().refine(
+    (val) => {
+      // Accept ISO datetime strings
+      const date = new Date(val);
+      return !isNaN(date.getTime()) && val.includes('T');
+    },
+    { message: 'Please select a valid date and time' }
+  ),
+  slot_end: z.string().refine(
+    (val) => {
+      // Accept ISO datetime strings
+      const date = new Date(val);
+      return !isNaN(date.getTime()) && val.includes('T');
+    },
+    { message: 'Please select a valid date and time' }
+  ),
   customer_name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
   customer_email: z.string().email('Invalid email address'),
   customer_phone: z.string().regex(uaePhoneRegex, 'Phone must be in format +971XXXXXXXXX'),
