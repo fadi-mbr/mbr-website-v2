@@ -133,9 +133,24 @@ export async function createCalendarEvent(booking: Booking): Promise<{
       }
     }
   
+    // Try to add calendar email as attendee (for restricted calendars)
+    // This sends an invite which might work even without direct write access
+    const calendarEmail = await getCalendarEmail(calendar, settings.google_calendar_id);
+    if (calendarEmail) {
+      event.attendees = [
+        {
+          email: calendarEmail,
+          responseStatus: 'accepted',
+        },
+      ];
+      console.log('Adding calendar email as attendee to send invite:', calendarEmail);
+    }
+  
+    // Try to create event - if direct write fails, we'll fall back to ICS file
     const response = await calendar.events.insert({
       calendarId: settings.google_calendar_id,
       requestBody: event,
+      sendUpdates: calendarEmail ? 'all' : 'none', // Send invites if calendar email found
     });
     
     if (!response.data.id || !response.data.htmlLink) {
