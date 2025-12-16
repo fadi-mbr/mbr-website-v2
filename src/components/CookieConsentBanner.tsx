@@ -5,12 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaCookie, FaTimes, FaCog, FaCheck, FaTimes as FaX } from 'react-icons/fa';
 import {
   getStoredConsent,
-  saveConsent,
   acceptAllCookies,
   rejectAllCookies,
   saveCustomConsent,
   type CookieConsent,
-  type ConsentStatus,
 } from '@/lib/cookie-consent';
 
 export default function CookieConsentBanner() {
@@ -104,7 +102,7 @@ export default function CookieConsentBanner() {
                       </h3>
                       <p className="text-body-enhanced leading-relaxed mb-4">
                         We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. 
-                        By clicking "Accept All", you consent to our use of cookies. You can also customize your preferences 
+                        By clicking &quot;Accept All&quot;, you consent to our use of cookies. You can also customize your preferences 
                         or reject non-essential cookies.
                       </p>
                       <p className="text-sm text-muted-enhanced mb-4">

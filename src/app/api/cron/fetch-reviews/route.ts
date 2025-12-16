@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { addReviewsToDatabase, getDatabaseStats } from '@/lib/reviews-database';
-import { selectBestReviews } from '@/lib/ai-review-selector';
 
 const PLACE_ID = process.env.GOOGLE_PLACE_ID;
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;

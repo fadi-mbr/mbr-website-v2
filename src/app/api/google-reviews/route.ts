@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { selectBestReviews, selectBestReviewsWithSmartAI } from '@/lib/ai-review-selector';
+import { selectBestReviewsWithSmartAI } from '@/lib/ai-review-selector';
 import { getFiveStarReviews, getDatabaseStats, addReviewsToDatabase } from '@/lib/reviews-database';
 
 interface GoogleReview {

@@ -202,7 +202,7 @@ export default function PremiumBrandsCarousel() {
           </h2>
           <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
             Expert service and repair for all luxury and premium car brands in Dubai, UAE.
-            Our certified technicians have extensive experience with the world's finest automotive marques.
+            Our certified technicians have extensive experience with the world&apos;s finest automotive marques.
           </p>
         </motion.div>
 
