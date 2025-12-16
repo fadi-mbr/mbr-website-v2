@@ -163,7 +163,15 @@ export default function BookingWizard() {
         // Redirect to success page
         window.location.href = `/book/success?bookingId=${result.booking.id}`;
       } else {
-        setError(result.error || 'Failed to create booking. Please try again.');
+        let errorMsg = result.error || 'Failed to create booking. Please try again.';
+        // Include error details if available
+        if (result.details) {
+          errorMsg += `\n\nDetails: ${result.details}`;
+        }
+        if (result.code) {
+          errorMsg += `\n\nError code: ${result.code}`;
+        }
+        setError(errorMsg);
         setLoading(false);
       }
     } catch (err) {
