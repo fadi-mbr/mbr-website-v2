@@ -89,13 +89,42 @@ export default function BookingWizard() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to create booking');
+        // Handle validation errors with detailed messages
+        let errorMessage = result.error || 'Failed to create booking. Please try again.';
+        
+        // If there are multiple errors, show them all
+        if (result.allErrors && result.allErrors.length > 1) {
+          errorMessage = 'Please fix the following errors:\n' + result.allErrors.map((err: string, i: number) => `${i + 1}. ${err}`).join('\n');
+        }
+        
+        // Add helpful context for common errors
+        if (result.details) {
+          const phoneError = result.details.find((d: any) => d.path.includes('customer_phone'));
+          if (phoneError) {
+            errorMessage += '\n\nTip: UAE phone numbers should be in format +971XXXXXXXXX (e.g., +971501234567)';
+          }
+          
+          const dateError = result.details.find((d: any) => d.path.includes('slot_start') || d.path.includes('slot_end'));
+          if (dateError) {
+            errorMessage += '\n\nTip: Please go back and select a date and time again.';
+          }
+        }
+        
+        setError(errorMessage);
+        setLoading(false);
+        return;
       }
 
-      // Redirect to success page
-      window.location.href = `/book/success?bookingId=${result.booking.id}`;
+      if (result.success) {
+        // Redirect to success page
+        window.location.href = `/book/success?bookingId=${result.booking.id}`;
+      } else {
+        setError(result.error || 'Failed to create booking. Please try again.');
+        setLoading(false);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create booking. Please try again.');
+      console.error('Booking submission error:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred. Please try again. If the problem persists, please contact us.');
       setLoading(false);
     }
   };
