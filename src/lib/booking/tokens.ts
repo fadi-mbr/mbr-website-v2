@@ -4,18 +4,25 @@ import { createClient } from '@/lib/supabase/server';
 import { getSettings } from './settings';
 
 export async function createConfirmationToken(bookingId: string): Promise<string> {
-  const supabase = await createClient();
+  // Use admin client to bypass RLS for token creation
+  const { createAdminClient } = await import('@/lib/supabase/server');
+  const supabase = createAdminClient();
   const settings = await getSettings();
+  
+  console.log('Creating confirmation token for booking:', bookingId);
   
   // Generate random token
   const token = crypto.randomBytes(32).toString('hex');
+  console.log('Generated token (first 8 chars):', token.substring(0, 8) + '...');
   
   // Hash token for storage
   const tokenHash = await bcrypt.hash(token, 10);
+  console.log('Token hashed successfully');
   
   // Calculate expiry
   const expiresAt = new Date();
   expiresAt.setMinutes(expiresAt.getMinutes() + settings.confirmation_expiry_minutes);
+  console.log('Token expires at:', expiresAt.toISOString());
   
   // Store in database
   const { error } = await supabase
@@ -27,9 +34,11 @@ export async function createConfirmationToken(bookingId: string): Promise<string
     });
   
   if (error) {
+    console.error('Failed to insert confirmation token:', error);
     throw new Error(`Failed to create confirmation token: ${error.message}`);
   }
   
+  console.log('✅ Confirmation token stored in database');
   return token;
 }
 

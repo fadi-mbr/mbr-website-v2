@@ -227,11 +227,16 @@ export async function POST(request: Request) {
     
     // Create confirmation token
     let confirmationToken;
+    let emailSent = false;
+    let emailError: string | null = null;
+    
     try {
+      console.log('Creating confirmation token for booking:', booking.id);
       confirmationToken = await createConfirmationToken(booking.id);
-      console.log('Confirmation token created successfully');
+      console.log('✅ Confirmation token created successfully:', confirmationToken.substring(0, 8) + '...');
     } catch (tokenError) {
-      console.error('Failed to create confirmation token:', tokenError);
+      console.error('❌ Failed to create confirmation token:', tokenError);
+      emailError = `Token creation failed: ${tokenError instanceof Error ? tokenError.message : String(tokenError)}`;
       // Don't fail the booking if token creation fails - log it and continue
       // The booking is still created, but confirmation won't work
     }
@@ -239,19 +244,24 @@ export async function POST(request: Request) {
     // Send confirmation email
     if (confirmationToken) {
       try {
+        console.log('📧 Attempting to send confirmation email to:', booking.customer_email);
         await sendConfirmationEmail(booking, confirmationToken);
-        console.log('Confirmation email sent successfully to:', booking.customer_email);
-      } catch (emailError) {
-        console.error('Email sending error:', emailError);
+        emailSent = true;
+        console.log('✅ Confirmation email sent successfully to:', booking.customer_email);
+      } catch (emailErrorCaught) {
+        emailSent = false;
+        emailError = emailErrorCaught instanceof Error ? emailErrorCaught.message : String(emailErrorCaught);
+        console.error('❌ Email sending error:', emailErrorCaught);
         console.error('Email error details:', {
-          message: emailError instanceof Error ? emailError.message : String(emailError),
-          stack: emailError instanceof Error ? emailError.stack : undefined,
+          message: emailError,
+          stack: emailErrorCaught instanceof Error ? emailErrorCaught.stack : undefined,
         });
         // Don't fail the booking if email fails - log it
         // The booking is still created, user can contact support if needed
       }
     } else {
-      console.warn('Skipping email send - no confirmation token was created');
+      console.warn('⚠️  Skipping email send - no confirmation token was created');
+      emailError = 'No confirmation token created';
     }
     
     return NextResponse.json({
@@ -259,8 +269,12 @@ export async function POST(request: Request) {
       booking: {
         id: booking.id,
         status: booking.status,
-        message: 'Booking created successfully. Please check your email to confirm.',
+        message: emailSent 
+          ? 'Booking created successfully. Please check your email to confirm.'
+          : 'Booking created successfully, but email could not be sent. Please contact support.',
       },
+      emailSent,
+      emailError: emailError || undefined,
     });
     
   } catch (error) {
