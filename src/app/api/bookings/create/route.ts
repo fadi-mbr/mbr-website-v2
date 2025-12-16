@@ -6,6 +6,7 @@ import { createConfirmationToken } from '@/lib/booking/tokens';
 import { sendConfirmationEmail } from '@/lib/booking/email';
 import { generateAvailableSlots, isSlotAvailable } from '@/lib/booking/slots';
 import { getServiceTypes } from '@/lib/booking/settings';
+import type { ServiceType } from '@/lib/booking/types';
 
 // Rate limiting: simple in-memory store (use Redis in production)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
