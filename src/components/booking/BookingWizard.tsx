@@ -160,6 +160,14 @@ export default function BookingWizard() {
       }
 
       if (result.success) {
+        // Log email status for debugging
+        if (result.emailSent === false) {
+          console.warn('⚠️  Booking created but email was not sent:', result.emailError);
+          // Still redirect to success, but log the issue
+        } else if (result.emailSent === true) {
+          console.log('✅ Email sent successfully');
+        }
+        
         // Redirect to success page
         window.location.href = `/book/success?bookingId=${result.booking.id}`;
       } else {
