@@ -122,15 +122,13 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5, duration: 0.4 }}
           >
-            <a
-              href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/book"
               className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small"
-              onClick={() => trackWhatsAppClick('navigation_desktop', 'Book Service')}
+              onClick={() => trackNavigation('book', 'desktop')}
             >
               Book Service
-            </a>
+            </Link>
           </motion.div>
 
           {/* Mobile Menu Button */}
@@ -208,18 +206,16 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                   transition={{ delay: 0.3, duration: 0.2 }}
                   className="pt-4"
                 >
-              <a
-                href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
-                target="_blank"
-                rel="noopener noreferrer"
-                    className="block liquid-glass-btn liquid-glass-btn-primary text-center"
+              <Link
+                href="/book"
+                className="block liquid-glass-btn liquid-glass-btn-primary text-center"
                 onClick={() => {
                   setIsOpen(false);
-                  trackWhatsAppClick('navigation_mobile', 'Book Service');
+                  trackNavigation('book', 'mobile');
                 }}
               >
                 Book Service
-              </a>
+              </Link>
                 </motion.div>
             </div>
           </motion.div>
