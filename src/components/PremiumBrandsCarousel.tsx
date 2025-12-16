@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
@@ -120,38 +120,30 @@ const duplicatedBrands = [...premiumBrands, ...premiumBrands];
 // Brand logo component with fallback
 function BrandLogo({ brand }: { brand: typeof premiumBrands[0] }) {
   const [imageError, setImageError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-
-  if (imageError) {
-    // Fallback to text if image fails to load
-    return (
-      <div 
-        className="text-sm font-light tracking-wider opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-        style={{ 
-          color: brand.color !== '#000000' ? brand.color : '#ffffff',
-          textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)'
-        }}
-      >
-        {brand.name}
-      </div>
-    );
-  }
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      <Image
-        src={brand.logo}
-        alt={`${brand.name} repair and service in Dubai, UAE`}
-        width={160}
-        height={80}
-        className={`object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300 ${
-          imageLoaded ? 'block' : 'hidden'
-        }`}
-        onLoad={() => setImageLoaded(true)}
-        onError={() => setImageError(true)}
-      />
-      {!imageLoaded && !imageError && (
-        <div className="text-xs text-muted-enhanced animate-pulse">Loading...</div>
+      {imageError ? (
+        // Fallback to text if image fails to load
+        <div 
+          className="text-sm font-light tracking-wider opacity-80 group-hover:opacity-100 transition-opacity duration-300 text-center px-2"
+          style={{ 
+            color: brand.color !== '#000000' ? brand.color : '#ffffff',
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)'
+          }}
+        >
+          {brand.name}
+        </div>
+      ) : (
+        <Image
+          src={brand.logo}
+          alt={`${brand.name} repair and service in Dubai, UAE`}
+          width={160}
+          height={80}
+          className="object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+          onError={() => setImageError(true)}
+          unoptimized={true}
+        />
       )}
     </div>
   );
