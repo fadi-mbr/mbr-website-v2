@@ -13,20 +13,52 @@ async function getTransporter() {
   const settings = await getSettings();
   
   // Get SMTP configuration with fallbacks
-  let smtpHost = settings.smtp_host || process.env.SMTP_HOST || '';
+  // Handle empty strings by treating them as missing
+  let smtpHost = (settings.smtp_host && settings.smtp_host.trim()) || process.env.SMTP_HOST || '';
   const smtpPort = settings.smtp_port || parseInt(process.env.SMTP_PORT || '587', 10);
-  const smtpUsername = settings.smtp_username || process.env.SMTP_USERNAME || process.env.SMTP_USER || '';
-  const smtpFrom = settings.smtp_from || process.env.SMTP_FROM || smtpUsername;
+  const smtpUsername = (settings.smtp_username && settings.smtp_username.trim()) || process.env.SMTP_USERNAME || process.env.SMTP_USER || '';
+  const smtpFrom = (settings.smtp_from && settings.smtp_from.trim()) || process.env.SMTP_FROM || smtpUsername;
+  
+  console.log('SMTP Configuration Check:', {
+    smtpHost_from_settings: settings.smtp_host,
+    smtpHost_after_fallback: smtpHost,
+    smtpUsername_from_settings: settings.smtp_username,
+    smtpUsername_after_fallback: smtpUsername,
+    smtpFrom_from_settings: settings.smtp_from,
+    smtpFrom_after_fallback: smtpFrom,
+    smtpPort,
+    env_SMTP_HOST: process.env.SMTP_HOST,
+    env_SMTP_USERNAME: process.env.SMTP_USERNAME,
+  });
   
   // Infer host from username if missing (for ImprovMX)
-  if (!smtpHost && smtpUsername.includes('@mail.mbrme.com')) {
+  if ((!smtpHost || smtpHost.trim() === '') && smtpUsername && smtpUsername.includes('@mail.mbrme.com')) {
     smtpHost = 'smtp.improvmx.com';
     console.log('ℹ️  Inferred SMTP host from username: smtp.improvmx.com');
   }
   
-  // Validate SMTP settings
-  if (!smtpHost || !smtpUsername || !smtpFrom) {
-    throw new Error('SMTP settings not configured. Please configure SMTP host, username, and from address in admin settings or environment variables.');
+  // Also check for ImprovMX pattern in env vars
+  if ((!smtpHost || smtpHost.trim() === '') && smtpUsername && smtpUsername.includes('improvmx')) {
+    smtpHost = 'smtp.improvmx.com';
+    console.log('ℹ️  Inferred SMTP host (ImprovMX pattern): smtp.improvmx.com');
+  }
+  
+  // Final validation - check for empty strings
+  const hasHost = smtpHost && smtpHost.trim() !== '';
+  const hasUsername = smtpUsername && smtpUsername.trim() !== '';
+  const hasFrom = smtpFrom && smtpFrom.trim() !== '';
+  
+  if (!hasHost || !hasUsername || !hasFrom) {
+    const missing: string[] = [];
+    if (!hasHost) missing.push('SMTP Host');
+    if (!hasUsername) missing.push('SMTP Username');
+    if (!hasFrom) missing.push('SMTP From Address');
+    
+    throw new Error(
+      `SMTP settings not configured. Missing: ${missing.join(', ')}. ` +
+      `Please configure these in Admin Dashboard → Settings → SMTP or set environment variables. ` +
+      `Current values - Host: "${smtpHost}", Username: "${smtpUsername}", From: "${smtpFrom}"`
+    );
   }
   
   const smtpPassword = process.env.SMTP_PASSWORD;
