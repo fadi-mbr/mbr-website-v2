@@ -89,13 +89,30 @@ export function DateTimePicker({
             onSelect={handleDateSelect}
             initialFocus
             disabled={(date) => {
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              const checkDate = new Date(date);
+              checkDate.setHours(0, 0, 0, 0);
+              
+              // Disable past dates
+              if (checkDate < today) {
+                return true;
+              }
+              
               // Disable dates that have no available slots
               const dateStr = format(date, "yyyy-MM-dd");
               const hasSlots = slots.some(slot => {
                 const slotDate = format(new Date(slot.slot_start), "yyyy-MM-dd");
                 return slotDate === dateStr && slot.available;
               });
+              
               return !hasSlots;
+            }}
+            modifiers={{
+              today: new Date(),
+            }}
+            modifiersClassNames={{
+              today: "day-today",
             }}
           />
           <div className="flex flex-col sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x border-t sm:border-t-0 sm:border-l">
