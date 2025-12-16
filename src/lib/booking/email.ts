@@ -12,15 +12,43 @@ async function getTransporter() {
   
   const settings = await getSettings();
   
+  // Validate SMTP settings
+  if (!settings.smtp_host || !settings.smtp_username || !settings.smtp_from) {
+    throw new Error('SMTP settings not configured. Please configure SMTP host, username, and from address in admin settings.');
+  }
+  
+  const smtpPassword = process.env.SMTP_PASSWORD;
+  if (!smtpPassword) {
+    throw new Error('SMTP_PASSWORD environment variable is not set. Please add it to your environment variables.');
+  }
+  
+  console.log('Creating SMTP transporter:', {
+    host: settings.smtp_host,
+    port: settings.smtp_port,
+    secure: settings.smtp_port === 465,
+    username: settings.smtp_username,
+    from: settings.smtp_from,
+    hasPassword: !!smtpPassword,
+  });
+  
   transporter = nodemailer.createTransport({
     host: settings.smtp_host,
     port: settings.smtp_port,
     secure: settings.smtp_port === 465,
     auth: {
       user: settings.smtp_username,
-      pass: process.env.SMTP_PASSWORD || '',
+      pass: smtpPassword,
     },
   });
+  
+  // Verify connection
+  try {
+    await transporter.verify();
+    console.log('SMTP connection verified successfully');
+  } catch (verifyError) {
+    console.error('SMTP verification failed:', verifyError);
+    throw new Error(`SMTP connection failed: ${verifyError instanceof Error ? verifyError.message : 'Unknown error'}`);
+  }
   
   return transporter;
 }
@@ -107,13 +135,23 @@ ${settings.business_name}
 ${settings.business_address}
   `;
   
-  await transporter.sendMail({
-    from: settings.smtp_from,
-    to: booking.customer_email,
-    subject: `Confirm Your Booking - ${settings.business_name}`,
-    html,
-    text,
-  });
+  try {
+    const result = await transporter.sendMail({
+      from: settings.smtp_from,
+      to: booking.customer_email,
+      subject: `Confirm Your Booking - ${settings.business_name}`,
+      html,
+      text,
+    });
+    console.log('Confirmation email sent successfully:', {
+      messageId: result.messageId,
+      to: booking.customer_email,
+      from: settings.smtp_from,
+    });
+  } catch (sendError) {
+    console.error('Failed to send confirmation email:', sendError);
+    throw sendError; // Re-throw to be caught by caller
+  }
 }
 
 export function generateICSFile(booking: Booking, settings: { timezone: string; business_address: string }): string {
@@ -148,6 +186,8 @@ export async function sendConfirmedEmail(
 ): Promise<void> {
   const settings = await getSettings();
   const transporter = await getTransporter();
+  
+  console.log('Sending confirmed email to:', booking.customer_email);
   
   const googleMapsLink = settings.google_maps_link || 
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.business_address)}`;
@@ -216,12 +256,23 @@ export async function sendConfirmedEmail(
     });
   }
   
-  await transporter.sendMail({
-    from: settings.smtp_from,
-    to: booking.customer_email,
-    subject: `Booking Confirmed - ${settings.business_name}`,
-    html,
-    attachments,
-  });
+  try {
+    const result = await transporter.sendMail({
+      from: settings.smtp_from,
+      to: booking.customer_email,
+      subject: `Booking Confirmed - ${settings.business_name}`,
+      html,
+      attachments,
+    });
+    console.log('Confirmed email sent successfully:', {
+      messageId: result.messageId,
+      to: booking.customer_email,
+      from: settings.smtp_from,
+      attachmentsCount: attachments.length,
+    });
+  } catch (sendError) {
+    console.error('Failed to send confirmed email:', sendError);
+    throw sendError; // Re-throw to be caught by caller
+  }
 }
 

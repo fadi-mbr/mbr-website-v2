@@ -240,13 +240,18 @@ export async function POST(request: Request) {
     if (confirmationToken) {
       try {
         await sendConfirmationEmail(booking, confirmationToken);
-        console.log('Confirmation email sent successfully');
+        console.log('Confirmation email sent successfully to:', booking.customer_email);
       } catch (emailError) {
         console.error('Email sending error:', emailError);
+        console.error('Email error details:', {
+          message: emailError instanceof Error ? emailError.message : String(emailError),
+          stack: emailError instanceof Error ? emailError.stack : undefined,
+        });
         // Don't fail the booking if email fails - log it
+        // The booking is still created, user can contact support if needed
       }
     } else {
-      console.warn('Skipping email send - no confirmation token');
+      console.warn('Skipping email send - no confirmation token was created');
     }
     
     return NextResponse.json({

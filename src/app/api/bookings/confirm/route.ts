@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { validateConfirmationToken } from '@/lib/booking/tokens';
 import { sendConfirmedEmail } from '@/lib/booking/email';
 import { createCalendarEvent } from '@/lib/booking/calendar';
@@ -32,7 +32,9 @@ export async function GET(request: Request) {
     }
     
     const bookingId = tokenValidation.bookingId!;
-    const supabase = await createClient();
+    
+    // Use admin client to read booking (bypasses RLS)
+    const supabase = createAdminClient();
     
     // Get booking
     const { data: booking, error: bookingError } = await supabase
@@ -65,12 +67,22 @@ export async function GET(request: Request) {
     let googleCalendarLink: string | undefined;
     
     // Create Google Calendar event (optional - won't fail booking if it fails)
-    const calendarEvent = await createCalendarEvent(booking);
-    if (calendarEvent) {
-      googleEventId = calendarEvent.eventId;
-      googleCalendarLink = calendarEvent.htmlLink;
-    } else {
-      console.warn('Calendar event not created - booking will still be confirmed');
+    console.log('Creating Google Calendar event for booking:', bookingId);
+    try {
+      const calendarEvent = await createCalendarEvent(booking);
+      if (calendarEvent) {
+        googleEventId = calendarEvent.eventId;
+        googleCalendarLink = calendarEvent.htmlLink;
+        console.log('Google Calendar event created successfully:', {
+          eventId: googleEventId,
+          calendarLink: googleCalendarLink,
+        });
+      } else {
+        console.warn('Calendar event not created - check Google Calendar settings');
+      }
+    } catch (calendarError) {
+      console.error('Failed to create calendar event:', calendarError);
+      // Continue with confirmation even if calendar fails
     }
     
     const { error: updateError } = await supabase
