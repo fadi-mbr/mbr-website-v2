@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import type { Booking, Settings } from '@/lib/booking/types';
 
@@ -12,11 +12,14 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [bookingsLoading, setBookingsLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const [settings, setSettings] = useState<Settings | null>(null);
-  const [localSettings, setLocalSettings] = useState<Settings | null>(null);
+  
+  // Settings state
+  const [originalSettings, setOriginalSettings] = useState<Settings | null>(null);
+  const [formSettings, setFormSettings] = useState<Settings | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(true);
+  const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsMessage, setSettingsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [savingKeys, setSavingKeys] = useState<Set<string>>(new Set());
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'bookings') {
@@ -46,9 +49,9 @@ export default function AdminDashboard() {
       const response = await fetch('/api/admin/settings');
       const data = await response.json();
       if (data.success) {
-        console.log('Settings loaded:', data.settings);
-        setSettings(data.settings);
-        setLocalSettings(data.settings);
+        setOriginalSettings(data.settings);
+        setFormSettings(data.settings);
+        setHasUnsavedChanges(false);
       } else {
         console.error('Failed to load settings:', data.error);
       }
@@ -59,82 +62,115 @@ export default function AdminDashboard() {
     }
   };
 
-  const updateSetting = async (key: string, value: unknown) => {
-    if (!localSettings) return;
+  // Update form field
+  const updateFormField = useCallback((key: keyof Settings, value: unknown) => {
+    if (!formSettings) return;
     
-    // Update local state immediately for responsive UI
-    setLocalSettings({ ...localSettings, [key]: value });
-    setSavingKeys(prev => new Set(prev).add(key));
+    setFormSettings(prev => {
+      if (!prev) return prev;
+      const updated = { ...prev, [key]: value };
+      
+      // Check if there are unsaved changes
+      const hasChanges = JSON.stringify(updated) !== JSON.stringify(originalSettings);
+      setHasUnsavedChanges(hasChanges);
+      
+      return updated;
+    });
+  }, [formSettings, originalSettings]);
+
+  // Update working hours field
+  const updateWorkingHoursField = useCallback((day: string, field: 'open' | 'close' | 'enabled', value: string | boolean) => {
+    if (!formSettings) return;
+    
+    setFormSettings(prev => {
+      if (!prev) return prev;
+      
+      const updatedHours = {
+        ...prev.working_hours,
+        [day]: {
+          ...(prev.working_hours[day] || { open: '09:00', close: '18:00', enabled: false }),
+          [field]: value,
+        },
+      };
+      
+      const updated = { ...prev, working_hours: updatedHours };
+      
+      // Check if there are unsaved changes
+      const hasChanges = JSON.stringify(updated) !== JSON.stringify(originalSettings);
+      setHasUnsavedChanges(hasChanges);
+      
+      return updated;
+    });
+  }, [formSettings, originalSettings]);
+
+  // Save all settings
+  const saveAllSettings = async () => {
+    if (!formSettings || !originalSettings) return;
+    
+    setSettingsSaving(true);
     setSettingsMessage(null);
     
     try {
-      const response = await fetch('/api/admin/settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key, value }),
+      // Save all settings in parallel
+      const savePromises = Object.entries(formSettings).map(async ([key, value]) => {
+        // Skip service_types as it's hardcoded
+        if (key === 'service_types') return;
+        
+        const response = await fetch('/api/admin/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key, value }),
+        });
+        
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.error || `Failed to save ${key}`);
+        }
       });
-
-      const data = await response.json();
       
-      if (data.success) {
-        // Update the main settings state
-        setSettings({ ...localSettings, [key]: value });
-        setSettingsMessage({ type: 'success', text: 'Setting saved successfully' });
-        setTimeout(() => setSettingsMessage(null), 3000);
-      } else {
-        // Revert on error
-        setLocalSettings(settings);
-        setSettingsMessage({ type: 'error', text: data.error || 'Failed to save setting' });
-      }
+      await Promise.all(savePromises);
+      
+      // Update original settings after successful save
+      setOriginalSettings(formSettings);
+      setHasUnsavedChanges(false);
+      setSettingsMessage({ type: 'success', text: 'All settings saved successfully' });
+      setTimeout(() => setSettingsMessage(null), 3000);
     } catch (error) {
-      console.error('Failed to update setting:', error);
-      // Revert on error
-      setLocalSettings(settings);
-      setSettingsMessage({ type: 'error', text: 'Failed to save setting' });
-    } finally {
-      setSavingKeys(prev => {
-        const next = new Set(prev);
-        next.delete(key);
-        return next;
+      console.error('Failed to save settings:', error);
+      setSettingsMessage({ 
+        type: 'error', 
+        text: error instanceof Error ? error.message : 'Failed to save settings' 
       });
+    } finally {
+      setSettingsSaving(false);
     }
   };
 
-  const updateLocalSetting = (key: string, value: unknown) => {
-    if (!localSettings) return;
-    setLocalSettings({ ...localSettings, [key]: value });
+  // Reset form to original values
+  const resetForm = () => {
+    if (originalSettings) {
+      setFormSettings(originalSettings);
+      setHasUnsavedChanges(false);
+      setSettingsMessage(null);
+    }
   };
 
-  const updateWorkingHours = (day: string, field: 'open' | 'close' | 'enabled', value: string | boolean) => {
-    if (!localSettings) return;
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
     
-    const updatedHours = {
-      ...localSettings.working_hours,
-      [day]: {
-        ...(localSettings.working_hours[day] || { open: '09:00', close: '18:00', enabled: false }),
-        [field]: value,
-      },
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
     };
     
-    updateSetting('working_hours', updatedHours);
-  };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
-  const updateLocalWorkingHours = (day: string, field: 'open' | 'close' | 'enabled', value: string | boolean) => {
-    if (!localSettings) return;
-    
-    const updatedHours = {
-      ...localSettings.working_hours,
-      [day]: {
-        ...(localSettings.working_hours[day] || { open: '09:00', close: '18:00', enabled: false }),
-        [field]: value,
-      },
-    };
-    
-    setLocalSettings({ ...localSettings, working_hours: updatedHours });
-  };
-
-  // Use localSettings for display, fallback to settings
-  const displaySettings = localSettings || settings;
+  if (!formSettings) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -160,7 +196,12 @@ export default function AdminDashboard() {
         {/* Tabs */}
         <div className="flex gap-4 mb-8 border-b border-gray-800">
           <button
-            onClick={() => setActiveTab('bookings')}
+            onClick={() => {
+              if (hasUnsavedChanges && !confirm('You have unsaved changes. Are you sure you want to switch tabs?')) {
+                return;
+              }
+              setActiveTab('bookings');
+            }}
             className={`pb-4 px-6 text-subheading transition-colors ${
               activeTab === 'bookings'
                 ? 'text-primary border-b-2 border-primary'
@@ -178,6 +219,9 @@ export default function AdminDashboard() {
             }`}
           >
             Settings
+            {hasUnsavedChanges && (
+              <span className="ml-2 w-2 h-2 bg-yellow-400 rounded-full inline-block"></span>
+            )}
           </button>
         </div>
 
@@ -252,6 +296,46 @@ export default function AdminDashboard() {
         {/* Settings Tab */}
         {activeTab === 'settings' && (
           <div className="space-y-6">
+            {/* Save/Reset Bar */}
+            <div className="glass-card p-4 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {hasUnsavedChanges && (
+                  <span className="text-yellow-400 text-sm flex items-center gap-2">
+                    <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
+                    You have unsaved changes
+                  </span>
+                )}
+                {!hasUnsavedChanges && !settingsSaving && (
+                  <span className="text-green-400 text-sm">All changes saved</span>
+                )}
+              </div>
+              <div className="flex gap-3">
+                {hasUnsavedChanges && (
+                  <button
+                    onClick={resetForm}
+                    disabled={settingsSaving}
+                    className="liquid-glass-btn liquid-glass-btn-secondary"
+                  >
+                    Reset
+                  </button>
+                )}
+                <button
+                  onClick={saveAllSettings}
+                  disabled={settingsSaving || !hasUnsavedChanges}
+                  className="liquid-glass-btn liquid-glass-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {settingsSaving ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      Saving...
+                    </span>
+                  ) : (
+                    'Save All Changes'
+                  )}
+                </button>
+              </div>
+            </div>
+
             {settingsMessage && (
               <div
                 className={`p-4 rounded-lg ${
@@ -266,38 +350,28 @@ export default function AdminDashboard() {
 
             {settingsLoading ? (
               <div className="text-center py-8 text-muted-enhanced">Loading settings...</div>
-            ) : displaySettings ? (
-              <>
+            ) : (
+              <form onSubmit={(e) => { e.preventDefault(); saveAllSettings(); }}>
                 {/* Business Information */}
                 <div className="glass-card p-8">
                   <h2 className="text-heading font-light mb-6">Business Information</h2>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-subheading mb-2">Business Name</label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={displaySettings.business_name || ''}
-                          onChange={(e) => updateLocalSetting('business_name', e.target.value)}
-                          onBlur={(e) => updateSetting('business_name', e.target.value)}
-                          disabled={savingKeys.has('business_name')}
-                          className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
-                          placeholder="Enter business name"
-                        />
-                        {savingKeys.has('business_name') && (
-                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                          </div>
-                        )}
-                      </div>
+                      <input
+                        type="text"
+                        value={formSettings.business_name || ''}
+                        onChange={(e) => updateFormField('business_name', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        placeholder="Enter business name"
+                      />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">Timezone</label>
                       <select
-                        value={displaySettings.timezone || 'Asia/Dubai'}
-                        onChange={(e) => updateSetting('timezone', e.target.value)}
-                        disabled={savingKeys.has('timezone')}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        value={formSettings.timezone || 'Asia/Dubai'}
+                        onChange={(e) => updateFormField('timezone', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       >
                         <option value="Asia/Dubai">Asia/Dubai (UAE)</option>
                         <option value="UTC">UTC</option>
@@ -308,12 +382,10 @@ export default function AdminDashboard() {
                     <div>
                       <label className="block text-subheading mb-2">Business Address</label>
                       <textarea
-                        value={displaySettings.business_address || ''}
-                        onChange={(e) => updateLocalSetting('business_address', e.target.value)}
-                        onBlur={(e) => updateSetting('business_address', e.target.value)}
-                        disabled={savingKeys.has('business_address')}
+                        value={formSettings.business_address || ''}
+                        onChange={(e) => updateFormField('business_address', e.target.value)}
                         rows={3}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50 resize-none"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary resize-none"
                         placeholder="Enter full business address"
                       />
                     </div>
@@ -321,12 +393,10 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">Google Maps Link (Optional)</label>
                       <input
                         type="url"
-                        value={displaySettings.google_maps_link || ''}
-                        onChange={(e) => updateLocalSetting('google_maps_link', e.target.value || undefined)}
-                        onBlur={(e) => updateSetting('google_maps_link', e.target.value || undefined)}
-                        disabled={savingKeys.has('google_maps_link')}
+                        value={formSettings.google_maps_link || ''}
+                        onChange={(e) => updateFormField('google_maps_link', e.target.value || undefined)}
                         placeholder="https://maps.app.goo.gl/..."
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                     </div>
                   </div>
@@ -340,37 +410,31 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">Slot Duration (minutes)</label>
                       <input
                         type="number"
-                        value={displaySettings.slot_duration_minutes || 30}
-                        onChange={(e) => updateLocalSetting('slot_duration_minutes', Number(e.target.value))}
-                        onBlur={(e) => updateSetting('slot_duration_minutes', Number(e.target.value))}
-                        disabled={savingKeys.has('slot_duration_minutes')}
+                        value={formSettings.slot_duration_minutes || 30}
+                        onChange={(e) => updateFormField('slot_duration_minutes', Number(e.target.value))}
                         min="15"
                         step="15"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">Default Slot Capacity</label>
                       <input
                         type="number"
-                        value={displaySettings.slot_capacity || 1}
-                        onChange={(e) => updateLocalSetting('slot_capacity', Number(e.target.value))}
-                        onBlur={(e) => updateSetting('slot_capacity', Number(e.target.value))}
-                        disabled={savingKeys.has('slot_capacity')}
+                        value={formSettings.slot_capacity || 1}
+                        onChange={(e) => updateFormField('slot_capacity', Number(e.target.value))}
                         min="1"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">Lead Time (hours)</label>
                       <input
                         type="number"
-                        value={displaySettings.lead_time_hours || 2}
-                        onChange={(e) => updateLocalSetting('lead_time_hours', Number(e.target.value))}
-                        onBlur={(e) => updateSetting('lead_time_hours', Number(e.target.value))}
-                        disabled={savingKeys.has('lead_time_hours')}
+                        value={formSettings.lead_time_hours || 2}
+                        onChange={(e) => updateFormField('lead_time_hours', Number(e.target.value))}
                         min="0"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                       <p className="text-sm text-muted-enhanced mt-1">Minimum hours before booking</p>
                     </div>
@@ -378,12 +442,10 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">Max Future Days</label>
                       <input
                         type="number"
-                        value={displaySettings.max_future_days || 90}
-                        onChange={(e) => updateLocalSetting('max_future_days', Number(e.target.value))}
-                        onBlur={(e) => updateSetting('max_future_days', Number(e.target.value))}
-                        disabled={savingKeys.has('max_future_days')}
+                        value={formSettings.max_future_days || 90}
+                        onChange={(e) => updateFormField('max_future_days', Number(e.target.value))}
                         min="1"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                       <p className="text-sm text-muted-enhanced mt-1">Maximum days in future for bookings</p>
                     </div>
@@ -391,12 +453,10 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">Confirmation Expiry (minutes)</label>
                       <input
                         type="number"
-                        value={displaySettings.confirmation_expiry_minutes || 30}
-                        onChange={(e) => updateLocalSetting('confirmation_expiry_minutes', Number(e.target.value))}
-                        onBlur={(e) => updateSetting('confirmation_expiry_minutes', Number(e.target.value))}
-                        disabled={savingKeys.has('confirmation_expiry_minutes')}
+                        value={formSettings.confirmation_expiry_minutes || 30}
+                        onChange={(e) => updateFormField('confirmation_expiry_minutes', Number(e.target.value))}
                         min="5"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                       <p className="text-sm text-muted-enhanced mt-1">Time before confirmation link expires</p>
                     </div>
@@ -408,14 +468,14 @@ export default function AdminDashboard() {
                   <h2 className="text-heading font-light mb-6">Working Hours</h2>
                   <div className="space-y-4">
                     {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => {
-                      const dayHours = displaySettings.working_hours?.[day] || { open: '09:00', close: '18:00', enabled: false };
+                      const dayHours = formSettings.working_hours?.[day] || { open: '09:00', close: '18:00', enabled: false };
                       return (
                         <div key={day} className="flex items-center gap-4 p-4 bg-gray-900/50 rounded-lg">
                           <div className="flex items-center gap-2 w-32">
                             <input
                               type="checkbox"
                               checked={dayHours.enabled}
-                              onChange={(e) => updateWorkingHours(day, 'enabled', e.target.checked)}
+                              onChange={(e) => updateWorkingHoursField(day, 'enabled', e.target.checked)}
                               className="w-4 h-4 cursor-pointer"
                             />
                             <label className="text-subheading capitalize cursor-pointer">{day}</label>
@@ -425,16 +485,14 @@ export default function AdminDashboard() {
                               <input
                                 type="time"
                                 value={dayHours.open}
-                                onChange={(e) => updateLocalWorkingHours(day, 'open', e.target.value)}
-                                onBlur={(e) => updateWorkingHours(day, 'open', e.target.value)}
+                                onChange={(e) => updateWorkingHoursField(day, 'open', e.target.value)}
                                 className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                               />
                               <span className="text-muted-enhanced">to</span>
                               <input
                                 type="time"
                                 value={dayHours.close}
-                                onChange={(e) => updateLocalWorkingHours(day, 'close', e.target.value)}
-                                onBlur={(e) => updateWorkingHours(day, 'close', e.target.value)}
+                                onChange={(e) => updateWorkingHoursField(day, 'close', e.target.value)}
                                 className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                               />
                             </>
@@ -453,20 +511,18 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">Google Calendar ID</label>
                       <input
                         type="text"
-                        value={displaySettings.google_calendar_id || ''}
-                        onChange={(e) => updateLocalSetting('google_calendar_id', e.target.value || undefined)}
-                        onBlur={(e) => updateSetting('google_calendar_id', e.target.value || undefined)}
-                        disabled={savingKeys.has('google_calendar_id')}
+                        value={formSettings.google_calendar_id || ''}
+                        onChange={(e) => updateFormField('google_calendar_id', e.target.value || undefined)}
                         placeholder="calendar@group.calendar.google.com"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                       <p className="text-sm text-muted-enhanced mt-1">Leave empty to disable calendar integration</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={displaySettings.google_calendar_conflict_check || false}
-                        onChange={(e) => updateSetting('google_calendar_conflict_check', e.target.checked)}
+                        checked={formSettings.google_calendar_conflict_check || false}
+                        onChange={(e) => updateFormField('google_calendar_conflict_check', e.target.checked)}
                         className="w-4 h-4 cursor-pointer"
                       />
                       <label className="text-subheading cursor-pointer">Enable conflict checking</label>
@@ -482,45 +538,37 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">SMTP Host</label>
                       <input
                         type="text"
-                        value={displaySettings.smtp_host || ''}
-                        onChange={(e) => updateLocalSetting('smtp_host', e.target.value)}
-                        onBlur={(e) => updateSetting('smtp_host', e.target.value)}
-                        disabled={savingKeys.has('smtp_host')}
+                        value={formSettings.smtp_host || ''}
+                        onChange={(e) => updateFormField('smtp_host', e.target.value)}
                         placeholder="smtp.gmail.com"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">SMTP Port</label>
                       <input
                         type="number"
-                        value={displaySettings.smtp_port || 587}
-                        onChange={(e) => updateLocalSetting('smtp_port', Number(e.target.value))}
-                        onBlur={(e) => updateSetting('smtp_port', Number(e.target.value))}
-                        disabled={savingKeys.has('smtp_port')}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        value={formSettings.smtp_port || 587}
+                        onChange={(e) => updateFormField('smtp_port', Number(e.target.value))}
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">SMTP Username</label>
                       <input
                         type="text"
-                        value={displaySettings.smtp_username || ''}
-                        onChange={(e) => updateLocalSetting('smtp_username', e.target.value)}
-                        onBlur={(e) => updateSetting('smtp_username', e.target.value)}
-                        disabled={savingKeys.has('smtp_username')}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        value={formSettings.smtp_username || ''}
+                        onChange={(e) => updateFormField('smtp_username', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">SMTP From Address</label>
                       <input
                         type="email"
-                        value={displaySettings.smtp_from || ''}
-                        onChange={(e) => updateLocalSetting('smtp_from', e.target.value)}
-                        onBlur={(e) => updateSetting('smtp_from', e.target.value)}
-                        disabled={savingKeys.has('smtp_from')}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                        value={formSettings.smtp_from || ''}
+                        onChange={(e) => updateFormField('smtp_from', e.target.value)}
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                       />
                     </div>
                   </div>
@@ -536,8 +584,8 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={displaySettings.email_include_ics ?? true}
-                        onChange={(e) => updateSetting('email_include_ics', e.target.checked)}
+                        checked={formSettings.email_include_ics ?? true}
+                        onChange={(e) => updateFormField('email_include_ics', e.target.checked)}
                         className="w-4 h-4 cursor-pointer"
                       />
                       <label className="text-subheading cursor-pointer">Include ICS calendar attachment</label>
@@ -545,8 +593,8 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={displaySettings.email_include_google_calendar_link ?? true}
-                        onChange={(e) => updateSetting('email_include_google_calendar_link', e.target.checked)}
+                        checked={formSettings.email_include_google_calendar_link ?? true}
+                        onChange={(e) => updateFormField('email_include_google_calendar_link', e.target.checked)}
                         className="w-4 h-4 cursor-pointer"
                       />
                       <label className="text-subheading cursor-pointer">Include Google Calendar link</label>
@@ -554,17 +602,15 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={displaySettings.email_include_google_maps_link ?? true}
-                        onChange={(e) => updateSetting('email_include_google_maps_link', e.target.checked)}
+                        checked={formSettings.email_include_google_maps_link ?? true}
+                        onChange={(e) => updateFormField('email_include_google_maps_link', e.target.checked)}
                         className="w-4 h-4 cursor-pointer"
                       />
                       <label className="text-subheading cursor-pointer">Include Google Maps link</label>
                     </div>
                   </div>
                 </div>
-              </>
-            ) : (
-              <div className="text-center py-8 text-muted-enhanced">Failed to load settings</div>
+              </form>
             )}
           </div>
         )}
