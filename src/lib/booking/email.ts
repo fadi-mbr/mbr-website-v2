@@ -216,7 +216,7 @@ export function generateICSFile(booking: Booking, settings: { timezone: string; 
     `DTSTAMP:${DateTime.now().setZone(settings.timezone).toFormat("yyyyMMdd'T'HHmmss")}`,
     `DTSTART;TZID=${settings.timezone}:${start.toFormat("yyyyMMdd'T'HHmmss")}`,
     `DTEND;TZID=${settings.timezone}:${end.toFormat("yyyyMMdd'T'HHmmss")}`,
-    `SUMMARY:MBR Booking – ${booking.service_type}`,
+    `SUMMARY:${booking.customer_name} - ${booking.service_type}`,
     `DESCRIPTION:Booking ID: ${booking.id}\\nCustomer: ${booking.customer_name}\\nPhone: ${booking.customer_phone}\\nEmail: ${booking.customer_email}${booking.customer_notes ? `\\nNotes: ${booking.customer_notes}` : ''}`,
     `LOCATION:${settings.business_address}`,
     'STATUS:CONFIRMED',

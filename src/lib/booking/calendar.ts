@@ -134,7 +134,7 @@ export async function createCalendarEvent(booking: Booking): Promise<{
       status: string;
       attendees?: Array<{ email: string; responseStatus?: string }>;
     } = {
-      summary: `MBR Booking – ${booking.service_type}`,
+      summary: `${booking.customer_name} - ${booking.service_type}`,
       description: `Booking ID: ${booking.id}\nCustomer: ${booking.customer_name}\nPhone: ${booking.customer_phone}\nEmail: ${booking.customer_email}${booking.customer_notes ? `\nNotes: ${booking.customer_notes}` : ''}`,
       start: {
         dateTime: startISO,
