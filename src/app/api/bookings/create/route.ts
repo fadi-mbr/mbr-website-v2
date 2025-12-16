@@ -179,7 +179,15 @@ export async function POST(request: Request) {
     
     // Create booking using admin client to bypass RLS
     // We've already validated everything server-side, so it's safe to use admin client
-    const supabase = createAdminClient();
+    let supabase;
+    try {
+      supabase = createAdminClient();
+    } catch (adminClientError) {
+      console.error('Failed to create admin client:', adminClientError);
+      // Fallback to regular client if admin client fails
+      console.log('Falling back to regular client...');
+      supabase = await createClient();
+    }
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
@@ -239,8 +247,21 @@ export async function POST(request: Request) {
     
   } catch (error) {
     console.error('Booking creation error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : 'Unknown',
+      cause: error instanceof Error ? error.cause : undefined,
+    });
+    
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    
     return NextResponse.json(
-      { error: 'An unexpected error occurred. Please try again later.' },
+      { 
+        error: 'An unexpected error occurred. Please try again later.',
+        details: errorMessage,
+        // Don't expose stack trace in production, but log it server-side
+      },
       { status: 500 }
     );
   }
