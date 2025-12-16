@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { bookingCreateSchema, formatUAEPhone } from '@/lib/booking/validation';
 import { generateCaptcha } from '@/lib/booking/captcha';
 import { createConfirmationToken } from '@/lib/booking/tokens';
@@ -177,8 +177,9 @@ export async function POST(request: Request) {
     
     console.log('Service type found:', serviceType);
     
-    // Create booking
-    const supabase = await createClient();
+    // Create booking using admin client to bypass RLS
+    // We've already validated everything server-side, so it's safe to use admin client
+    const supabase = createAdminClient();
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
