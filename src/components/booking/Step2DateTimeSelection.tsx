@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DateTime } from 'luxon';
 import type { ServiceType, SlotAvailability } from '@/lib/booking/types';
@@ -20,17 +20,7 @@ export default function Step2DateTimeSelection({ serviceType, onSelect, onBack }
   const [loading, setLoading] = useState(false);
   const [dateAvailability, setDateAvailability] = useState<Map<string, number>>(new Map());
 
-  // Load slots when date changes
-  useEffect(() => {
-    loadSlots();
-  }, [selectedDate, serviceType.id]);
-
-  // Load availability for visible month
-  useEffect(() => {
-    loadMonthAvailability();
-  }, [currentMonth, serviceType.id]);
-
-  const loadSlots = async () => {
+  const loadSlots = useCallback(async () => {
     setLoading(true);
     try {
       const startDate = DateTime.fromISO(selectedDate).startOf('day').toJSDate();
@@ -49,9 +39,9 @@ export default function Step2DateTimeSelection({ serviceType, onSelect, onBack }
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate, serviceType.id]);
 
-  const loadMonthAvailability = async () => {
+  const loadMonthAvailability = useCallback(async () => {
     try {
       const monthStart = currentMonth.startOf('month').startOf('day').toJSDate();
       const monthEnd = currentMonth.endOf('month').endOf('day').toJSDate();
@@ -75,7 +65,17 @@ export default function Step2DateTimeSelection({ serviceType, onSelect, onBack }
     } catch (error) {
       console.error('Failed to load month availability:', error);
     }
-  };
+  }, [currentMonth, serviceType.id]);
+
+  // Load slots when date changes
+  useEffect(() => {
+    loadSlots();
+  }, [loadSlots]);
+
+  // Load availability for visible month
+  useEffect(() => {
+    loadMonthAvailability();
+  }, [loadMonthAvailability]);
 
   // Generate calendar days
   const calendarDays = useMemo(() => {

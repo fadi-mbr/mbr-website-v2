@@ -14,7 +14,6 @@ export default function AdminDashboard() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(true);
-  const [settingsSaving, setSettingsSaving] = useState(false);
   const [settingsMessage, setSettingsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
@@ -58,7 +57,6 @@ export default function AdminDashboard() {
   };
 
   const updateSetting = async (key: string, value: unknown) => {
-    setSettingsSaving(true);
     setSettingsMessage(null);
     
     try {
@@ -81,8 +79,6 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Failed to update setting:', error);
       setSettingsMessage({ type: 'error', text: 'Failed to save setting' });
-    } finally {
-      setSettingsSaving(false);
     }
   };
 

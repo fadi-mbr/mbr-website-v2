@@ -76,7 +76,7 @@ export async function getSettings(): Promise<Settings> {
   const getOptionalString = (key: string): string | undefined => {
     const value = extractValue(settingsMap.get(key));
     if (value === null || value === undefined) return undefined;
-    let str = typeof value === 'string' ? value.replace(/^"|"$/g, '') : String(value);
+    const str = typeof value === 'string' ? value.replace(/^"|"$/g, '') : String(value);
     // Handle empty string or '""' as undefined
     if (str === '' || str === '""') return undefined;
     return str;
