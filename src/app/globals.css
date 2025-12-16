@@ -1141,3 +1141,18 @@ body {
     animation-duration: 40s;
   }
 }
+
+/* Brand Logo Filter - Convert to greyscale/white for better contrast on red background */
+.brand-logo-filter {
+  filter: grayscale(100%) brightness(0) invert(1);
+  /* 
+   * grayscale(100%) - Convert to greyscale
+   * brightness(0) - Make completely black
+   * invert(1) - Invert to white for contrast on red background
+   */
+}
+
+.brand-logo-filter:hover {
+  filter: grayscale(100%) brightness(0) invert(1) brightness(1.1);
+  /* Slightly brighter on hover */
+}

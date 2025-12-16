@@ -4,112 +4,113 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
-// Premium car brands data with local logo paths
-// All logos are hosted locally in /public/images/brands/
+// Premium car brands data with local SVG logo paths
+// All logos are hosted locally in /public/images/brands/ as SVG files
+// SVGs are converted to greyscale/white for better contrast on red background
 const premiumBrands = [
   {
     name: "Mercedes-Benz",
     slug: "mercedes-benz",
     keywords: "Mercedes repair Dubai, Mercedes service UAE, Mercedes-Benz maintenance",
-    logo: "/images/brands/mercedes-benz.png",
+    logo: "/images/brands/mercedes-benz.svg",
     color: "#00ADEF"
   },
   {
     name: "BMW",
     slug: "bmw",
     keywords: "BMW repair Dubai, BMW service UAE, BMW maintenance",
-    logo: "/images/brands/bmw.png",
+    logo: "/images/brands/bmw.svg",
     color: "#1C69D4"
   },
   {
     name: "Audi",
     slug: "audi",
     keywords: "Audi repair Dubai, Audi service UAE, Audi maintenance",
-    logo: "/images/brands/audi.png",
+    logo: "/images/brands/audi.svg",
     color: "#BB0A30"
   },
   {
     name: "Porsche",
     slug: "porsche",
     keywords: "Porsche repair Dubai, Porsche service UAE, Porsche maintenance",
-    logo: "/images/brands/porsche.png",
+    logo: "/images/brands/porsche.svg",
     color: "#000000"
   },
   {
     name: "Range Rover",
     slug: "range-rover",
     keywords: "Range Rover repair Dubai, Range Rover service UAE",
-    logo: "/images/brands/range-rover.png",
+    logo: "/images/brands/range-rover.svg",
     color: "#005A2B"
   },
   {
     name: "Land Rover",
     slug: "land-rover",
     keywords: "Land Rover repair Dubai, Land Rover service UAE",
-    logo: "/images/brands/land-rover.png",
+    logo: "/images/brands/land-rover.svg",
     color: "#005A2B"
   },
   {
     name: "Lexus",
     slug: "lexus",
     keywords: "Lexus repair Dubai, Lexus service UAE, Lexus maintenance",
-    logo: "/images/brands/lexus.png",
+    logo: "/images/brands/lexus.svg",
     color: "#000000"
   },
   {
     name: "Jaguar",
     slug: "jaguar",
     keywords: "Jaguar repair Dubai, Jaguar service UAE, Jaguar maintenance",
-    logo: "/images/brands/jaguar.png",
+    logo: "/images/brands/jaguar.svg",
     color: "#000000"
   },
   {
     name: "Maserati",
     slug: "maserati",
     keywords: "Maserati repair Dubai, Maserati service UAE",
-    logo: "/images/brands/maserati.png",
+    logo: "/images/brands/maserati.svg",
     color: "#0C2340"
   },
   {
     name: "Bentley",
     slug: "bentley",
     keywords: "Bentley repair Dubai, Bentley service UAE",
-    logo: "/images/brands/bentley.png",
+    logo: "/images/brands/bentley.svg",
     color: "#000000"
   },
   {
     name: "Rolls-Royce",
     slug: "rolls-royce",
     keywords: "Rolls-Royce repair Dubai, Rolls-Royce service UAE",
-    logo: "/images/brands/rolls-royce.png",
+    logo: "/images/brands/rolls-royce.svg",
     color: "#000000"
   },
   {
     name: "Lamborghini",
     slug: "lamborghini",
     keywords: "Lamborghini repair Dubai, Lamborghini service UAE",
-    logo: "/images/brands/lamborghini.png",
+    logo: "/images/brands/lamborghini.svg",
     color: "#FFB800"
   },
   {
     name: "Ferrari",
     slug: "ferrari",
     keywords: "Ferrari repair Dubai, Ferrari service UAE",
-    logo: "/images/brands/ferrari.png",
+    logo: "/images/brands/ferrari.svg",
     color: "#DC143C"
   },
   {
     name: "McLaren",
     slug: "mclaren",
     keywords: "McLaren repair Dubai, McLaren service UAE",
-    logo: "/images/brands/mclaren.png",
+    logo: "/images/brands/mclaren.svg",
     color: "#FF8000"
   },
   {
     name: "Tesla",
     slug: "tesla",
     keywords: "Tesla repair Dubai, Tesla service UAE, Tesla maintenance",
-    logo: "/images/brands/tesla.png",
+    logo: "/images/brands/tesla.svg",
     color: "#E31937"
   }
 ];
@@ -140,9 +141,8 @@ function BrandLogo({ brand }: { brand: typeof premiumBrands[0] }) {
           alt={`${brand.name} repair and service in Dubai, UAE`}
           width={160}
           height={80}
-          className="object-contain opacity-80 group-hover:opacity-100 transition-opacity duration-300"
+          className="object-contain opacity-90 group-hover:opacity-100 transition-opacity duration-300 brand-logo-filter"
           onError={() => setImageError(true)}
-          unoptimized={true}
         />
       )}
     </div>
