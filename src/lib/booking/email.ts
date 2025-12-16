@@ -103,7 +103,8 @@ export async function sendConfirmationEmail(
   booking: Booking,
   confirmationToken: string
 ): Promise<void> {
-  const settings = await getSettings();
+  // Use admin client to read settings (bypasses RLS)
+  const settings = await getSettings(true);
   const transporter = await getTransporter();
   
   const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://mbrme.com'}/book/confirm?token=${confirmationToken}`;
@@ -230,7 +231,8 @@ export async function sendConfirmedEmail(
   booking: Booking,
   googleCalendarLink?: string
 ): Promise<void> {
-  const settings = await getSettings();
+  // Use admin client to read settings (bypasses RLS)
+  const settings = await getSettings(true);
   const transporter = await getTransporter();
   
   console.log('Sending confirmed email to:', booking.customer_email);
