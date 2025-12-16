@@ -13,8 +13,10 @@ export default function AdminDashboard() {
   const [bookingsLoading, setBookingsLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [localSettings, setLocalSettings] = useState<Settings | null>(null);
   const [settingsLoading, setSettingsLoading] = useState(true);
   const [settingsMessage, setSettingsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [savingKeys, setSavingKeys] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (activeTab === 'bookings') {
@@ -46,6 +48,7 @@ export default function AdminDashboard() {
       if (data.success) {
         console.log('Settings loaded:', data.settings);
         setSettings(data.settings);
+        setLocalSettings(data.settings);
       } else {
         console.error('Failed to load settings:', data.error);
       }
@@ -57,6 +60,11 @@ export default function AdminDashboard() {
   };
 
   const updateSetting = async (key: string, value: unknown) => {
+    if (!localSettings) return;
+    
+    // Update local state immediately for responsive UI
+    setLocalSettings({ ...localSettings, [key]: value });
+    setSavingKeys(prev => new Set(prev).add(key));
     setSettingsMessage(null);
     
     try {
@@ -69,32 +77,64 @@ export default function AdminDashboard() {
       const data = await response.json();
       
       if (data.success) {
+        // Update the main settings state
+        setSettings({ ...localSettings, [key]: value });
         setSettingsMessage({ type: 'success', text: 'Setting saved successfully' });
-        // Refresh settings from database to ensure we have the latest values
-        await fetchSettings();
         setTimeout(() => setSettingsMessage(null), 3000);
       } else {
+        // Revert on error
+        setLocalSettings(settings);
         setSettingsMessage({ type: 'error', text: data.error || 'Failed to save setting' });
       }
     } catch (error) {
       console.error('Failed to update setting:', error);
+      // Revert on error
+      setLocalSettings(settings);
       setSettingsMessage({ type: 'error', text: 'Failed to save setting' });
+    } finally {
+      setSavingKeys(prev => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
     }
   };
 
+  const updateLocalSetting = (key: string, value: unknown) => {
+    if (!localSettings) return;
+    setLocalSettings({ ...localSettings, [key]: value });
+  };
+
   const updateWorkingHours = (day: string, field: 'open' | 'close' | 'enabled', value: string | boolean) => {
-    if (!settings) return;
+    if (!localSettings) return;
     
     const updatedHours = {
-      ...settings.working_hours,
+      ...localSettings.working_hours,
       [day]: {
-        ...settings.working_hours[day],
+        ...(localSettings.working_hours[day] || { open: '09:00', close: '18:00', enabled: false }),
         [field]: value,
       },
     };
     
     updateSetting('working_hours', updatedHours);
   };
+
+  const updateLocalWorkingHours = (day: string, field: 'open' | 'close' | 'enabled', value: string | boolean) => {
+    if (!localSettings) return;
+    
+    const updatedHours = {
+      ...localSettings.working_hours,
+      [day]: {
+        ...(localSettings.working_hours[day] || { open: '09:00', close: '18:00', enabled: false }),
+        [field]: value,
+      },
+    };
+    
+    setLocalSettings({ ...localSettings, working_hours: updatedHours });
+  };
+
+  // Use localSettings for display, fallback to settings
+  const displaySettings = localSettings || settings;
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -226,7 +266,7 @@ export default function AdminDashboard() {
 
             {settingsLoading ? (
               <div className="text-center py-8 text-muted-enhanced">Loading settings...</div>
-            ) : settings ? (
+            ) : displaySettings ? (
               <>
                 {/* Business Information */}
                 <div className="glass-card p-8">
@@ -234,19 +274,30 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-subheading mb-2">Business Name</label>
-                      <input
-                        type="text"
-                        value={settings.business_name}
-                        onChange={(e) => updateSetting('business_name', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={displaySettings.business_name || ''}
+                          onChange={(e) => updateLocalSetting('business_name', e.target.value)}
+                          onBlur={(e) => updateSetting('business_name', e.target.value)}
+                          disabled={savingKeys.has('business_name')}
+                          className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
+                          placeholder="Enter business name"
+                        />
+                        {savingKeys.has('business_name') && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">Timezone</label>
                       <select
-                        value={settings.timezone}
+                        value={displaySettings.timezone || 'Asia/Dubai'}
                         onChange={(e) => updateSetting('timezone', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        disabled={savingKeys.has('timezone')}
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       >
                         <option value="Asia/Dubai">Asia/Dubai (UAE)</option>
                         <option value="UTC">UTC</option>
@@ -257,20 +308,25 @@ export default function AdminDashboard() {
                     <div>
                       <label className="block text-subheading mb-2">Business Address</label>
                       <textarea
-                        value={settings.business_address}
-                        onChange={(e) => updateSetting('business_address', e.target.value)}
+                        value={displaySettings.business_address || ''}
+                        onChange={(e) => updateLocalSetting('business_address', e.target.value)}
+                        onBlur={(e) => updateSetting('business_address', e.target.value)}
+                        disabled={savingKeys.has('business_address')}
                         rows={3}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50 resize-none"
+                        placeholder="Enter full business address"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">Google Maps Link (Optional)</label>
                       <input
                         type="url"
-                        value={settings.google_maps_link || ''}
-                        onChange={(e) => updateSetting('google_maps_link', e.target.value || undefined)}
+                        value={displaySettings.google_maps_link || ''}
+                        onChange={(e) => updateLocalSetting('google_maps_link', e.target.value || undefined)}
+                        onBlur={(e) => updateSetting('google_maps_link', e.target.value || undefined)}
+                        disabled={savingKeys.has('google_maps_link')}
                         placeholder="https://maps.app.goo.gl/..."
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                     </div>
                   </div>
@@ -284,31 +340,37 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">Slot Duration (minutes)</label>
                       <input
                         type="number"
-                        value={settings.slot_duration_minutes}
-                        onChange={(e) => updateSetting('slot_duration_minutes', Number(e.target.value))}
+                        value={displaySettings.slot_duration_minutes || 30}
+                        onChange={(e) => updateLocalSetting('slot_duration_minutes', Number(e.target.value))}
+                        onBlur={(e) => updateSetting('slot_duration_minutes', Number(e.target.value))}
+                        disabled={savingKeys.has('slot_duration_minutes')}
                         min="15"
                         step="15"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">Default Slot Capacity</label>
                       <input
                         type="number"
-                        value={settings.slot_capacity}
-                        onChange={(e) => updateSetting('slot_capacity', Number(e.target.value))}
+                        value={displaySettings.slot_capacity || 1}
+                        onChange={(e) => updateLocalSetting('slot_capacity', Number(e.target.value))}
+                        onBlur={(e) => updateSetting('slot_capacity', Number(e.target.value))}
+                        disabled={savingKeys.has('slot_capacity')}
                         min="1"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">Lead Time (hours)</label>
                       <input
                         type="number"
-                        value={settings.lead_time_hours}
-                        onChange={(e) => updateSetting('lead_time_hours', Number(e.target.value))}
+                        value={displaySettings.lead_time_hours || 2}
+                        onChange={(e) => updateLocalSetting('lead_time_hours', Number(e.target.value))}
+                        onBlur={(e) => updateSetting('lead_time_hours', Number(e.target.value))}
+                        disabled={savingKeys.has('lead_time_hours')}
                         min="0"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                       <p className="text-sm text-muted-enhanced mt-1">Minimum hours before booking</p>
                     </div>
@@ -316,10 +378,12 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">Max Future Days</label>
                       <input
                         type="number"
-                        value={settings.max_future_days}
-                        onChange={(e) => updateSetting('max_future_days', Number(e.target.value))}
+                        value={displaySettings.max_future_days || 90}
+                        onChange={(e) => updateLocalSetting('max_future_days', Number(e.target.value))}
+                        onBlur={(e) => updateSetting('max_future_days', Number(e.target.value))}
+                        disabled={savingKeys.has('max_future_days')}
                         min="1"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                       <p className="text-sm text-muted-enhanced mt-1">Maximum days in future for bookings</p>
                     </div>
@@ -327,10 +391,12 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">Confirmation Expiry (minutes)</label>
                       <input
                         type="number"
-                        value={settings.confirmation_expiry_minutes}
-                        onChange={(e) => updateSetting('confirmation_expiry_minutes', Number(e.target.value))}
+                        value={displaySettings.confirmation_expiry_minutes || 30}
+                        onChange={(e) => updateLocalSetting('confirmation_expiry_minutes', Number(e.target.value))}
+                        onBlur={(e) => updateSetting('confirmation_expiry_minutes', Number(e.target.value))}
+                        disabled={savingKeys.has('confirmation_expiry_minutes')}
                         min="5"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                       <p className="text-sm text-muted-enhanced mt-1">Time before confirmation link expires</p>
                     </div>
@@ -342,7 +408,7 @@ export default function AdminDashboard() {
                   <h2 className="text-heading font-light mb-6">Working Hours</h2>
                   <div className="space-y-4">
                     {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => {
-                      const dayHours = settings.working_hours[day] || { open: '09:00', close: '18:00', enabled: false };
+                      const dayHours = displaySettings.working_hours?.[day] || { open: '09:00', close: '18:00', enabled: false };
                       return (
                         <div key={day} className="flex items-center gap-4 p-4 bg-gray-900/50 rounded-lg">
                           <div className="flex items-center gap-2 w-32">
@@ -350,23 +416,25 @@ export default function AdminDashboard() {
                               type="checkbox"
                               checked={dayHours.enabled}
                               onChange={(e) => updateWorkingHours(day, 'enabled', e.target.checked)}
-                              className="w-4 h-4"
+                              className="w-4 h-4 cursor-pointer"
                             />
-                            <label className="text-subheading capitalize">{day}</label>
+                            <label className="text-subheading capitalize cursor-pointer">{day}</label>
                           </div>
                           {dayHours.enabled && (
                             <>
                               <input
                                 type="time"
                                 value={dayHours.open}
-                                onChange={(e) => updateWorkingHours(day, 'open', e.target.value)}
+                                onChange={(e) => updateLocalWorkingHours(day, 'open', e.target.value)}
+                                onBlur={(e) => updateWorkingHours(day, 'open', e.target.value)}
                                 className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                               />
                               <span className="text-muted-enhanced">to</span>
                               <input
                                 type="time"
                                 value={dayHours.close}
-                                onChange={(e) => updateWorkingHours(day, 'close', e.target.value)}
+                                onChange={(e) => updateLocalWorkingHours(day, 'close', e.target.value)}
+                                onBlur={(e) => updateWorkingHours(day, 'close', e.target.value)}
                                 className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
                               />
                             </>
@@ -385,21 +453,23 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">Google Calendar ID</label>
                       <input
                         type="text"
-                        value={settings.google_calendar_id || ''}
-                        onChange={(e) => updateSetting('google_calendar_id', e.target.value || undefined)}
+                        value={displaySettings.google_calendar_id || ''}
+                        onChange={(e) => updateLocalSetting('google_calendar_id', e.target.value || undefined)}
+                        onBlur={(e) => updateSetting('google_calendar_id', e.target.value || undefined)}
+                        disabled={savingKeys.has('google_calendar_id')}
                         placeholder="calendar@group.calendar.google.com"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                       <p className="text-sm text-muted-enhanced mt-1">Leave empty to disable calendar integration</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={settings.google_calendar_conflict_check}
+                        checked={displaySettings.google_calendar_conflict_check || false}
                         onChange={(e) => updateSetting('google_calendar_conflict_check', e.target.checked)}
-                        className="w-4 h-4"
+                        className="w-4 h-4 cursor-pointer"
                       />
-                      <label className="text-subheading">Enable conflict checking</label>
+                      <label className="text-subheading cursor-pointer">Enable conflict checking</label>
                     </div>
                   </div>
                 </div>
@@ -412,37 +482,45 @@ export default function AdminDashboard() {
                       <label className="block text-subheading mb-2">SMTP Host</label>
                       <input
                         type="text"
-                        value={settings.smtp_host}
-                        onChange={(e) => updateSetting('smtp_host', e.target.value)}
+                        value={displaySettings.smtp_host || ''}
+                        onChange={(e) => updateLocalSetting('smtp_host', e.target.value)}
+                        onBlur={(e) => updateSetting('smtp_host', e.target.value)}
+                        disabled={savingKeys.has('smtp_host')}
                         placeholder="smtp.gmail.com"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">SMTP Port</label>
                       <input
                         type="number"
-                        value={settings.smtp_port}
-                        onChange={(e) => updateSetting('smtp_port', Number(e.target.value))}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        value={displaySettings.smtp_port || 587}
+                        onChange={(e) => updateLocalSetting('smtp_port', Number(e.target.value))}
+                        onBlur={(e) => updateSetting('smtp_port', Number(e.target.value))}
+                        disabled={savingKeys.has('smtp_port')}
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">SMTP Username</label>
                       <input
                         type="text"
-                        value={settings.smtp_username}
-                        onChange={(e) => updateSetting('smtp_username', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        value={displaySettings.smtp_username || ''}
+                        onChange={(e) => updateLocalSetting('smtp_username', e.target.value)}
+                        onBlur={(e) => updateSetting('smtp_username', e.target.value)}
+                        disabled={savingKeys.has('smtp_username')}
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                     </div>
                     <div>
                       <label className="block text-subheading mb-2">SMTP From Address</label>
                       <input
                         type="email"
-                        value={settings.smtp_from}
-                        onChange={(e) => updateSetting('smtp_from', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        value={displaySettings.smtp_from || ''}
+                        onChange={(e) => updateLocalSetting('smtp_from', e.target.value)}
+                        onBlur={(e) => updateSetting('smtp_from', e.target.value)}
+                        disabled={savingKeys.has('smtp_from')}
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary disabled:opacity-50"
                       />
                     </div>
                   </div>
@@ -458,29 +536,29 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={settings.email_include_ics}
+                        checked={displaySettings.email_include_ics ?? true}
                         onChange={(e) => updateSetting('email_include_ics', e.target.checked)}
-                        className="w-4 h-4"
+                        className="w-4 h-4 cursor-pointer"
                       />
-                      <label className="text-subheading">Include ICS calendar attachment</label>
+                      <label className="text-subheading cursor-pointer">Include ICS calendar attachment</label>
                     </div>
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={settings.email_include_google_calendar_link}
+                        checked={displaySettings.email_include_google_calendar_link ?? true}
                         onChange={(e) => updateSetting('email_include_google_calendar_link', e.target.checked)}
-                        className="w-4 h-4"
+                        className="w-4 h-4 cursor-pointer"
                       />
-                      <label className="text-subheading">Include Google Calendar link</label>
+                      <label className="text-subheading cursor-pointer">Include Google Calendar link</label>
                     </div>
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={settings.email_include_google_maps_link}
+                        checked={displaySettings.email_include_google_maps_link ?? true}
                         onChange={(e) => updateSetting('email_include_google_maps_link', e.target.checked)}
-                        className="w-4 h-4"
+                        className="w-4 h-4 cursor-pointer"
                       />
-                      <label className="text-subheading">Include Google Maps link</label>
+                      <label className="text-subheading cursor-pointer">Include Google Maps link</label>
                     </div>
                   </div>
                 </div>

@@ -132,15 +132,30 @@ export async function getServiceTypes(): Promise<ServiceType[]> {
 export async function updateSetting(key: string, value: unknown): Promise<void> {
   const supabase = await createClient();
   
+  // Ensure value is properly formatted for JSONB
+  // If it's already an object/array, it will be stored as JSONB
+  // If it's a primitive, wrap it appropriately
+  let jsonbValue: unknown = value;
+  
+  // For strings, numbers, booleans - store as-is (Supabase handles JSONB conversion)
+  // For objects/arrays - store directly
+  // For undefined/null - store as null
+  if (value === undefined) {
+    jsonbValue = null;
+  }
+  
   const { error } = await supabase
     .from('settings')
     .upsert({
       key,
-      value,
+      value: jsonbValue,
       updated_at: new Date().toISOString(),
+    }, {
+      onConflict: 'key'
     });
 
   if (error) {
+    console.error('Supabase update error:', error);
     throw new Error(`Failed to update setting: ${error.message}`);
   }
 }
