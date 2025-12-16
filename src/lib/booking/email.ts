@@ -12,9 +12,21 @@ async function getTransporter() {
   
   const settings = await getSettings();
   
+  // Get SMTP configuration with fallbacks
+  let smtpHost = settings.smtp_host || process.env.SMTP_HOST || '';
+  const smtpPort = settings.smtp_port || parseInt(process.env.SMTP_PORT || '587', 10);
+  const smtpUsername = settings.smtp_username || process.env.SMTP_USERNAME || process.env.SMTP_USER || '';
+  const smtpFrom = settings.smtp_from || process.env.SMTP_FROM || smtpUsername;
+  
+  // Infer host from username if missing (for ImprovMX)
+  if (!smtpHost && smtpUsername.includes('@mail.mbrme.com')) {
+    smtpHost = 'smtp.improvmx.com';
+    console.log('ℹ️  Inferred SMTP host from username: smtp.improvmx.com');
+  }
+  
   // Validate SMTP settings
-  if (!settings.smtp_host || !settings.smtp_username || !settings.smtp_from) {
-    throw new Error('SMTP settings not configured. Please configure SMTP host, username, and from address in admin settings.');
+  if (!smtpHost || !smtpUsername || !smtpFrom) {
+    throw new Error('SMTP settings not configured. Please configure SMTP host, username, and from address in admin settings or environment variables.');
   }
   
   const smtpPassword = process.env.SMTP_PASSWORD;
@@ -23,20 +35,20 @@ async function getTransporter() {
   }
   
   console.log('Creating SMTP transporter:', {
-    host: settings.smtp_host,
-    port: settings.smtp_port,
-    secure: settings.smtp_port === 465,
-    username: settings.smtp_username,
-    from: settings.smtp_from,
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
+    username: smtpUsername,
+    from: smtpFrom,
     hasPassword: !!smtpPassword,
   });
   
   transporter = nodemailer.createTransport({
-    host: settings.smtp_host,
-    port: settings.smtp_port,
-    secure: settings.smtp_port === 465,
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
     auth: {
-      user: settings.smtp_username,
+      user: smtpUsername,
       pass: smtpPassword,
     },
   });

@@ -23,41 +23,63 @@ interface SMTPConfig {
 }
 
 async function getSMTPConfig(): Promise<SMTPConfig> {
-  const supabase = createAdminClient();
+  // Try to get from database first, fallback to environment variables
+  let host = '';
+  let port = 587;
+  let username = '';
+  let from = '';
   
-  const { data, error } = await supabase
-    .from('settings')
-    .select('key, value')
-    .in('key', ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_from']);
-  
-  if (error) {
-    throw new Error(`Failed to fetch SMTP settings: ${error.message}`);
+  try {
+    const supabase = createAdminClient();
+    
+    const { data, error } = await supabase
+      .from('settings')
+      .select('key, value')
+      .in('key', ['smtp_host', 'smtp_port', 'smtp_username', 'smtp_from']);
+    
+    if (!error && data) {
+      const settingsMap = new Map(data.map(s => [s.key, s.value]));
+      
+      // Helper to extract string value from JSONB
+      const getStringValue = (value: unknown): string => {
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'string') {
+          // Remove quotes if present
+          return value.replace(/^"|"$/g, '');
+        }
+        return String(value);
+      };
+      
+      const getNumberValue = (value: unknown, defaultValue: number): number => {
+        if (value === null || value === undefined) return defaultValue;
+        if (typeof value === 'number') return value;
+        const str = getStringValue(value);
+        const num = parseInt(str, 10);
+        return isNaN(num) ? defaultValue : num;
+      };
+      
+      host = getStringValue(settingsMap.get('smtp_host'));
+      port = getNumberValue(settingsMap.get('smtp_port'), 587);
+      username = getStringValue(settingsMap.get('smtp_username'));
+      from = getStringValue(settingsMap.get('smtp_from'));
+    }
+  } catch (dbError) {
+    console.warn('Could not fetch from database, using environment variables...');
   }
   
-  const settingsMap = new Map(data.map(s => [s.key, s.value]));
+  // Fallback to environment variables if database values are empty
+  // Also check common env var names
+  host = host || process.env.SMTP_HOST || '';
+  port = port || parseInt(process.env.SMTP_PORT || '587', 10);
+  username = username || process.env.SMTP_USERNAME || process.env.SMTP_USER || '';
+  from = from || process.env.SMTP_FROM || username;
   
-  // Helper to extract string value from JSONB
-  const getStringValue = (value: unknown): string => {
-    if (value === null || value === undefined) return '';
-    if (typeof value === 'string') {
-      // Remove quotes if present
-      return value.replace(/^"|"$/g, '');
-    }
-    return String(value);
-  };
+  // If still empty, try to infer from username (for improvmx)
+  if (!host && username.includes('@mail.mbrme.com')) {
+    host = 'smtp.improvmx.com';
+    console.log('ℹ️  Inferred SMTP host from username: smtp.improvmx.com');
+  }
   
-  const getNumberValue = (value: unknown, defaultValue: number): number => {
-    if (value === null || value === undefined) return defaultValue;
-    if (typeof value === 'number') return value;
-    const str = getStringValue(value);
-    const num = parseInt(str, 10);
-    return isNaN(num) ? defaultValue : num;
-  };
-  
-  const host = getStringValue(settingsMap.get('smtp_host'));
-  const port = getNumberValue(settingsMap.get('smtp_port'), 587);
-  const username = getStringValue(settingsMap.get('smtp_username'));
-  const from = getStringValue(settingsMap.get('smtp_from'));
   const password = process.env.SMTP_PASSWORD || '';
   
   return {
