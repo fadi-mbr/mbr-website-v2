@@ -148,42 +148,11 @@ export async function createCalendarEvent(booking: Booking): Promise<{
       status: 'confirmed',
     };
   
-    // Always add business email and customer email as attendees
-    // This ensures both receive calendar invites
-    const attendees: Array<{ email: string; responseStatus?: string }> = [
-      {
-        email: 'info@mbrme.com',
-        responseStatus: 'accepted',
-      },
-      {
-        email: booking.customer_email,
-      },
-    ];
-    
-    // If a shared calendar is configured, also add it as attendee
-    // This way the event appears in the shared calendar via invite
-    if (settings.google_calendar_id && settings.google_calendar_id.trim() !== '') {
-      const calendarEmail = await getCalendarEmail(calendar, settings.google_calendar_id);
-      if (calendarEmail && !attendees.some(a => a.email === calendarEmail)) {
-        attendees.push({
-          email: calendarEmail,
-          responseStatus: 'accepted',
-        });
-        console.log('Adding shared calendar as attendee:', calendarEmail);
-      } else if (settings.google_calendar_id.includes('@')) {
-        // If calendar ID itself looks like an email, use it directly
-        if (!attendees.some(a => a.email === settings.google_calendar_id)) {
-          attendees.push({
-            email: settings.google_calendar_id,
-            responseStatus: 'accepted',
-          });
-          console.log('Adding shared calendar ID as attendee:', settings.google_calendar_id);
-        }
-      }
-    }
-    
-    event.attendees = attendees;
-    console.log('Creating calendar event in service account calendar with attendees:', attendees.map(a => a.email).join(', '));
+    // Note: Service accounts cannot send calendar invites without Domain-Wide Delegation
+    // Instead, we create the event in the service account calendar and rely on ICS file
+    // attachments in emails for calendar invites (which is already implemented)
+    console.log('Creating calendar event in service account calendar');
+    console.log('Note: ICS file attachment in email will handle calendar invites');
   
     // Check for conflicts if enabled (check the shared calendar if configured)
     if (settings.google_calendar_conflict_check && settings.google_calendar_id && settings.google_calendar_id.trim() !== '') {
@@ -208,11 +177,12 @@ export async function createCalendarEvent(booking: Booking): Promise<{
       }
     }
   
-    // Create event in target calendar and send invites to all attendees
+    // Create event in service account calendar without sending invites
+    // The ICS file attachment in the confirmation email will handle calendar invites
     const response = await calendar.events.insert({
       calendarId: targetCalendarId,
       requestBody: event,
-      sendUpdates: 'all', // Send calendar invites to all attendees
+      sendUpdates: 'none', // Don't send invites (service accounts can't without domain-wide delegation)
     });
     
     if (!response.data.id || !response.data.htmlLink) {
