@@ -46,8 +46,38 @@ export async function POST(request: Request) {
     // Validate input
     const validationResult = bookingCreateSchema.safeParse(body);
     if (!validationResult.success) {
+      // Format validation errors into user-friendly messages
+      const errorMessages = validationResult.error.errors.map(err => {
+        const field = err.path.join('.');
+        let message = err.message;
+        
+        // Make error messages more user-friendly
+        if (field === 'customer_phone') {
+          message = 'Phone number must be in format +971XXXXXXXXX (e.g., +971501234567)';
+        } else if (field === 'slot_start' || field === 'slot_end') {
+          message = 'Please select a valid date and time';
+        } else if (field === 'service_type') {
+          message = 'Please select a service type';
+        } else if (field === 'customer_email') {
+          message = 'Please enter a valid email address';
+        } else if (field === 'customer_name') {
+          message = 'Name must be at least 2 characters';
+        } else if (field === 'captcha_answer') {
+          message = 'Please complete the security check';
+        }
+        
+        return `${message}`;
+      });
+      
+      // Return the first error message (most relevant)
+      const primaryError = errorMessages[0] || 'Please check your input and try again';
+      
       return NextResponse.json(
-        { error: 'Invalid input', details: validationResult.error.errors },
+        { 
+          error: primaryError,
+          details: validationResult.error.errors,
+          allErrors: errorMessages
+        },
         { status: 400 }
       );
     }
