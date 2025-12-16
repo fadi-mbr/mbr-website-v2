@@ -2,6 +2,19 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
+import { 
+  FaBuilding, 
+  FaCalendarAlt, 
+  FaClock, 
+  FaEnvelope, 
+  FaGoogle, 
+  FaSave, 
+  FaUndo,
+  FaCheckCircle,
+  FaExclamationCircle,
+  FaCalendarCheck,
+  FaCog
+} from 'react-icons/fa';
 import type { Booking, Settings } from '@/lib/booking/types';
 
 type Tab = 'bookings' | 'settings';
@@ -134,7 +147,7 @@ export default function AdminDashboard() {
       setOriginalSettings(formSettings);
       setHasUnsavedChanges(false);
       setSettingsMessage({ type: 'success', text: 'All settings saved successfully' });
-      setTimeout(() => setSettingsMessage(null), 3000);
+      setTimeout(() => setSettingsMessage(null), 5000);
     } catch (error) {
       console.error('Failed to save settings:', error);
       setSettingsMessage({ 
@@ -174,14 +187,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="container-luxury py-12">
+      <div className="container-luxury py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-display font-light gradient-text mb-2">
               Admin Dashboard
             </h1>
-            <p className="text-body-enhanced">
+            <p className="text-body-enhanced text-muted-enhanced">
               Welcome, {session?.user?.email}
             </p>
           </div>
@@ -194,7 +207,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-gray-800">
+        <div className="flex gap-1 mb-8 border-b border-gray-800">
           <button
             onClick={() => {
               if (hasUnsavedChanges && !confirm('You have unsaved changes. Are you sure you want to switch tabs?')) {
@@ -202,25 +215,37 @@ export default function AdminDashboard() {
               }
               setActiveTab('bookings');
             }}
-            className={`pb-4 px-6 text-subheading transition-colors ${
+            className={`pb-4 px-6 text-subheading transition-colors relative ${
               activeTab === 'bookings'
-                ? 'text-primary border-b-2 border-primary'
+                ? 'text-primary'
                 : 'text-muted-enhanced hover:text-white'
             }`}
           >
-            Bookings
+            <span className="flex items-center gap-2">
+              <FaCalendarCheck />
+              Bookings
+            </span>
+            {activeTab === 'bookings' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></span>
+            )}
           </button>
           <button
             onClick={() => setActiveTab('settings')}
-            className={`pb-4 px-6 text-subheading transition-colors ${
+            className={`pb-4 px-6 text-subheading transition-colors relative ${
               activeTab === 'settings'
-                ? 'text-primary border-b-2 border-primary'
+                ? 'text-primary'
                 : 'text-muted-enhanced hover:text-white'
             }`}
           >
-            Settings
-            {hasUnsavedChanges && (
-              <span className="ml-2 w-2 h-2 bg-yellow-400 rounded-full inline-block"></span>
+            <span className="flex items-center gap-2">
+              <FaCog />
+              Settings
+              {hasUnsavedChanges && (
+                <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
+              )}
+            </span>
+            {activeTab === 'settings' && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></span>
             )}
           </button>
         </div>
@@ -251,7 +276,7 @@ export default function AdminDashboard() {
                     {bookings.map((booking) => (
                       <tr
                         key={booking.id}
-                        className="border-b border-gray-800 hover:bg-gray-900/50 cursor-pointer"
+                        className="border-b border-gray-800 hover:bg-gray-900/50 cursor-pointer transition-colors"
                         onClick={() => setSelectedBooking(booking)}
                       >
                         <td className="py-3 px-4 text-body">
@@ -262,7 +287,7 @@ export default function AdminDashboard() {
                         <td className="py-3 px-4 text-body">{booking.customer_phone}</td>
                         <td className="py-3 px-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-sm ${
+                            className={`px-3 py-1 rounded-full text-sm font-medium ${
                               booking.status === 'CONFIRMED'
                                 ? 'bg-green-500/20 text-green-400'
                                 : booking.status === 'PENDING'
@@ -279,7 +304,7 @@ export default function AdminDashboard() {
                               e.stopPropagation();
                               setSelectedBooking(booking);
                             }}
-                            className="text-primary hover:text-primary-hover"
+                            className="text-primary hover:text-primary-hover transition-colors"
                           >
                             View
                           </button>
@@ -295,207 +320,262 @@ export default function AdminDashboard() {
 
         {/* Settings Tab */}
         {activeTab === 'settings' && (
-          <div className="space-y-6">
-            {/* Save/Reset Bar */}
-            <div className="glass-card p-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {hasUnsavedChanges && (
-                  <span className="text-yellow-400 text-sm flex items-center gap-2">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                    You have unsaved changes
-                  </span>
-                )}
-                {!hasUnsavedChanges && !settingsSaving && (
-                  <span className="text-green-400 text-sm">All changes saved</span>
-                )}
+          <div className="space-y-8">
+            {/* Sticky Save Bar */}
+            {hasUnsavedChanges && (
+              <div className="sticky top-0 z-10 glass-card p-4 mb-6 border-l-4 border-yellow-400">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FaExclamationCircle className="text-yellow-400" />
+                    <div>
+                      <p className="text-subheading font-medium">You have unsaved changes</p>
+                      <p className="text-sm text-muted-enhanced">Don&apos;t forget to save your changes</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={resetForm}
+                      disabled={settingsSaving}
+                      className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                    >
+                      <FaUndo />
+                      Reset
+                    </button>
+                    <button
+                      onClick={saveAllSettings}
+                      disabled={settingsSaving}
+                      className="px-6 py-2 bg-primary hover:bg-primary-dark rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2 font-medium"
+                    >
+                      {settingsSaving ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <FaSave />
+                          Save All Changes
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="flex gap-3">
-                {hasUnsavedChanges && (
-                  <button
-                    onClick={resetForm}
-                    disabled={settingsSaving}
-                    className="liquid-glass-btn liquid-glass-btn-secondary"
-                  >
-                    Reset
-                  </button>
-                )}
-                <button
-                  onClick={saveAllSettings}
-                  disabled={settingsSaving || !hasUnsavedChanges}
-                  className="liquid-glass-btn liquid-glass-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {settingsSaving ? (
-                    <span className="flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                      Saving...
-                    </span>
-                  ) : (
-                    'Save All Changes'
-                  )}
-                </button>
-              </div>
-            </div>
+            )}
 
+            {/* Success/Error Message */}
             {settingsMessage && (
               <div
-                className={`p-4 rounded-lg ${
+                className={`p-4 rounded-lg flex items-center gap-3 ${
                   settingsMessage.type === 'success'
                     ? 'bg-green-500/20 text-green-400 border border-green-500/50'
                     : 'bg-red-500/20 text-red-400 border border-red-500/50'
                 }`}
               >
-                {settingsMessage.text}
+                {settingsMessage.type === 'success' ? (
+                  <FaCheckCircle className="text-xl" />
+                ) : (
+                  <FaExclamationCircle className="text-xl" />
+                )}
+                <span>{settingsMessage.text}</span>
               </div>
             )}
 
             {settingsLoading ? (
-              <div className="text-center py-8 text-muted-enhanced">Loading settings...</div>
+              <div className="text-center py-12 text-muted-enhanced">
+                <div className="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p>Loading settings...</p>
+              </div>
             ) : (
-              <form onSubmit={(e) => { e.preventDefault(); saveAllSettings(); }}>
-                {/* Business Information */}
+              <form onSubmit={(e) => { e.preventDefault(); saveAllSettings(); }} className="space-y-8">
+                {/* Business Information Section */}
                 <div className="glass-card p-8">
-                  <h2 className="text-heading font-light mb-6">Business Information</h2>
-                  <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-800">
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <FaBuilding className="text-primary text-xl" />
+                    </div>
                     <div>
-                      <label className="block text-subheading mb-2">Business Name</label>
+                      <h2 className="text-heading font-light">Business Information</h2>
+                      <p className="text-sm text-muted-enhanced mt-1">Configure your business details and location</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-subheading mb-2 font-medium">Business Name</label>
                       <input
                         type="text"
                         value={formSettings.business_name || ''}
                         onChange={(e) => updateFormField('business_name', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                         placeholder="Enter business name"
                       />
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">Timezone</label>
+                      <label className="block text-subheading mb-2 font-medium">Timezone</label>
                       <select
                         value={formSettings.timezone || 'Asia/Dubai'}
                         onChange={(e) => updateFormField('timezone', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       >
                         <option value="Asia/Dubai">Asia/Dubai (UAE)</option>
                         <option value="UTC">UTC</option>
                         <option value="America/New_York">America/New_York</option>
                         <option value="Europe/London">Europe/London</option>
                       </select>
+                      <p className="text-sm text-muted-enhanced mt-2">Select your business timezone for accurate scheduling</p>
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">Business Address</label>
+                      <label className="block text-subheading mb-2 font-medium">Business Address</label>
                       <textarea
                         value={formSettings.business_address || ''}
                         onChange={(e) => updateFormField('business_address', e.target.value)}
                         rows={3}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary resize-none"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
                         placeholder="Enter full business address"
                       />
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">Google Maps Link (Optional)</label>
+                      <label className="block text-subheading mb-2 font-medium">Google Maps Link <span className="text-muted-enhanced font-normal">(Optional)</span></label>
                       <input
                         type="url"
                         value={formSettings.google_maps_link || ''}
                         onChange={(e) => updateFormField('google_maps_link', e.target.value || undefined)}
                         placeholder="https://maps.app.goo.gl/..."
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
+                      <p className="text-sm text-muted-enhanced mt-2">Override default Google Maps link for location sharing</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Booking Settings */}
+                {/* Booking Settings Section */}
                 <div className="glass-card p-8">
-                  <h2 className="text-heading font-light mb-6">Booking Settings</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-800">
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <FaCalendarAlt className="text-primary text-xl" />
+                    </div>
                     <div>
-                      <label className="block text-subheading mb-2">Slot Duration (minutes)</label>
+                      <h2 className="text-heading font-light">Booking Settings</h2>
+                      <p className="text-sm text-muted-enhanced mt-1">Configure booking availability and scheduling rules</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-subheading mb-2 font-medium">Slot Duration <span className="text-muted-enhanced font-normal">(minutes)</span></label>
                       <input
                         type="number"
                         value={formSettings.slot_duration_minutes || 30}
                         onChange={(e) => updateFormField('slot_duration_minutes', Number(e.target.value))}
                         min="15"
                         step="15"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
+                      <p className="text-sm text-muted-enhanced mt-2">Time slot duration for bookings</p>
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">Default Slot Capacity</label>
+                      <label className="block text-subheading mb-2 font-medium">Default Slot Capacity</label>
                       <input
                         type="number"
                         value={formSettings.slot_capacity || 1}
                         onChange={(e) => updateFormField('slot_capacity', Number(e.target.value))}
                         min="1"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
+                      <p className="text-sm text-muted-enhanced mt-2">Number of bookings allowed per time slot</p>
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">Lead Time (hours)</label>
+                      <label className="block text-subheading mb-2 font-medium">Lead Time <span className="text-muted-enhanced font-normal">(hours)</span></label>
                       <input
                         type="number"
                         value={formSettings.lead_time_hours || 2}
                         onChange={(e) => updateFormField('lead_time_hours', Number(e.target.value))}
                         min="0"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
-                      <p className="text-sm text-muted-enhanced mt-1">Minimum hours before booking</p>
+                      <p className="text-sm text-muted-enhanced mt-2">Minimum hours before a booking can be made</p>
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">Max Future Days</label>
+                      <label className="block text-subheading mb-2 font-medium">Max Future Days</label>
                       <input
                         type="number"
                         value={formSettings.max_future_days || 90}
                         onChange={(e) => updateFormField('max_future_days', Number(e.target.value))}
                         min="1"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
-                      <p className="text-sm text-muted-enhanced mt-1">Maximum days in future for bookings</p>
+                      <p className="text-sm text-muted-enhanced mt-2">Maximum days in advance for bookings</p>
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">Confirmation Expiry (minutes)</label>
+                      <label className="block text-subheading mb-2 font-medium">Confirmation Expiry <span className="text-muted-enhanced font-normal">(minutes)</span></label>
                       <input
                         type="number"
                         value={formSettings.confirmation_expiry_minutes || 30}
                         onChange={(e) => updateFormField('confirmation_expiry_minutes', Number(e.target.value))}
                         min="5"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
-                      <p className="text-sm text-muted-enhanced mt-1">Time before confirmation link expires</p>
+                      <p className="text-sm text-muted-enhanced mt-2">Time before confirmation link expires</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Working Hours */}
+                {/* Working Hours Section */}
                 <div className="glass-card p-8">
-                  <h2 className="text-heading font-light mb-6">Working Hours</h2>
-                  <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-800">
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <FaClock className="text-primary text-xl" />
+                    </div>
+                    <div>
+                      <h2 className="text-heading font-light">Working Hours</h2>
+                      <p className="text-sm text-muted-enhanced mt-1">Set your business operating hours for each day</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
                     {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map((day) => {
                       const dayHours = formSettings.working_hours?.[day] || { open: '09:00', close: '18:00', enabled: false };
                       return (
-                        <div key={day} className="flex items-center gap-4 p-4 bg-gray-900/50 rounded-lg">
-                          <div className="flex items-center gap-2 w-32">
+                        <div key={day} className="flex items-center gap-4 p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900/70 transition-colors">
+                          <div className="flex items-center gap-3 w-40">
                             <input
                               type="checkbox"
+                              id={`day-${day}`}
                               checked={dayHours.enabled}
                               onChange={(e) => updateWorkingHoursField(day, 'enabled', e.target.checked)}
-                              className="w-4 h-4 cursor-pointer"
+                              className="w-5 h-5 cursor-pointer rounded border-gray-600 bg-gray-800 text-primary focus:ring-2 focus:ring-primary/20"
                             />
-                            <label className="text-subheading capitalize cursor-pointer">{day}</label>
+                            <label htmlFor={`day-${day}`} className="text-subheading capitalize cursor-pointer font-medium">
+                              {day.charAt(0).toUpperCase() + day.slice(1)}
+                            </label>
                           </div>
                           {dayHours.enabled && (
-                            <>
+                            <div className="flex items-center gap-3 flex-1">
                               <input
                                 type="time"
                                 value={dayHours.open}
                                 onChange={(e) => updateWorkingHoursField(day, 'open', e.target.value)}
-                                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                               />
                               <span className="text-muted-enhanced">to</span>
                               <input
                                 type="time"
                                 value={dayHours.close}
                                 onChange={(e) => updateWorkingHoursField(day, 'close', e.target.value)}
-                                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                                className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                               />
-                            </>
+                            </div>
+                          )}
+                          {!dayHours.enabled && (
+                            <span className="text-sm text-muted-enhanced">Closed</span>
                           )}
                         </div>
                       );
@@ -503,113 +583,180 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Google Calendar Settings */}
+                {/* Google Calendar Section */}
                 <div className="glass-card p-8">
-                  <h2 className="text-heading font-light mb-6">Google Calendar Integration</h2>
-                  <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-800">
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <FaGoogle className="text-primary text-xl" />
+                    </div>
                     <div>
-                      <label className="block text-subheading mb-2">Google Calendar ID</label>
+                      <h2 className="text-heading font-light">Google Calendar Integration</h2>
+                      <p className="text-sm text-muted-enhanced mt-1">Connect your Google Calendar for automatic event creation</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-subheading mb-2 font-medium">Google Calendar ID</label>
                       <input
                         type="text"
                         value={formSettings.google_calendar_id || ''}
                         onChange={(e) => updateFormField('google_calendar_id', e.target.value || undefined)}
                         placeholder="calendar@group.calendar.google.com"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
-                      <p className="text-sm text-muted-enhanced mt-1">Leave empty to disable calendar integration</p>
+                      <p className="text-sm text-muted-enhanced mt-2">Leave empty to disable calendar integration. Find your calendar ID in Google Calendar settings.</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    
+                    <div className="flex items-start gap-3 p-4 bg-gray-900/50 rounded-lg">
                       <input
                         type="checkbox"
+                        id="conflict-check"
                         checked={formSettings.google_calendar_conflict_check || false}
                         onChange={(e) => updateFormField('google_calendar_conflict_check', e.target.checked)}
-                        className="w-4 h-4 cursor-pointer"
+                        className="w-5 h-5 mt-0.5 cursor-pointer rounded border-gray-600 bg-gray-800 text-primary focus:ring-2 focus:ring-primary/20"
                       />
-                      <label className="text-subheading cursor-pointer">Enable conflict checking</label>
+                      <div>
+                        <label htmlFor="conflict-check" className="text-subheading cursor-pointer font-medium block mb-1">
+                          Enable conflict checking
+                        </label>
+                        <p className="text-sm text-muted-enhanced">Prevent double bookings by checking for existing calendar events</p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* SMTP Settings */}
+                {/* SMTP Settings Section */}
                 <div className="glass-card p-8">
-                  <h2 className="text-heading font-light mb-6">SMTP Email Settings</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-800">
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <FaEnvelope className="text-primary text-xl" />
+                    </div>
                     <div>
-                      <label className="block text-subheading mb-2">SMTP Host</label>
+                      <h2 className="text-heading font-light">Email Settings</h2>
+                      <p className="text-sm text-muted-enhanced mt-1">Configure SMTP settings for booking confirmation emails</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-subheading mb-2 font-medium">SMTP Host</label>
                       <input
                         type="text"
                         value={formSettings.smtp_host || ''}
                         onChange={(e) => updateFormField('smtp_host', e.target.value)}
                         placeholder="smtp.gmail.com"
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">SMTP Port</label>
+                      <label className="block text-subheading mb-2 font-medium">SMTP Port</label>
                       <input
                         type="number"
                         value={formSettings.smtp_port || 587}
                         onChange={(e) => updateFormField('smtp_port', Number(e.target.value))}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">SMTP Username</label>
+                      <label className="block text-subheading mb-2 font-medium">SMTP Username</label>
                       <input
                         type="text"
                         value={formSettings.smtp_username || ''}
                         onChange={(e) => updateFormField('smtp_username', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
                     </div>
+                    
                     <div>
-                      <label className="block text-subheading mb-2">SMTP From Address</label>
+                      <label className="block text-subheading mb-2 font-medium">SMTP From Address</label>
                       <input
                         type="email"
                         value={formSettings.smtp_from || ''}
                         onChange={(e) => updateFormField('smtp_from', e.target.value)}
-                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary"
+                        className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       />
                     </div>
                   </div>
-                  <p className="text-sm text-muted-enhanced mt-4">
-                    Note: SMTP password is stored in environment variable (SMTP_PASSWORD) for security.
-                  </p>
+                  
+                  <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <p className="text-sm text-blue-300">
+                      <strong>Note:</strong> SMTP password is stored securely in environment variables (SMTP_PASSWORD) and cannot be changed here.
+                    </p>
+                  </div>
                 </div>
 
-                {/* Email Preferences */}
+                {/* Email Preferences Section */}
                 <div className="glass-card p-8">
-                  <h2 className="text-heading font-light mb-6">Email Preferences</h2>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={formSettings.email_include_ics ?? true}
-                        onChange={(e) => updateFormField('email_include_ics', e.target.checked)}
-                        className="w-4 h-4 cursor-pointer"
-                      />
-                      <label className="text-subheading cursor-pointer">Include ICS calendar attachment</label>
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-800">
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <FaEnvelope className="text-primary text-xl" />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={formSettings.email_include_google_calendar_link ?? true}
-                        onChange={(e) => updateFormField('email_include_google_calendar_link', e.target.checked)}
-                        className="w-4 h-4 cursor-pointer"
-                      />
-                      <label className="text-subheading cursor-pointer">Include Google Calendar link</label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={formSettings.email_include_google_maps_link ?? true}
-                        onChange={(e) => updateFormField('email_include_google_maps_link', e.target.checked)}
-                        className="w-4 h-4 cursor-pointer"
-                      />
-                      <label className="text-subheading cursor-pointer">Include Google Maps link</label>
+                    <div>
+                      <h2 className="text-heading font-light">Email Preferences</h2>
+                      <p className="text-sm text-muted-enhanced mt-1">Customize what to include in confirmation emails</p>
                     </div>
                   </div>
+                  
+                  <div className="space-y-4">
+                    {[
+                      { key: 'email_include_ics', label: 'Include ICS calendar attachment', desc: 'Add .ics file for easy calendar import' },
+                      { key: 'email_include_google_calendar_link', label: 'Include Google Calendar link', desc: 'Add one-click link to add event to Google Calendar' },
+                      { key: 'email_include_google_maps_link', label: 'Include Google Maps link', desc: 'Add location link for easy navigation' },
+                    ].map(({ key, label, desc }) => (
+                      <div key={key} className="flex items-start gap-3 p-4 bg-gray-900/50 rounded-lg hover:bg-gray-900/70 transition-colors">
+                        <input
+                          type="checkbox"
+                          id={key}
+                          checked={formSettings[key as keyof Settings] as boolean ?? true}
+                          onChange={(e) => updateFormField(key as keyof Settings, e.target.checked)}
+                          className="w-5 h-5 mt-0.5 cursor-pointer rounded border-gray-600 bg-gray-800 text-primary focus:ring-2 focus:ring-primary/20"
+                        />
+                        <div>
+                          <label htmlFor={key} className="text-subheading cursor-pointer font-medium block mb-1">
+                            {label}
+                          </label>
+                          <p className="text-sm text-muted-enhanced">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Bottom Save Bar (for mobile) */}
+                {hasUnsavedChanges && (
+                  <div className="sticky bottom-0 glass-card p-4 border-t-2 border-primary md:hidden">
+                    <div className="flex gap-3">
+                      <button
+                        onClick={resetForm}
+                        disabled={settingsSaving}
+                        className="flex-1 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        <FaUndo />
+                        Reset
+                      </button>
+                      <button
+                        onClick={saveAllSettings}
+                        disabled={settingsSaving}
+                        className="flex-1 px-4 py-3 bg-primary hover:bg-primary-dark rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2 font-medium"
+                      >
+                        {settingsSaving ? (
+                          <>
+                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <FaSave />
+                            Save
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </form>
             )}
           </div>
@@ -623,7 +770,7 @@ export default function AdminDashboard() {
                 <h2 className="text-heading font-light">Booking Details</h2>
                 <button
                   onClick={() => setSelectedBooking(null)}
-                  className="text-muted-enhanced hover:text-white"
+                  className="text-muted-enhanced hover:text-white text-2xl"
                 >
                   ✕
                 </button>
