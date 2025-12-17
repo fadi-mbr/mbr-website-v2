@@ -32,9 +32,9 @@ function Calendar({
         head_row: "flex mb-2",
         head_cell:
           "text-gray-400 w-11 font-semibold text-xs uppercase tracking-wider text-center",
-        row: "flex w-full",
+        row: "flex w-full mt-1 flex-nowrap",
         cell: cn(
-          "h-11 w-11 p-0 relative",
+          "h-11 w-11 p-0 relative text-center flex-shrink-0 flex-grow-0",
           "border border-gray-700",
           "focus-within:relative focus-within:z-20"
         ),
