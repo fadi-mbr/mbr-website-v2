@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DateTime } from 'luxon';
 import type { ServiceType, SlotAvailability } from '@/lib/booking/types';
-import { DateTimePicker } from './DateTimePicker';
+import { BookingCalendar } from './BookingCalendar';
 
 interface Props {
   serviceType: ServiceType;
@@ -60,7 +60,7 @@ export default function Step2DateTimeSelection({ serviceType, onSelect, onBack }
       {/* DateTime Picker */}
       <div>
         <label className="block text-subheading mb-3">Date & Time</label>
-        <DateTimePicker
+        <BookingCalendar
           slots={slots}
           loading={loading}
           onSelect={handleSlotSelect}
