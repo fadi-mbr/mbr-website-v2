@@ -14,3 +14,4 @@ echo ""
 
 npx tsx scripts/test-email.ts "$1"
 
+
