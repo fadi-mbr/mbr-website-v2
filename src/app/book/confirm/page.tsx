@@ -10,7 +10,7 @@ function BookingConfirmContent() {
   const token = searchParams.get('token');
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
   const [message, setMessage] = useState('');
-  const [bookingData, setBookingData] = useState<{ id?: string; status?: string; google_calendar_link?: string } | null>(null);
+  const [bookingData, setBookingData] = useState<{ id?: string; status?: string } | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -65,15 +65,17 @@ function BookingConfirmContent() {
             </h1>
             <p className="text-body-enhanced mb-8">{message}</p>
             
-            {bookingData?.google_calendar_link && (
+            {bookingData?.id && (
               <div className="mb-6">
                 <a
-                  href={bookingData.google_calendar_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="liquid-glass-btn liquid-glass-btn-primary inline-block"
+                  href={`/api/bookings/ics?id=${bookingData.id}`}
+                  download
+                  className="liquid-glass-btn liquid-glass-btn-primary inline-flex items-center gap-2"
                 >
-                  Add to Google Calendar
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Download Calendar Event
                 </a>
               </div>
             )}

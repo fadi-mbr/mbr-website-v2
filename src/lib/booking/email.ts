@@ -228,8 +228,7 @@ export function generateICSFile(booking: Booking, settings: { timezone: string; 
 }
 
 export async function sendConfirmedEmail(
-  booking: Booking,
-  googleCalendarLink?: string
+  booking: Booking
 ): Promise<void> {
   // Use admin client to read settings (bypasses RLS)
   const settings = await getSettings(true);
@@ -240,13 +239,14 @@ export async function sendConfirmedEmail(
   const googleMapsLink = settings.google_maps_link || 
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.business_address)}`;
   
-  let calendarLinksHtml = '';
-  if (settings.email_include_google_calendar_link && googleCalendarLink) {
-    calendarLinksHtml += `<p><a href="${googleCalendarLink}" style="color: #E30613;">Add to Google Calendar</a></p>`;
-  }
+  let linksHtml = '';
   if (settings.email_include_google_maps_link) {
-    calendarLinksHtml += `<p><a href="${googleMapsLink}" style="color: #E30613;">View on Google Maps</a></p>`;
+    linksHtml += `<p><a href="${googleMapsLink}" style="color: #E30613; text-decoration: none;">📍 View Location on Google Maps</a></p>`;
   }
+  
+  const calendarNote = settings.email_include_ics 
+    ? `<p style="background: #e8f4f8; padding: 12px; border-radius: 5px; margin: 15px 0;">📅 <strong>Calendar Event Attached:</strong> Open the attached .ics file to add this appointment to your calendar (works with Google Calendar, Apple Calendar, Outlook, and more).</p>`
+    : '';
   
   const html = `
     <!DOCTYPE html>
@@ -277,7 +277,9 @@ export async function sendConfirmedEmail(
           ${booking.customer_notes ? `<p><strong>Your Notes:</strong> ${booking.customer_notes}</p>` : ''}
         </div>
         
-        ${calendarLinksHtml ? `<div style="margin: 20px 0;">${calendarLinksHtml}</div>` : ''}
+        ${calendarNote}
+        
+        ${linksHtml ? `<div style="margin: 20px 0;">${linksHtml}</div>` : ''}
         
         <p>If you need to make any changes or have questions, please contact us.</p>
       </div>

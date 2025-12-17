@@ -104,7 +104,7 @@ export async function GET(request: Request) {
     
     // Send confirmation email with ICS attachment
     try {
-      await sendConfirmedEmail(booking, googleCalendarLink);
+      await sendConfirmedEmail(booking);
     } catch (emailError) {
       console.error('Confirmation email error:', emailError);
       // Don't fail if email fails
@@ -116,7 +116,6 @@ export async function GET(request: Request) {
       booking: {
         id: booking.id,
         status: 'CONFIRMED',
-        google_calendar_link: googleCalendarLink,
       },
     });
     
