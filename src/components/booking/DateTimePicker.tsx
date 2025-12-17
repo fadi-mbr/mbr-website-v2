@@ -72,23 +72,6 @@ export function DateTimePicker({
     ? format(new Date(selectedSlot.start), "EEEE, MMMM d, yyyy 'at' h:mm aa")
     : null;
 
-  // Custom day formatter to show slot count
-  const formatDayWithSlots = (day: Date) => {
-    const dayNumber = format(day, "d");
-    const slotCount = getSlotCountForDate(day, slots);
-    
-    return (
-      <div className="flex flex-col items-center justify-center h-full w-full">
-        <span className="text-sm font-medium">{dayNumber}</span>
-        {slotCount > 0 && (
-          <span className="text-[10px] text-primary font-semibold leading-none mt-0.5">
-            {slotCount}
-          </span>
-        )}
-      </div>
-    );
-  };
-
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
