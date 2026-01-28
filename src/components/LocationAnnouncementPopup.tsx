@@ -14,22 +14,16 @@ export default function LocationAnnouncementPopup({ onClose }: LocationAnnouncem
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    // Check if user has already seen the popup in this session
-    const hasSeenPopup = sessionStorage.getItem('mbr-location-popup-seen');
+    // Small delay before showing popup for better UX
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 1500);
 
-    if (!hasSeenPopup) {
-      // Small delay before showing popup for better UX
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 1500);
-
-      return () => clearTimeout(timer);
-    }
+    return () => clearTimeout(timer);
   }, []);
 
   const handleClose = () => {
     setIsVisible(false);
-    sessionStorage.setItem('mbr-location-popup-seen', 'true');
     onClose?.();
   };
 
