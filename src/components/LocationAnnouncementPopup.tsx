@@ -11,7 +11,6 @@ interface LocationAnnouncementPopupProps {
 export default function LocationAnnouncementPopup({ onClose }: LocationAnnouncementPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [hasEnded, setHasEnded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -38,18 +37,6 @@ export default function LocationAnnouncementPopup({ onClose }: LocationAnnouncem
     if (videoRef.current) {
       videoRef.current.muted = !videoRef.current.muted;
       setIsMuted(videoRef.current.muted);
-    }
-  };
-
-  const handleVideoEnd = () => {
-    setHasEnded(true);
-  };
-
-  const replayVideo = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
-      setHasEnded(false);
     }
   };
 
@@ -110,9 +97,9 @@ export default function LocationAnnouncementPopup({ onClose }: LocationAnnouncem
                   <video
                     ref={videoRef}
                     autoPlay
+                    loop
                     muted={isMuted}
                     playsInline
-                    onEnded={handleVideoEnd}
                     className="w-full h-full object-cover"
                   >
                     <source src="/videos/mbr-location-promo.mp4" type="video/mp4" />
@@ -135,23 +122,6 @@ export default function LocationAnnouncementPopup({ onClose }: LocationAnnouncem
                         <FaVolumeUp className="w-4 h-4" />
                       )}
                     </motion.button>
-
-                    {/* Replay Button (shown when video ends) */}
-                    <AnimatePresence>
-                      {hasEnded && (
-                        <motion.button
-                          onClick={replayVideo}
-                          className="liquid-glass-btn liquid-glass-btn-small"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          Replay
-                        </motion.button>
-                      )}
-                    </AnimatePresence>
                   </div>
                 </div>
 
@@ -170,19 +140,11 @@ export default function LocationAnnouncementPopup({ onClose }: LocationAnnouncem
                       </div>
                     </div>
 
-                    {/* CTA Buttons */}
+                    {/* CTA Button */}
                     <div className="flex gap-3">
-                      <a
-                        href="https://maps.google.com/?q=MBR+Auto+Services+Al+Quoz+Industrial+Area+4+Dubai"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small flex-1 md:flex-none text-center"
-                      >
-                        Get Directions
-                      </a>
                       <button
                         onClick={handleClose}
-                        className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small flex-1 md:flex-none"
+                        className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small flex-1 md:flex-none"
                       >
                         Continue
                       </button>
