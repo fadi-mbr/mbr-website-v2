@@ -244,7 +244,7 @@ export default function LuxuryHero({
               </a>
 
               <a
-                href="https://maps.app.goo.gl/6A6XeA4Nk4qD8MdRA"
+                href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-3 group transition-all duration-300 hover:text-gold"
@@ -252,8 +252,8 @@ export default function LuxuryHero({
               >
                 <FaMapMarkerAlt className="text-gold text-sm" />
                 <div>
-                  <div className="text-white text-sm group-hover:text-gold transition-colors">Al Quoz Industrial 4</div>
-                  <div className="text-xs text-muted-enhanced">Dubai, UAE</div>
+                  <div className="text-white text-sm group-hover:text-gold transition-colors">16 8 St Al Qouz Ind.fourth</div>
+                  <div className="text-xs text-muted-enhanced">Al Quoz, Dubai</div>
                 </div>
               </a>
 

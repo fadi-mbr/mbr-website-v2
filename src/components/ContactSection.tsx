@@ -34,10 +34,10 @@ const contactInfo = [
   {
     icon: FaMapMarkerAlt,
     title: "Visit Us",
-    primary: "Al Quoz Industrial 4",
-    secondary: "Dubai, UAE",
-    description: "Behind Times Square mall",
-    action: "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A",
+    primary: "16 8 St Al Qouz Ind.fourth",
+    secondary: "Al Quoz, Dubai",
+    description: "Our new location",
+    action: "https://maps.app.goo.gl/gj9EXG4uchRBtZcE6",
     color: "text-red-400"
   },
   {
@@ -234,7 +234,7 @@ export default function ContactSection() {
               </div>
               <div className="text-center">
                 <p className="text-body text-body-enhanced mb-2">
-                  {locationData?.address || "Al Quoz Industrial Area 4, Dubai, UAE"}
+                  {locationData?.address || "16 8 St Al Qouz Ind.fourth - Al Quoz - Dubai"}
                 </p>
                 {locationData && (
                   <a

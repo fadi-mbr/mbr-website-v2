@@ -42,7 +42,7 @@ export async function GET() {
         lng: data.result.geometry.location.lng
       },
       placeId: data.result.place_id,
-      googleMapsUrl: data.result.url || `https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A`,
+      googleMapsUrl: data.result.url || `https://maps.app.goo.gl/gj9EXG4uchRBtZcE6`,
       embedUrl: `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=place_id:${data.result.place_id}&zoom=15`
     };
 
@@ -59,13 +59,13 @@ export async function GET() {
       success: false,
       data: {
         name: "MBR Auto Services",
-        address: "Al Quoz Industrial Area 4, Dubai, UAE",
+        address: "16 8 St Al Qouz Ind.fourth - Al Quoz - Dubai",
         coordinates: {
           lat: 25.1389859,
           lng: 55.2250031
         },
         placeId: PLACE_ID,
-        googleMapsUrl: "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A",
+        googleMapsUrl: "https://maps.app.goo.gl/gj9EXG4uchRBtZcE6",
         embedUrl: `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=place_id:${PLACE_ID}&zoom=15`
       },
       error: error instanceof Error ? error.message : 'Failed to fetch location data',

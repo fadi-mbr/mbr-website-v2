@@ -13,8 +13,8 @@ export const autoRepairSchema = {
   "description": "Premium car repair and luxury auto service in Dubai, UAE. 15+ years experience servicing Mercedes, BMW, Audi, Porsche and all premium brands.",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "Al Quoz",
-    "addressLocality": "Dubai",
+    "streetAddress": "16 8 St Al Qouz Ind.fourth",
+    "addressLocality": "Al Quoz",
     "addressRegion": "Dubai",
     "addressCountry": "AE"
   },

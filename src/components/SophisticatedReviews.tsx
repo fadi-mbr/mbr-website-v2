@@ -44,7 +44,7 @@ export default function SophisticatedReviews() {
             reviews: [
               {
                 author_name: "Ahmad Al-Mansouri",
-                author_url: "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A",
+                author_url: "https://maps.app.goo.gl/gj9EXG4uchRBtZcE6",
                 rating: 5,
                 text: "Exceptional service! The team at MBR diagnosed and fixed my BMW's electrical issue quickly. Professional, knowledgeable, and trustworthy. They explained everything clearly and the pricing was fair. Highly recommend for anyone looking for quality automotive care in Dubai.",
                 time: Date.now() - 86400000,
@@ -184,7 +184,7 @@ export default function SophisticatedReviews() {
           viewport={{ once: true }}
         >
           <a
-            href="https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"
+            href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full max-w-4xl mx-auto"
@@ -233,7 +233,7 @@ export default function SophisticatedReviews() {
               transition={{ duration: 0.3 }}
             >
               <a
-                href={review.author_url || "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"}
+                href={review.author_url || "https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block h-full"
@@ -291,7 +291,7 @@ export default function SophisticatedReviews() {
         >
           <div className="inline-flex flex-col sm:flex-row gap-6">
             <a
-              href="https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"
+              href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
               target="_blank"
               rel="noopener noreferrer"
               className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large"

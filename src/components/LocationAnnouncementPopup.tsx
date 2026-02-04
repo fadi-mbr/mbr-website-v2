@@ -130,15 +130,23 @@ export default function LocationAnnouncementPopup({ onClose }: LocationAnnouncem
                       </div>
                       <div>
                         <p className="text-sm md:text-base text-white/60 font-medium">New Location</p>
-                        <p className="text-base md:text-lg text-white font-semibold">Al Quoz Industrial Area 4, Dubai</p>
+                        <p className="text-base md:text-lg text-white font-semibold">16 8 St Al Qouz Ind.fourth - Al Quoz - Dubai</p>
                       </div>
                     </div>
 
-                    {/* CTA Button */}
+                    {/* CTA Buttons */}
                     <div className="flex gap-3">
+                      <a
+                        href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small flex-1 md:flex-none text-center"
+                      >
+                        Get Directions
+                      </a>
                       <button
                         onClick={handleClose}
-                        className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small flex-1 md:flex-none"
+                        className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-small flex-1 md:flex-none"
                       >
                         Continue
                       </button>

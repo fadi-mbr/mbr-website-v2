@@ -231,7 +231,7 @@ export default function LuxuryReviewsSection() {
                   transition={{ duration: 0.5 }}
                 >
                   <a
-                    href={reviewsData.reviews?.[currentReview]?.author_url || "https://maps.app.goo.gl/P7vgB2XDpeRCMaH3A"}
+                    href={reviewsData.reviews?.[currentReview]?.author_url || "https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block cursor-pointer hover:opacity-80 transition-opacity"

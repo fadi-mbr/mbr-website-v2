@@ -117,7 +117,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="mt-4 space-y-2">
               <p><strong>MBR Making Better Rides</strong></p>
-              <p>Al Quoz, Dubai, UAE</p>
+              <p>16 8 St Al Qouz Ind.fourth - Al Quoz - Dubai</p>
               <p>Phone: <a href="tel:+971565015800" className="text-red-400 hover:text-red-300">+971 56 501 5800</a></p>
               <p>Email: <a href="mailto:info@mbrme.com" className="text-red-400 hover:text-red-300">info@mbrme.com</a></p>
             </div>

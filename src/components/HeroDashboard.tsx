@@ -258,7 +258,7 @@ export default function HeroDashboard({
               <div className="flex items-center justify-center space-x-2">
                 <FaMapMarkerAlt className="text-blue-400" />
                 <a
-                  href="https://maps.app.goo.gl/6A6XeA4Nk4qD8MdRA"
+                  href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hud-text text-sm hover:text-white transition-colors"
