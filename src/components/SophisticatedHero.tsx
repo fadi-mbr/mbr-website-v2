@@ -153,6 +153,26 @@ export default function SophisticatedHero({
           </button>
         </motion.div>
 
+        {/* Relocation Pill - Top Center */}
+        <motion.a
+          href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-20 md:top-24 left-1/2 -translate-x-1/2 z-20 backdrop-blur-sm bg-black/30 border border-white/20 rounded-full px-4 md:px-5 py-2 md:py-2.5 flex items-center gap-2 shadow-lg hover:bg-black/40 transition-all duration-300 hover:scale-105 group whitespace-nowrap"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.8, duration: 0.8 }}
+          aria-label="Get directions to our new location in Al Quoz Industrial 4"
+        >
+          <FaMapMarkerAlt className="text-[#E30613] text-[0.9rem] md:text-[1.05rem]" />
+          <span className="text-white font-light tracking-wide text-[0.9rem] md:text-[1.05rem]">
+            Now relocated to Al Quoz Industrial 4 &middot; Dubai
+          </span>
+          <span className="text-white/50 group-hover:text-white transition-colors text-[0.9rem] md:text-[1.05rem]" aria-hidden="true">
+            &rarr;
+          </span>
+        </motion.a>
+
         {/* Reviews Badge & Instagram - Bottom Left */}
         <div className="absolute bottom-4 left-4 z-20 flex flex-col gap-3">
           {/* Instagram Icon */}
@@ -195,23 +215,6 @@ export default function SophisticatedHero({
         </motion.div>
         </div>
       </section>
-
-      {/* Subtle Relocation Note */}
-      <a
-        href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group block bg-black border-t border-white/5 hover:bg-white/[0.02] transition-colors duration-300"
-        aria-label="Get directions to our new location in Al Quoz Industrial 4"
-      >
-        <div className="container-luxury flex items-center justify-center gap-2 py-3 text-xs md:text-sm text-white/50 group-hover:text-white/80 transition-colors duration-300">
-          <FaMapMarkerAlt className="w-3 h-3 text-[#E30613]/70 group-hover:text-[#E30613] transition-colors" />
-          <span className="font-light tracking-wide">
-            Now relocated to Al Quoz Industrial 4 &middot; Dubai
-          </span>
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">&rarr;</span>
-        </div>
-      </a>
 
       {/* Content Section Below Video */}
       <section className="relative bg-gradient-to-b from-black via-black to-gray-950 py-20 vibrant-bg-gradient">
