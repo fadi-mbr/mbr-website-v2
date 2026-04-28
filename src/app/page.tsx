@@ -9,12 +9,10 @@ import SophisticatedReviews from '@/components/SophisticatedReviews';
 import AboutSection from '@/components/AboutSection';
 import SophisticatedTeam from '@/components/SophisticatedTeam';
 import ContactSection from '@/components/ContactSection';
-import LocationAnnouncementPopup from '@/components/LocationAnnouncementPopup';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-black text-white">
-      <LocationAnnouncementPopup />
       <ProfessionalNavigation />
       <SophisticatedHero />
       <SophisticatedServices />

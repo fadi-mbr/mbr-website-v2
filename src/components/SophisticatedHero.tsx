@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { FaVolumeUp, FaVolumeMute, FaPlay, FaPause, FaStar, FaGoogle, FaInstagram, FaFacebook } from 'react-icons/fa';
+import { FaVolumeUp, FaVolumeMute, FaPlay, FaPause, FaStar, FaGoogle, FaInstagram, FaFacebook, FaMapMarkerAlt } from 'react-icons/fa';
 import { useGoogleReviews } from './GoogleReviewsHook';
 import { trackWhatsAppClick } from '@/lib/analytics';
 
@@ -195,6 +195,23 @@ export default function SophisticatedHero({
         </motion.div>
         </div>
       </section>
+
+      {/* Subtle Relocation Note */}
+      <a
+        href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group block bg-black border-t border-white/5 hover:bg-white/[0.02] transition-colors duration-300"
+        aria-label="Get directions to our new location in Al Quoz Industrial 4"
+      >
+        <div className="container-luxury flex items-center justify-center gap-2 py-3 text-xs md:text-sm text-white/50 group-hover:text-white/80 transition-colors duration-300">
+          <FaMapMarkerAlt className="w-3 h-3 text-[#E30613]/70 group-hover:text-[#E30613] transition-colors" />
+          <span className="font-light tracking-wide">
+            Now relocated to Al Quoz Industrial 4 &middot; Dubai
+          </span>
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">&rarr;</span>
+        </div>
+      </a>
 
       {/* Content Section Below Video */}
       <section className="relative bg-gradient-to-b from-black via-black to-gray-950 py-20 vibrant-bg-gradient">
