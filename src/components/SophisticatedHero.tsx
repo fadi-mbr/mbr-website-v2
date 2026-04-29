@@ -224,11 +224,14 @@ export default function SophisticatedHero({
               />
             </div>
             <div className="max-w-4xl mx-auto">
+              <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-luxury-gold mb-3">
+                Trusted by Ferrari · Lamborghini · Rolls-Royce owners
+              </p>
               <p className="text-xl md:text-2xl font-light gradient-text mb-4">
-                Expert Car Care in Dubai
+                Dubai&rsquo;s Independent Luxury Workshop
               </p>
               <p className="text-lg text-muted-enhanced mb-12">
-                Premium Automotive Excellence • Trusted by 5,000+ Customers • 15+ Years Experience
+                OEM-level diagnostics, genuine OEM parts · Bosch-authorised · 15+ years · 5,000+ owners trust us
               </p>
             </div>
 
