@@ -11,6 +11,7 @@ import {
   FaFacebook
 } from 'react-icons/fa';
 import { trackWhatsAppClick, trackPhoneCall, trackMapClick, trackSocialMediaClick } from '@/lib/analytics';
+import { BUSINESS_HOURS, getWeeklyHours } from '@/lib/business-hours';
 
 const contactInfo = [
   {
@@ -43,23 +44,15 @@ const contactInfo = [
   {
     icon: FaClock,
     title: "Working Hours",
-    primary: "Mon - Sat",
-    secondary: "8:30 AM - 7:30 PM",
-    description: "Sunday: Closed",
+    primary: BUSINESS_HOURS.displayDayRange,
+    secondary: BUSINESS_HOURS.displayHours,
+    description: BUSINESS_HOURS.closedNote,
     action: null,
     color: "text-yellow-400"
   }
 ];
 
-const workingHours = [
-  { day: "Monday", hours: "8:30 AM - 7:30 PM" },
-  { day: "Tuesday", hours: "8:30 AM - 7:30 PM" },
-  { day: "Wednesday", hours: "8:30 AM - 7:30 PM" },
-  { day: "Thursday", hours: "8:30 AM - 7:30 PM" },
-  { day: "Friday", hours: "8:30 AM - 7:30 PM" },
-  { day: "Saturday", hours: "8:30 AM - 7:30 PM" },
-  { day: "Sunday", hours: "Closed" }
-];
+const workingHours = getWeeklyHours();
 
 interface LocationData {
   name: string;

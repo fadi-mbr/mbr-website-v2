@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { FaVolumeUp, FaVolumeMute, FaPlay, FaPause, FaStar, FaGoogle, FaInstagram, FaFacebook, FaMapMarkerAlt } from 'react-icons/fa';
 import { useGoogleReviews } from './GoogleReviewsHook';
 import { trackWhatsAppClick } from '@/lib/analytics';
+import { isShopOpen } from '@/lib/business-hours';
 
 interface SophisticatedHeroProps {
   googleReviews?: {
@@ -26,24 +27,11 @@ export default function SophisticatedHero({
   // Fetch live Google Reviews data
   const { data: reviewsData, loading: reviewsLoading } = useGoogleReviews();
 
-  // Calculate business status
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       setCurrentTime(now);
-      const hour = now.getHours();
-      const minute = now.getMinutes();
-      const day = now.getDay();
-      // Monday-Saturday 8:30-19:30, Sunday closed
-      if (day === 0) {
-        setIsOpen(false);
-      } else {
-        // Check if current time is between 8:30 AM and 7:30 PM
-        const currentMinutes = hour * 60 + minute;
-        const openMinutes = 8 * 60 + 30; // 8:30 AM
-        const closeMinutes = 19 * 60 + 30; // 7:30 PM
-        setIsOpen(currentMinutes >= openMinutes && currentMinutes < closeMinutes);
-      }
+      setIsOpen(isShopOpen(now));
     };
 
     updateTime();

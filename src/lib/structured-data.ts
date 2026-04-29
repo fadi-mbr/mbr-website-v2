@@ -1,9 +1,11 @@
 /**
  * Structured Data (Schema.org JSON-LD) for SEO
- * 
+ *
  * This file contains schema markup to help search engines understand
  * the business, services, and content of MBR Auto Services.
  */
+
+import { BUSINESS_HOURS } from './business-hours';
 
 export const autoRepairSchema = {
   "@context": "https://schema.org",
@@ -24,9 +26,9 @@ export const autoRepairSchema = {
   "openingHoursSpecification": [
     {
       "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      "opens": "09:00",
-      "closes": "18:00"
+      "dayOfWeek": [...BUSINESS_HOURS.schemaDays],
+      "opens": BUSINESS_HOURS.schemaOpens,
+      "closes": BUSINESS_HOURS.schemaCloses
     }
   ],
   "areaServed": {
