@@ -90,11 +90,12 @@ export default function SophisticatedServices() {
           viewport={{ once: true }}
         >
           <h2 className="text-display font-light gradient-text mb-8 tracking-tight">
-            Premium Services
+            Luxury &amp; Supercar Services
           </h2>
           <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
-            Comprehensive automotive solutions backed by 15+ years of expertise,
-            certified technicians, and state-of-the-art equipment.
+            Engine, transmission, electrical and chassis work &mdash; performed with OEM-level
+            diagnostics and genuine OEM parts. Trusted by Ferrari, Lamborghini, and Rolls-Royce
+            owners; experienced with Bentley, Porsche, and the German luxury lineup.
           </p>
         </motion.div>
 
