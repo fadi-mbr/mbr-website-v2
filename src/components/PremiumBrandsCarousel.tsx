@@ -38,10 +38,7 @@ function BrandLogo({ brand }: { brand: Brand }) {
 
   if (imageError) {
     return (
-      <div
-        className="text-base font-light tracking-[0.18em] uppercase text-white/95 text-center px-2"
-        style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.6)' }}
-      >
+      <div className="text-base font-light tracking-[0.18em] uppercase text-black/80 text-center px-2">
         {brand.name}
       </div>
     );
@@ -53,7 +50,7 @@ function BrandLogo({ brand }: { brand: Brand }) {
       alt={`${brand.name} repair and service in Dubai, UAE — MBR Auto Services`}
       width={140}
       height={70}
-      className="brand-logo-filter object-contain w-auto h-auto max-w-[60%] max-h-[60%] opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+      className="object-contain w-auto h-auto max-w-[70%] max-h-[70%] opacity-100 group-hover:scale-[1.04] transition-transform duration-300"
       onError={() => setImageError(true)}
     />
   );
