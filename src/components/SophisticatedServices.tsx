@@ -21,7 +21,7 @@ const services = [
     subtitle: "Advanced Systems",
     description: "State-of-the-art diagnostic equipment for all electrical systems. From battery issues to complex ECU problems, we diagnose and repair with manufacturer-level precision.",
     features: ["ECU Diagnostics", "Battery & Alternator", "Wiring Repair", "Computer Systems"],
-    image: "/images/mbr_electrical.jpg",
+    image: "/images/mbr_electrical.webp",
     icon: FaBolt,
     color: "from-yellow-600/20 to-orange-600/20"
   },

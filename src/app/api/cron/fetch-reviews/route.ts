@@ -42,12 +42,24 @@ interface GooglePlacesResponse {
  */
 export async function GET(request: Request) {
   try {
-    // Optional: Add secret check for security
-    const { searchParams } = new URL(request.url);
-    const secret = searchParams.get('secret');
     const expectedSecret = process.env.CRON_SECRET;
 
-    if (expectedSecret && secret !== expectedSecret) {
+    if (!expectedSecret) {
+      return NextResponse.json(
+        { success: false, error: 'Server misconfigured: CRON_SECRET not set' },
+        { status: 500 }
+      );
+    }
+
+    const authHeader = request.headers.get('authorization') ?? '';
+    const headerSecret = authHeader.toLowerCase().startsWith('bearer ')
+      ? authHeader.slice(7).trim()
+      : null;
+    const { searchParams } = new URL(request.url);
+    const querySecret = searchParams.get('secret');
+    const provided = headerSecret ?? querySecret;
+
+    if (provided !== expectedSecret) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
