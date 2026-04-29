@@ -42,7 +42,7 @@ const certifications = [
   {
     title: "Advanced Diagnostics",
     description: "State-of-the-art equipment for all vehicle systems",
-    image: "/images/mbr_electrical.jpg"
+    image: "/images/mbr_electrical.webp"
   }
 ];
 
