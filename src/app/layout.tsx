@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/react';
@@ -19,6 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://mbrme.com"),
   title: "Ferrari, Lamborghini & Rolls-Royce Service Dubai | MBR Auto Services",
   description: "Independent luxury workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, OEM-level diagnostics, genuine OEM parts. 15+ years in Al Quoz Industrial 4.",
   keywords: [
@@ -97,9 +98,10 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  themeColor: '#E30613',
 };
 
 export default function RootLayout({
