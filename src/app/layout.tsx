@@ -20,7 +20,14 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://mbrme.com"),
-  title: "Ferrari, Lamborghini & Rolls-Royce Service Dubai | MBR Auto Services",
+  // Title leads with "MBR Auto Services" so the browser tab — which truncates
+  // long titles — always shows the brand first. Full title still feeds Google
+  // SERP with the high-intent luxury-marque keywords.
+  title: {
+    default: "MBR Auto Services — Ferrari, Lamborghini & Rolls-Royce Service Dubai",
+    template: "%s | MBR Auto Services",
+  },
+  applicationName: "MBR Auto Services",
   description: "Independent luxury workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, OEM-level diagnostics, genuine OEM parts. 15+ years in Al Quoz Industrial 4.",
   keywords: [
     "Ferrari service Dubai",
@@ -55,11 +62,19 @@ export const metadata: Metadata = {
   alternates: {
     canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://mbrme.com",
   },
+  // Multi-format favicon coverage:
+  //   - favicon.ico (multi-resolution 16/32) for legacy browsers + Safari URL bar
+  //   - PNG 16/32 for Chrome / Firefox tab
+  //   - apple-touch-icon (180) for iOS home-screen
+  //   - android-chrome 192/512 for Android home-screen + PWA install
+  //   - mstile-150 for Windows Start tile (paired with msapplication-TileColor)
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
@@ -74,13 +89,15 @@ export const metadata: Metadata = {
   },
   other: {
     'msapplication-TileColor': '#E30613',
+    'msapplication-TileImage': '/mstile-150x150.png',
+    'msapplication-config': 'none',
   },
   openGraph: {
-    title: "Ferrari, Lamborghini & Rolls-Royce Service Dubai | MBR Auto Services",
+    title: "MBR Auto Services — Ferrari, Lamborghini & Rolls-Royce Service Dubai",
     description: "Independent luxury workshop in Dubai — trusted by Ferrari, Lamborghini and Rolls-Royce owners. Bosch-authorised, 15+ years in Al Quoz Industrial 4.",
     type: "website",
     locale: "en_US",
-    siteName: "MBR Making Better Rides",
+    siteName: "MBR Auto Services",
     images: [
       {
         url: 'https://mbrme.com/images/Logo_MBRauto_noWhite_small.png',
@@ -92,7 +109,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ferrari, Lamborghini & Rolls-Royce Service Dubai | MBR Auto Services",
+    title: "MBR Auto Services — Ferrari, Lamborghini & Rolls-Royce Service Dubai",
     description: "Independent luxury workshop in Dubai. Bosch-authorised, OEM-level diagnostics, 15+ years.",
     images: ['https://mbrme.com/images/Logo_MBRauto_noWhite_small.png'],
   },
