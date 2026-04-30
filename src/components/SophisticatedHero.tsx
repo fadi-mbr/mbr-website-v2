@@ -228,10 +228,10 @@ export default function SophisticatedHero({
                 Trusted by Ferrari · Lamborghini · Rolls-Royce owners
               </p>
               <p className="text-xl md:text-2xl font-light gradient-text mb-4">
-                Dubai&rsquo;s Independent Luxury Workshop
+                Dubai&rsquo;s Independent Luxury &amp; Exotic-Car Workshop
               </p>
-              <p className="text-lg text-muted-enhanced mb-12">
-                OEM-level diagnostics, genuine OEM parts · Bosch-authorised · 15+ years · 5,000+ owners trust us
+              <p className="text-base md:text-lg text-muted-enhanced mb-12 leading-relaxed">
+                Leonardo exotic diagnostics &middot; OEM-level tooling &middot; genuine OEM parts &middot; Bosch-authorised &middot; 15+ years &middot; 5,000+ owners trust us
               </p>
             </div>
 

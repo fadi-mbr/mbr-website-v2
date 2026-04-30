@@ -10,8 +10,8 @@ import Image from 'next/image';
  * Order matters: the user-facing prioritization leads with the
  * supercars and ultra-luxury marques (Ferrari, Lamborghini,
  * Rolls-Royce) before the German luxury and British SUV tier.
- * Mainstream brands (Tesla, Lexus) were intentionally removed —
- * MBR's positioning is luxury / supercar specialist.
+ * Mainstream brands (Tesla, Lexus) were intentionally removed.
+ * MBR's positioning is luxury and exotic-car focused.
  */
 const luxuryBrands = [
   { name: "Ferrari",       slug: "ferrari",       tier: "supercar",     logo: "/images/brands/ferrari.svg",       keywords: "Ferrari repair Dubai, Ferrari service UAE, Ferrari maintenance, Ferrari mechanic Dubai" },
@@ -47,7 +47,7 @@ function BrandLogo({ brand }: { brand: Brand }) {
   return (
     <Image
       src={brand.logo}
-      alt={`${brand.name} repair and service in Dubai, UAE — MBR Auto Services`}
+      alt={`${brand.name} repair and service in Dubai, UAE | MBR Auto Services`}
       width={140}
       height={70}
       className="object-contain w-auto h-auto max-w-[70%] max-h-[70%] opacity-100 group-hover:scale-[1.04] transition-transform duration-300"
@@ -81,9 +81,9 @@ export default function PremiumBrandsCarousel() {
             Ferrari, Lamborghini, Rolls-Royce &amp; the World&rsquo;s Finest
           </h2>
           <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
-            From Maranello to Crewe to Stuttgart — MBR is trusted by owners of the supercar,
-            ultra-luxury, and luxury marques driven across Dubai. OEM-level diagnostic
-            equipment, genuine OEM parts, Bosch-authorised workshop.
+            From Maranello to Crewe to Stuttgart, MBR is trusted by owners of the exotic,
+            supercar, ultra-luxury, and luxury marques driven across Dubai. OEM-level
+            diagnostic equipment, genuine OEM parts, Bosch-authorised workshop.
           </p>
         </motion.div>
 
@@ -121,14 +121,14 @@ export default function PremiumBrandsCarousel() {
           viewport={{ once: true }}
         >
           {[
-            { label: "Supercars", brands: "Ferrari · Lamborghini · McLaren" },
+            { label: "Exotic & Supercars", brands: "Ferrari · Lamborghini · McLaren" },
             { label: "Ultra-luxury", brands: "Rolls-Royce · Bentley" },
-            { label: "Luxury & sport", brands: "Porsche · Maserati · Mercedes · BMW · Audi" },
+            { label: "Luxury & Sport", brands: "Porsche · Maserati · Mercedes · BMW · Audi" },
             { label: "Luxury SUV", brands: "Range Rover · Jaguar" },
           ].map((tier) => (
             <div key={tier.label} className="px-2">
-              <div className="text-xs uppercase tracking-[0.2em] text-luxury-gold mb-1">{tier.label}</div>
-              <div className="text-xs md:text-sm text-white/60 leading-relaxed">{tier.brands}</div>
+              <div className="text-[0.7rem] md:text-xs uppercase tracking-[0.2em] text-luxury-gold mb-2 font-medium">{tier.label}</div>
+              <div className="text-sm md:text-base text-white/80 leading-relaxed font-light">{tier.brands}</div>
             </div>
           ))}
         </motion.div>
@@ -143,19 +143,21 @@ export default function PremiumBrandsCarousel() {
         >
           <div className="glass-card-premium p-8 max-w-4xl mx-auto">
             <h3 className="text-heading font-light text-white mb-4">
-              Experienced with every luxury marque
+              Experienced with every luxury and exotic marque
             </h3>
             <p className="text-body-enhanced leading-relaxed mb-6">
               MBR Auto Services counts Ferrari, Lamborghini, and Rolls-Royce owners among its
-              regular customers in Dubai &mdash; alongside Bentley, McLaren, Maserati, Porsche,
-              Mercedes-Benz, BMW, Audi, Range Rover, and Jaguar. Every service is carried out with
-              OEM-level diagnostic equipment and genuine OEM parts.
+              regular customers in Dubai, alongside Bentley, McLaren, Maserati, Porsche,
+              Mercedes-Benz, BMW, Audi, Range Rover, and Jaguar. Every service is carried out
+              with OEM-level diagnostic equipment, including the Leonardo exotic-car diagnostic
+              platform, and genuine OEM parts.
             </p>
             <p className="text-body-enhanced leading-relaxed">
-              With 15+ years in Dubai and Bosch-authorised certification, our team handles engine
-              and transmission work, electrical and ECU diagnostics, suspension and brake service,
-              and preventive maintenance. Scheduled service intervals, pre-purchase inspections,
-              and accident repairs &mdash; all with the same workshop standard.
+              With 15+ years in Dubai and Bosch-authorised certification, our team handles
+              engine and transmission work, electrical and ECU diagnostics, suspension and
+              brake service, and preventive maintenance. Scheduled service intervals,
+              pre-purchase inspections, and accident repairs are all delivered to the same
+              workshop standard.
             </p>
           </div>
         </motion.div>

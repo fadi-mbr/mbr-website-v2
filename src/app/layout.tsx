@@ -20,15 +20,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://mbrme.com"),
-  // Title leads with "MBR Auto Services" so the browser tab — which truncates
-  // long titles — always shows the brand first. Full title still feeds Google
-  // SERP with the high-intent luxury-marque keywords.
+  // Title leads with "MBR Auto Services" so the browser tab (which
+  // truncates long titles) always shows the brand first. Full title
+  // still feeds Google SERP with the high-intent luxury-marque keywords.
   title: {
-    default: "MBR Auto Services — Ferrari, Lamborghini & Rolls-Royce Service Dubai",
+    default: "MBR Auto Services | Ferrari, Lamborghini & Rolls-Royce Service Dubai",
     template: "%s | MBR Auto Services",
   },
   applicationName: "MBR Auto Services",
-  description: "Independent luxury workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, OEM-level diagnostics, genuine OEM parts. 15+ years in Al Quoz Industrial 4.",
+  description: "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, Leonardo exotic-car diagnostics, genuine OEM parts. 15+ years in Al Quoz Industrial 4.",
   keywords: [
     "Ferrari service Dubai",
     "Ferrari repair Dubai",
@@ -55,6 +55,8 @@ export const metadata: Metadata = {
     "ECU diagnostics Dubai luxury",
     "supercar maintenance Dubai",
     "ultra-luxury car repair UAE",
+    "exotic car service Dubai",
+    "Leonardo diagnostic tool Dubai",
     "MBR Auto Services",
   ].join(", "),
   authors: [{ name: "MBR Auto Services" }],
@@ -93,8 +95,8 @@ export const metadata: Metadata = {
     'msapplication-config': 'none',
   },
   openGraph: {
-    title: "MBR Auto Services — Ferrari, Lamborghini & Rolls-Royce Service Dubai",
-    description: "Independent luxury workshop in Dubai — trusted by Ferrari, Lamborghini and Rolls-Royce owners. Bosch-authorised, 15+ years in Al Quoz Industrial 4.",
+    title: "MBR Auto Services | Ferrari, Lamborghini & Rolls-Royce Service Dubai",
+    description: "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners. Bosch-authorised, Leonardo exotic diagnostics, 15+ years in Al Quoz Industrial 4.",
     type: "website",
     locale: "en_US",
     siteName: "MBR Auto Services",
@@ -103,14 +105,14 @@ export const metadata: Metadata = {
         url: 'https://mbrme.com/images/Logo_MBRauto_noWhite_small.png',
         width: 1200,
         height: 630,
-        alt: 'MBR Auto Services — Independent luxury workshop in Dubai',
+        alt: 'MBR Auto Services. Independent luxury and exotic-car workshop in Dubai.',
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MBR Auto Services — Ferrari, Lamborghini & Rolls-Royce Service Dubai",
-    description: "Independent luxury workshop in Dubai. Bosch-authorised, OEM-level diagnostics, 15+ years.",
+    title: "MBR Auto Services | Ferrari, Lamborghini & Rolls-Royce Service Dubai",
+    description: "Independent luxury and exotic-car workshop in Dubai. Bosch-authorised, Leonardo exotic diagnostics, OEM-level tooling, 15+ years.",
     images: ['https://mbrme.com/images/Logo_MBRauto_noWhite_small.png'],
   },
 };
