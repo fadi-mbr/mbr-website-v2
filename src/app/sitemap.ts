@@ -4,7 +4,7 @@ import { MetadataRoute } from 'next'
  * Sitemap for SEO.
  *
  * Only canonical URLs belong here. Section anchors (#services, #reviews,
- * etc.) are not separate pages — search engines fold fragments into the
+ * etc.) are not separate pages; search engines fold fragments into the
  * parent URL and listing them as distinct entries can downgrade trust.
  * When real `/services`, `/team` etc. routes are added, list them here.
  */

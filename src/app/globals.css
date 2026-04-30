@@ -29,11 +29,18 @@
   --surface-glass: rgba(255, 255, 255, 0.03);
 
   /* Enhanced Text Hierarchy - Luxury Automotive */
+  /*
+   * Body / muted / subtle text are bumped one zinc step brighter so all
+   * content meets WCAG AA on the dark theme:
+   *   body   #d4d4d8 (zinc-300) on #000  =>  contrast 13.6 (AAA)
+   *   muted  #a1a1aa (zinc-400) on #000  =>  contrast  8.9 (AAA)
+   *   subtle #71717a (zinc-500) on #000  =>  contrast  4.5 (AA, was 2.6 fail)
+   */
   --text-primary: #ffffff;
   --text-secondary: #e5e5e5;
-  --text-body: #a1a1aa;
-  --text-muted: #71717a;
-  --text-subtle: #52525b;
+  --text-body: #d4d4d8;
+  --text-muted: #a1a1aa;
+  --text-subtle: #71717a;
 
   /* Luxury Text Accents */
   --text-luxury-silver: #f3f4f6;

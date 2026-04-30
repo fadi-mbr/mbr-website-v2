@@ -1,9 +1,9 @@
 /**
  * Structured Data (Schema.org JSON-LD) for SEO.
  *
- * Positions MBR as a luxury / supercar specialist (Ferrari, Lamborghini,
- * Rolls-Royce). Brand list mirrors PremiumBrandsCarousel and the keep-list
- * decision; if either changes, update both.
+ * Positions MBR as a luxury and exotic-car workshop (Ferrari, Lamborghini,
+ * Rolls-Royce among regulars). Brand list mirrors PremiumBrandsCarousel
+ * and the keep-list decision; if either changes, update both.
  */
 
 import { BUSINESS_HOURS } from './business-hours';
@@ -33,22 +33,22 @@ const SERVICE_CATALOG = [
   {
     name: 'Mechanical Repairs',
     description:
-      'Engine, transmission, clutch and brake work for Ferrari, Lamborghini, Porsche and the wider luxury lineup.',
+      'Engine, transmission, clutch and brake work for Ferrari, Lamborghini, Porsche and the wider luxury lineup. OEM-level tooling and genuine parts.',
   },
   {
     name: 'Electrical & ECU Diagnostics',
     description:
-      'Manufacturer-level ECU diagnostics, wiring, alternator and battery service for Rolls-Royce, Bentley and modern luxury electronics.',
+      'OEM-level ECU diagnostics including the Leonardo exotic-car platform for Ferrari and Lamborghini. Wiring, alternator, battery and comfort-system work for Rolls-Royce, Bentley and modern luxury electronics.',
   },
   {
     name: 'Suspension & Steering',
     description:
-      'Air-suspension service, alignment and steering work for ultra-luxury and supercar chassis.',
+      'Air-suspension service, alignment, ride-height calibration and steering work for ultra-luxury and supercar chassis.',
   },
   {
     name: 'Preventive Maintenance',
     description:
-      'Scheduled luxury car servicing, fluid changes, AC service and pre-purchase inspections.',
+      'Manufacturer-schedule servicing, fluid changes, AC service and pre-purchase inspections for luxury and exotic vehicles.',
   },
 ];
 
@@ -61,7 +61,7 @@ export const autoRepairSchema = {
   image: LOGO_URL,
   logo: LOGO_URL,
   description:
-    "Independent luxury workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, OEM-level diagnostics, genuine OEM parts. 15+ years in Al Quoz Industrial 4.",
+    "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, Leonardo exotic-car diagnostics, genuine OEM parts. 15+ years in Al Quoz Industrial 4.",
   address: {
     '@type': 'PostalAddress',
     streetAddress: '16 8 St Al Quoz Industrial 4',
@@ -86,7 +86,7 @@ export const autoRepairSchema = {
   ],
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
-    name: 'Luxury & Supercar Services',
+    name: 'Luxury, Exotic & Supercar Services',
     itemListElement: SERVICE_CATALOG.map((s) => ({
       '@type': 'Offer',
       itemOffered: {
@@ -97,7 +97,7 @@ export const autoRepairSchema = {
       },
     })),
   },
-  // Marques serviced — gives Google a structured list of brands.
+  // Marques serviced. Gives Google a structured list of brands.
   brand: SERVICED_BRANDS.map((b) => ({ '@type': 'Brand', name: b })),
   makesOffer: SERVICED_BRANDS.map((b) => ({
     '@type': 'Offer',
@@ -113,13 +113,15 @@ export const autoRepairSchema = {
     'Lamborghini servicing',
     'Rolls-Royce servicing',
     'Bentley servicing',
-    'Luxury vehicle maintenance',
+    'Exotic car maintenance',
     'Supercar maintenance',
+    'Ultra-luxury vehicle service',
     'OEM-level diagnostics',
+    'Leonardo Diagnostic Tool',
     'Bosch authorised diagnostics',
     'Genuine OEM parts',
   ],
-  slogan: "Dubai's independent luxury workshop",
+  slogan: "Dubai's independent luxury and exotic-car workshop",
 };
 
 export const organizationSchema = {
@@ -131,7 +133,7 @@ export const organizationSchema = {
   url: SITE_URL,
   logo: LOGO_URL,
   description:
-    "Independent luxury workshop in Dubai trusted by Ferrari, Lamborghini and Rolls-Royce owners. Bosch-authorised; OEM-level diagnostics; genuine OEM parts.",
+    "Independent luxury and exotic-car workshop in Dubai trusted by Ferrari, Lamborghini and Rolls-Royce owners. Bosch-authorised; Leonardo exotic diagnostics; genuine OEM parts.",
   address: {
     '@type': 'PostalAddress',
     streetAddress: '16 8 St Al Quoz Industrial 4',
