@@ -286,7 +286,7 @@ export default function SophisticatedHero({
 
           {/* Key Highlights Grid */}
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20"
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
@@ -305,14 +305,6 @@ export default function SophisticatedHero({
                 <div className="text-4xl font-light gradient-text-vibrant mb-4">5000+</div>
                 <div className="text-lg text-luxury-silver mb-2">Customers</div>
                 <div className="text-sm text-muted-enhanced">Trust Our Service</div>
-              </div>
-            </div>
-
-            <div className="text-center group cursor-pointer">
-              <div className="glass-card glass-shimmer p-8 hover:glow-red transition-all duration-300">
-                <div className="text-4xl font-light gradient-text-vibrant mb-4">24/7</div>
-                <div className="text-lg text-luxury-silver mb-2">Emergency</div>
-                <div className="text-sm text-muted-enhanced">Support Available</div>
               </div>
             </div>
           </motion.div>
