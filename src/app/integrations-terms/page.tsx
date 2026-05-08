@@ -31,7 +31,7 @@ export default function IntegrationsTermsPage() {
               These terms govern the connection between MBR Making Better Rides (&quot;MBR&quot;)
               internal operational systems and third-party platforms used to support
               accounting, reporting, and customer-experience functions. They apply
-              alongside our <Link href="/privacy-policy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link> and our <Link href="/cookie-policy" className="text-red-400 hover:text-red-300 underline">Cookie Policy</Link>.
+              alongside our <Link href="/privacy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link> and our <Link href="/cookie-policy" className="text-red-400 hover:text-red-300 underline">Cookie Policy</Link>.
             </p>
           </section>
 

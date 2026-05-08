@@ -79,7 +79,7 @@ export default function QboLandingPage() {
             <p>
               Use of this integration is governed by our{' '}
               <Link href="/integrations-terms" className="text-red-400 hover:text-red-300 underline">Integrations Terms</Link>,{' '}
-              <Link href="/privacy-policy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link>, and{' '}
+              <Link href="/privacy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link>, and{' '}
               <Link href="/cookie-policy" className="text-red-400 hover:text-red-300 underline">Cookie Policy</Link>.
               Intuit&apos;s use of authorized data is governed by{' '}
               <a href="https://www.intuit.com/privacy/" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300 underline">Intuit&apos;s privacy notice</a>.

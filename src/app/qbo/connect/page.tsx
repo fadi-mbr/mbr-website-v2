@@ -89,7 +89,7 @@ export default function QboConnectPage() {
                 Integrations Terms
               </Link>{' '}
               and{' '}
-              <Link href="/privacy-policy" className="text-red-400 hover:text-red-300 underline">
+              <Link href="/privacy" className="text-red-400 hover:text-red-300 underline">
                 Privacy Policy
               </Link>
               .
