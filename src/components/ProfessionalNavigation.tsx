@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trackNavigation } from '@/lib/analytics';
 
@@ -32,11 +33,26 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+  // On non-home pages, section anchors must route home first.
+  const hrefPrefix = isHome ? '' : '/';
 
   useEffect(() => {
+    // Suppress unused-var warning on `currentSection` (kept for API stability).
+    void currentSection;
+  }, [currentSection]);
+
+  useEffect(() => {
+    // Section-scroll spy only makes sense on the home page.
+    if (!isHome) {
+      setScrolled(false);
+      setActiveSection('');
+      return;
+    }
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
-      
+
       // Detect active section based on scroll position
       const sections = navigationItems.map(item => {
         const element = document.getElementById(item.id);
@@ -54,7 +70,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
       const current = sections.find(
         section => section && section.top <= 100 && section.bottom >= 100
       );
-      
+
       if (current) {
         setActiveSection(current.id);
       } else if (window.scrollY < 100) {
@@ -65,7 +81,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
     window.addEventListener('scroll', handleScroll);
     handleScroll(); // Initial check
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isHome]);
 
   return (
     <motion.nav
@@ -106,7 +122,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                 transition={{ delay: index * 0.1 + 0.3, duration: 0.4 }}
               >
                 <Link
-                href={`#${item.id}`}
+                href={`${hrefPrefix}#${item.id}`}
                   className={`nav-link-enhanced ${activeSection === item.id ? 'nav-link-active' : ''}`}
                   onClick={() => trackNavigation(item.id, 'desktop')}
               >
@@ -203,7 +219,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                     transition={{ delay: index * 0.1, duration: 0.2 }}
                   >
                 <Link
-                  href={`#${item.id}`}
+                  href={`${hrefPrefix}#${item.id}`}
                       className={`block nav-link-mobile ${activeSection === item.id ? 'nav-link-mobile-active' : ''}`}
                   onClick={() => {
                     setIsOpen(false);
