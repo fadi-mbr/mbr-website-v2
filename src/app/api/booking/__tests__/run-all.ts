@@ -1,0 +1,23 @@
+/**
+ * Entry point for `npm run test:booking`.
+ *
+ * Each test file's default export is a thunk that returns the `runSuite()`
+ * promise — we invoke them sequentially so output stays grouped per suite
+ * and we fail-fast on the first suite that calls `process.exit(1)`.
+ */
+
+import phoneSuite from "./phone.test";
+import validateSuite from "./validate.test";
+import rateLimitSuite from "./rate-limit.test";
+
+async function main(): Promise<void> {
+  await phoneSuite();
+  await validateSuite();
+  await rateLimitSuite();
+  console.log("\nAll booking unit tests passed.");
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
