@@ -63,7 +63,7 @@ export default function TeamSection() {
                 transition={{ duration: 0.7, delay: i * 0.1, ease: 'easeOut' }}
               >
                 {/* Portrait — 3:4 aspect, bronze hairline on hover */}
-                <div className="relative overflow-hidden rounded-2xl border border-white/8 group-hover:border-[var(--accent-bronze)]/45 transition-colors duration-500 bg-[var(--surface-2)]">
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 group-hover:border-[var(--accent-bronze)]/45 transition-colors duration-500 bg-[var(--surface-2)]">
                   <div className="relative aspect-[3/4]">
                     <Image
                       src={member.image}

@@ -150,23 +150,52 @@ export default function SiteFooter() {
             </ul>
           </nav>
 
-          {/* Contact stub */}
+          {/* Contact + visit stub. Now includes a small workshop
+              thumbnail anchored to Google Maps — a concrete visual at
+              the end of the page reminding the visitor where we are. */}
           <div>
             <h2 className="text-xs uppercase tracking-[0.3em] text-accent-bronze mb-5">
               Visit
             </h2>
+
+            {/* Workshop thumbnail → Maps */}
+            <a
+              href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block relative overflow-hidden rounded-2xl border border-white/10 hover:border-[var(--accent-bronze)]/50 transition-colors duration-300 mb-5"
+              aria-label="Open MBR Auto Services in Google Maps"
+            >
+              <div className="relative aspect-[16/9]">
+                <Image
+                  src="/images/hero-poster.jpg"
+                  alt="MBR workshop — Al Quoz Industrial 4, Dubai"
+                  fill
+                  sizes="(min-width: 768px) 33vw, 100vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.75) 100%)',
+                  }}
+                />
+                <div className="absolute inset-x-0 bottom-0 p-4 flex items-end justify-between gap-3">
+                  <div className="text-white">
+                    <p className="text-eyebrow text-[var(--accent-bronze)] mb-1">
+                      Al Quoz Industrial 4
+                    </p>
+                    <p className="text-sm font-light tracking-tight">
+                      Get directions →
+                    </p>
+                  </div>
+                  <FaMapMarkerAlt className="w-4 h-4 text-white/80 flex-shrink-0" />
+                </div>
+              </div>
+            </a>
+
             <ul className="space-y-3 text-sm text-[var(--text-body)]">
-              <li className="flex items-start gap-3">
-                <FaMapMarkerAlt className="w-4 h-4 mt-1 text-[var(--text-muted)] flex-shrink-0" />
-                <a
-                  href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
-                >
-                  16 8 St Al Quoz Industrial 4<br />Dubai, UAE
-                </a>
-              </li>
               <li className="flex items-start gap-3">
                 <FaPhone className="w-4 h-4 mt-1 text-[var(--text-muted)] flex-shrink-0" />
                 <a href="tel:+971565015800" className="hover:text-white transition-colors">

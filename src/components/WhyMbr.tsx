@@ -7,7 +7,8 @@ import {
   FaShieldAlt,
   FaCog,
   FaHandshake,
-  FaCheckCircle,
+  FaMicrochip,
+  FaTools,
 } from 'react-icons/fa';
 import SectionMarker from './SectionMarker';
 
@@ -19,36 +20,12 @@ const STATS = [
   { value: '100%', label: 'Workmanship guarantee' },
 ];
 
-const CERTIFICATIONS = [
-  {
-    name: 'Bosch Authorised Service',
-    description:
-      'Certified Bosch service centre — diagnostic tooling and OE-spec parts straight from the supplier network.',
-    logo: '/images/Bosch_Logo24.webp' as string | undefined,
-    href: undefined as string | undefined,
-  },
-  {
-    name: 'Leonardo Exotic Diagnostics',
-    description:
-      'OEM-grade diagnostics on Ferrari, Lamborghini and McLaren — the same toolchain factory technicians use.',
-    logo: undefined,
-    href: 'https://www.leonardodiagnostictool.com/',
-  },
-  {
-    name: 'OEM-Level Tooling',
-    description:
-      'Genuine torque specs, factory procedures, and original-equipment parts. No shortcuts on cars that don\'t forgive them.',
-    logo: undefined,
-    href: undefined,
-  },
-];
-
 const PILLARS = [
   {
     icon: FaShieldAlt,
     title: 'Independent expertise',
     body:
-      'Dealership-level work without the dealership markup. A decade-plus inside the same marques the dealer principals service.',
+      'Dealership-level work without the dealership markup. The team has worked inside the same marques the dealer principals service.',
   },
   {
     icon: FaCog,
@@ -61,6 +38,41 @@ const PILLARS = [
     title: 'Transparent pricing',
     body:
       'Quote first, approve before we lift a spanner. Itemised invoice covering labour, parts, consumables — no surprise lines at handover.',
+  },
+];
+
+/*
+ * Three credibility anchors — each rendered as a tall, centred card with
+ * a prominent badge medallion at the top. With years claims gone these
+ * are the proof points that carry the weight of the section.
+ */
+type Certification = {
+  name: string;
+  description: string;
+  logo?: string;
+  icon?: typeof FaMicrochip;
+  href?: string;
+};
+
+const CERTIFICATIONS: Certification[] = [
+  {
+    name: 'Bosch Authorised Service',
+    description:
+      'Certified Bosch service centre — diagnostic tooling and OE-spec parts straight from the supplier network that builds the parts in your car.',
+    logo: '/images/Bosch_Logo24.webp',
+  },
+  {
+    name: 'Leonardo Exotic Diagnostics',
+    description:
+      'OEM-grade diagnostics on Ferrari, Lamborghini and McLaren — the same toolchain factory technicians use.',
+    icon: FaMicrochip,
+    href: 'https://www.leonardodiagnostictool.com/',
+  },
+  {
+    name: 'OEM-Level Tooling',
+    description:
+      'Genuine torque specs, factory procedures, and original-equipment parts. No shortcuts on cars that don\'t forgive them.',
+    icon: FaTools,
   },
 ];
 
@@ -89,8 +101,8 @@ export default function WhyMbr() {
           body="An independent workshop chosen by the owners who could go anywhere. Bosch tooling, exotic-car diagnostics, and the discipline of doing things to factory spec."
         />
 
-        {/* Stat strip — 911Porsche numerals, no card wrapping. Tabular
-            figures keep the column edges aligned. */}
+        {/* Stat strip — Fraunces serif tabular numerals, no card chrome,
+            tight 3-up so the figures carry the editorial weight. */}
         <motion.div
           className="mt-20 md:mt-24 grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-8 md:gap-x-12 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 24 }}
@@ -114,87 +126,128 @@ export default function WhyMbr() {
           ))}
         </motion.div>
 
-        {/* 2-column treatment: certifications left, pillars right. */}
-        <div className="mt-24 md:mt-28 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          {/* Certifications */}
-          <div>
-            <p className="text-eyebrow mb-8">Certifications &amp; Tooling</p>
-            <div className="space-y-5">
-              {CERTIFICATIONS.map((cert) => {
-                const Inner = (
-                  <div className="flex items-start gap-5 p-6 md:p-7 rounded-2xl border border-[var(--accent-bronze)]/20 bg-[color:var(--accent-bronze-soft)] hover:border-[var(--accent-bronze)]/50 transition-colors duration-300">
-                    <div
-                      className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-full"
-                      style={{
-                        background:
-                          'linear-gradient(145deg, rgba(165,120,66,0.22), rgba(165,120,66,0.04))',
-                        border: '1px solid rgba(165,120,66,0.45)',
-                      }}
-                    >
-                      {cert.logo ? (
-                        <Image
-                          src={cert.logo}
-                          alt={cert.name}
-                          width={28}
-                          height={28}
-                          className="object-contain"
-                        />
-                      ) : (
-                        <FaCheckCircle className="w-5 h-5 text-[var(--accent-bronze)]" />
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="text-base md:text-lg text-white font-light leading-tight mb-1.5">
-                        {cert.name}
-                      </h3>
-                      <p className="text-sm text-[var(--text-body)] leading-relaxed">
-                        {cert.description}
-                      </p>
-                    </div>
-                  </div>
-                );
-
-                return cert.href ? (
-                  <Link
-                    key={cert.name}
-                    href={cert.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block"
-                    aria-label={`Open ${cert.name} (external)`}
-                  >
-                    {Inner}
-                  </Link>
-                ) : (
-                  <div key={cert.name}>{Inner}</div>
-                );
-              })}
-            </div>
+        {/* Pillars — what we believe. Full-width 3-up, sober card chrome
+            (var(--surface-2) + white/10 border + rounded-2xl), Fraunces
+            serif titles, sans body. */}
+        <motion.div
+          className="mt-20 md:mt-24 motion-calm"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <p className="text-eyebrow mb-8 md:mb-10 text-center">What Sets Us Apart</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {PILLARS.map((pillar) => (
+              <div
+                key={pillar.title}
+                className="p-7 md:p-8 rounded-2xl border border-white/10 bg-[var(--surface-2)] hover:border-white/25 transition-colors duration-300"
+              >
+                <pillar.icon className="w-6 h-6 text-[var(--primary)] mb-5" />
+                <h3 className="font-display text-xl md:text-2xl text-white font-light leading-tight tracking-[-0.01em] mb-3">
+                  {pillar.title}
+                </h3>
+                <p className="text-sm text-[var(--text-body)] leading-relaxed">
+                  {pillar.body}
+                </p>
+              </div>
+            ))}
           </div>
+        </motion.div>
 
-          {/* Pillars */}
-          <div className="motion-calm">
-            <p className="text-eyebrow mb-8">What Sets Us Apart</p>
-            <div className="space-y-5">
-              {PILLARS.map((pillar) => (
+        {/* Cert wall — credibility anchor. Full-width 3-up with PROMINENT
+            badge medallions (3x bigger than the prior nested cards), tall
+            cards, centred content. Bronze gradient surface so they read as
+            "the proof" distinct from the white-bordered pillars above. */}
+        <motion.div
+          className="mt-20 md:mt-24"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <p className="text-eyebrow mb-8 md:mb-10 text-center">
+            Certifications &amp; Tooling
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {CERTIFICATIONS.map((cert) => {
+              const Inner = (
                 <div
-                  key={pillar.title}
-                  className="p-6 md:p-7 rounded-2xl border border-white/8 bg-[var(--surface-2)] hover:border-white/20 transition-colors duration-300"
+                  className="group h-full flex flex-col items-center text-center p-8 md:p-9 rounded-2xl border transition-all duration-300 hover:border-[var(--accent-bronze)]"
+                  style={{
+                    borderColor: 'rgba(165,120,66,0.28)',
+                    background:
+                      'linear-gradient(180deg, rgba(165,120,66,0.10) 0%, rgba(165,120,66,0.02) 60%, var(--surface-2) 100%)',
+                  }}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <pillar.icon className="w-5 h-5 text-[var(--primary)]" />
-                    <h3 className="text-base md:text-lg text-white font-light leading-tight">
-                      {pillar.title}
-                    </h3>
+                  {/* Badge medallion — large, centred */}
+                  <div
+                    className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-105"
+                    style={{
+                      background:
+                        'linear-gradient(145deg, rgba(165,120,66,0.28), rgba(165,120,66,0.06))',
+                      border: '1px solid rgba(165,120,66,0.55)',
+                      boxShadow:
+                        '0 8px 28px rgba(165,120,66,0.18), inset 0 1px 0 rgba(255,255,255,0.06)',
+                    }}
+                  >
+                    {cert.logo ? (
+                      <Image
+                        src={cert.logo}
+                        alt={cert.name}
+                        width={56}
+                        height={56}
+                        className="object-contain"
+                      />
+                    ) : cert.icon ? (
+                      <cert.icon className="w-9 h-9 text-[var(--accent-bronze)]" />
+                    ) : null}
                   </div>
-                  <p className="text-sm text-[var(--text-body)] leading-relaxed">
-                    {pillar.body}
+
+                  {/* Bronze hairline */}
+                  <div
+                    className="h-px w-10 mb-5"
+                    style={{
+                      background:
+                        'linear-gradient(90deg, transparent, var(--accent-bronze), transparent)',
+                    }}
+                    aria-hidden="true"
+                  />
+
+                  <h3 className="font-display text-xl md:text-2xl text-white font-light leading-tight tracking-[-0.01em] mb-3 max-w-[14rem]">
+                    {cert.name}
+                  </h3>
+                  <p className="text-sm text-[var(--text-body)] leading-relaxed max-w-xs">
+                    {cert.description}
                   </p>
+
+                  {cert.href && (
+                    <span className="mt-5 text-eyebrow text-[var(--accent-bronze)] group-hover:text-white transition-colors">
+                      Learn more →
+                    </span>
+                  )}
                 </div>
-              ))}
-            </div>
+              );
+
+              return cert.href ? (
+                <Link
+                  key={cert.name}
+                  href={cert.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block h-full"
+                  aria-label={`${cert.name} — external link`}
+                >
+                  {Inner}
+                </Link>
+              ) : (
+                <div key={cert.name} className="h-full">
+                  {Inner}
+                </div>
+              );
+            })}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

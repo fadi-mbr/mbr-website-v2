@@ -117,7 +117,7 @@ function ServiceSlabRow({
     >
       {/* Image */}
       <div
-        className={`lg:col-span-7 relative overflow-hidden rounded-3xl border border-white/5 ${
+        className={`lg:col-span-7 relative overflow-hidden rounded-2xl border border-white/10 ${
           flipped ? 'lg:order-2' : ''
         }`}
       >

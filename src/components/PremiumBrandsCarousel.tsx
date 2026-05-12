@@ -58,80 +58,43 @@ function BrandLogo({ brand }: { brand: Brand }) {
 
 export default function PremiumBrandsCarousel() {
   return (
-    <section id="premium-brands" className="relative py-20 bg-black overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-red-600/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl"></div>
-      </div>
-
+    /*
+     * Slim brand ribbon — used inside SophisticatedServices between
+     * slabs 2 and 3. Theme: no own section header (the parent Services
+     * section's SectionMarker carries the title), no own background
+     * wash, no tier-caption block (already covered by BrandsStrip at
+     * the top of the page). Just the marquee carousel + the editorial
+     * pull-quote close. Vertical footprint ~50% of the old version.
+     */
+    <section
+      id="premium-brands"
+      aria-label="Marques serviced"
+      className="relative py-12 md:py-14 overflow-hidden"
+    >
       <div className="relative container-luxury">
-        {/* Section Header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          viewport={{ once: true }}
-        >
-          <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-accent-bronze mb-4">
-            Marques We Care For
-          </p>
-          <h2 className="text-display font-light gradient-text mb-6 tracking-tight">
-            Ferrari, Lamborghini, Rolls-Royce &amp; the World&rsquo;s Finest
-          </h2>
-          <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
-            From Maranello to Crewe to Stuttgart, MBR is trusted by owners of the exotic,
-            supercar, ultra-luxury, and luxury marques driven across Dubai. OEM-level
-            diagnostic equipment, genuine OEM parts, Bosch-authorised workshop.
-          </p>
-        </motion.div>
+        {/* Infinite scroll marquee — smaller cards, slower scroll cadence */}
+        <div className="relative overflow-hidden" aria-hidden="true">
+          {/* Edge fades */}
+          <div className="absolute left-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-r from-black via-black to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-l from-black via-black to-transparent z-10 pointer-events-none" />
 
-        {/* Infinite Scrolling Carousel */}
-        <div className="relative overflow-hidden" aria-label="Luxury car brands serviced">
-          {/* Gradient Overlays for fade effect */}
-          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black via-black to-transparent z-10 pointer-events-none"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black via-black to-transparent z-10 pointer-events-none"></div>
-
-          {/* Carousel Container */}
-          <div className="flex gap-8 brand-carousel-scroll">
+          <div className="flex gap-6 md:gap-8 brand-carousel-scroll">
             {carouselBrands.map((brand, index) => (
               <motion.div
                 key={`${brand.slug}-${index}`}
                 className="flex-shrink-0 group"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: (index % luxuryBrands.length) * 0.04 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: (index % luxuryBrands.length) * 0.03 }}
                 viewport={{ once: true }}
               >
-                <div className="glass-card-brand-logo w-48 h-32 flex items-center justify-center p-4 transition-all duration-500 overflow-hidden">
+                <div className="w-32 h-20 md:w-36 md:h-24 flex items-center justify-center p-3 opacity-80 hover:opacity-100 transition-opacity duration-300">
                   <BrandLogo brand={brand} />
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
-
-        {/* Tier Captions */}
-        <motion.div
-          className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-          viewport={{ once: true }}
-        >
-          {[
-            { label: "Exotic & Supercars", brands: "Ferrari · Lamborghini · McLaren" },
-            { label: "Ultra-luxury", brands: "Rolls-Royce · Bentley" },
-            { label: "Luxury & Sport", brands: "Porsche · Maserati · Mercedes · BMW · Audi" },
-            { label: "Luxury SUV", brands: "Range Rover · Jaguar" },
-          ].map((tier) => (
-            <div key={tier.label} className="px-2">
-              <div className="text-[0.7rem] md:text-xs uppercase tracking-[0.2em] text-accent-bronze mb-2 font-medium">{tier.label}</div>
-              <div className="text-sm md:text-base text-white/80 leading-relaxed font-light">{tier.brands}</div>
-            </div>
-          ))}
-        </motion.div>
 
         {/* Editorial pull-quote — closes the brand ribbon with one
             confident line instead of a wall of SEO paragraphs. The
