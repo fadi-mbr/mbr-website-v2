@@ -178,14 +178,21 @@ export default async function ConfirmPage({ searchParams }: PageProps) {
   }
 
   if (result.kind === 'submit-failed') {
-    const heading =
-      result.code === 'SLOT_TAKEN'
-        ? "That slot was just booked"
-        : "We couldn't create your booking";
-    const body =
-      result.code === 'SLOT_TAKEN'
-        ? 'Another booking landed on that time before yours. Please pick a new slot.'
-        : `${result.message} If this keeps happening, please reach out on WhatsApp or by phone.`;
+    let heading: string;
+    let body: string;
+    if (result.code === 'SLOT_TAKEN') {
+      heading = 'That slot was just booked';
+      body = 'Another booking landed on that time before yours. Please pick a new slot.';
+    } else if (result.code === 'EXISTING_CUSTOMER') {
+      heading = "We need to attach this to your existing record";
+      body = result.message;
+    } else if (result.code === 'PHONE_PROBLEM') {
+      heading = "Phone number issue";
+      body = `${result.message} You can also reach us on WhatsApp.`;
+    } else {
+      heading = "We couldn't create your booking";
+      body = `${result.message} If this keeps happening, please reach out on WhatsApp or by phone.`;
+    }
     return <ErrorCard heading={heading} body={body} />;
   }
 

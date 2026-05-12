@@ -272,7 +272,9 @@ export async function POST(req: Request): Promise<NextResponse> {
     const status =
       result.code === 'SLOT_TAKEN'
         ? 409
-        : result.code === 'UNKNOWN_SERVICE' || result.code === 'PHONE_PROBLEM'
+        : result.code === 'UNKNOWN_SERVICE' ||
+            result.code === 'PHONE_PROBLEM' ||
+            result.code === 'EXISTING_CUSTOMER'
           ? 400
           : 503; // SERVICE_LOOKUP_FAILED / ARC_DOWN
     logBooking({
