@@ -12,6 +12,11 @@ import rateLimitSuite from "./rate-limit.test";
 import embedModeSuite from "./embed-mode.test";
 import chatwootSuite from "./chatwoot.test";
 import embedContextSuite from "./embed-context.test";
+import tokenSuite from "./token.test";
+import kvSuite from "./kv.test";
+import emailSuite from "./email.test";
+import rateLimitKvSuite from "./rate-limit-kv.test";
+import arcSubmitSuite from "./arc-submit.test";
 
 async function main(): Promise<void> {
   await phoneSuite();
@@ -20,6 +25,11 @@ async function main(): Promise<void> {
   await embedModeSuite();
   await chatwootSuite();
   await embedContextSuite();
+  await tokenSuite();
+  await kvSuite();
+  await emailSuite();
+  await rateLimitKvSuite();
+  await arcSubmitSuite();
   console.log("\nAll booking unit tests passed.");
 }
 
