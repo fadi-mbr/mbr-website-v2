@@ -241,7 +241,7 @@ export default function AboutSection() {
                       href={cert.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-xs uppercase tracking-[0.2em] text-luxury-gold hover:text-white transition-colors duration-300"
+                      className="inline-flex items-center text-xs uppercase tracking-[0.2em] text-accent-bronze hover:text-white transition-colors duration-300"
                     >
                       {cert.linkLabel}
                       <span className="ml-2" aria-hidden="true">&rarr;</span>

@@ -58,7 +58,7 @@ const contactInfo = [
     secondary: BUSINESS_HOURS.displayHours,
     description: BUSINESS_HOURS.closedNote,
     action: null,
-    color: "text-yellow-400"
+    color: "text-accent-bronze"
   }
 ];
 

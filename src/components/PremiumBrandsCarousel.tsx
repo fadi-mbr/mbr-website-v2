@@ -74,7 +74,7 @@ export default function PremiumBrandsCarousel() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-luxury-gold mb-4">
+          <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-accent-bronze mb-4">
             Marques We Care For
           </p>
           <h2 className="text-display font-light gradient-text mb-6 tracking-tight">
@@ -127,7 +127,7 @@ export default function PremiumBrandsCarousel() {
             { label: "Luxury SUV", brands: "Range Rover · Jaguar" },
           ].map((tier) => (
             <div key={tier.label} className="px-2">
-              <div className="text-[0.7rem] md:text-xs uppercase tracking-[0.2em] text-luxury-gold mb-2 font-medium">{tier.label}</div>
+              <div className="text-[0.7rem] md:text-xs uppercase tracking-[0.2em] text-accent-bronze mb-2 font-medium">{tier.label}</div>
               <div className="text-sm md:text-base text-white/80 leading-relaxed font-light">{tier.brands}</div>
             </div>
           ))}
