@@ -9,60 +9,19 @@ import {
   FaMapMarkerAlt,
   FaClock,
   FaInstagram,
-  FaFacebook
+  FaFacebook,
 } from 'react-icons/fa';
-import { trackWhatsAppClick, trackPhoneCall, trackMapClick, trackSocialMediaClick, trackEmailClick } from '@/lib/analytics';
+import {
+  trackWhatsAppClick,
+  trackPhoneCall,
+  trackMapClick,
+  trackSocialMediaClick,
+  trackEmailClick,
+} from '@/lib/analytics';
 import { BUSINESS_HOURS, getWeeklyHours } from '@/lib/business-hours';
+import SectionMarker from './SectionMarker';
 
-const contactInfo = [
-  {
-    icon: FaPhone,
-    title: "Call Us",
-    primary: "800-MBRAuto",
-    secondary: "800-627-2886",
-    description: "Toll-free within the UAE",
-    action: "tel:8006272886",
-    color: "text-blue-400"
-  },
-  {
-    icon: FaWhatsapp,
-    title: "WhatsApp",
-    primary: "+971 56 501 5800",
-    secondary: "Instant Response",
-    description: "Quick quotes and booking",
-    action: "https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20automotive%20service",
-    color: "text-green-400"
-  },
-  {
-    icon: FaEnvelope,
-    title: "Email Us",
-    primary: "info@mbrme.com",
-    secondary: "Service inquiries & quotes",
-    description: "We reply during working hours",
-    action: "mailto:info@mbrme.com",
-    color: "text-cyan-400"
-  },
-  {
-    icon: FaMapMarkerAlt,
-    title: "Visit Us",
-    primary: "16 8 St Al Qouz Ind.fourth",
-    secondary: "Al Quoz, Dubai",
-    description: "Our new location",
-    action: "https://maps.app.goo.gl/gj9EXG4uchRBtZcE6",
-    color: "text-red-400"
-  },
-  {
-    icon: FaClock,
-    title: "Working Hours",
-    primary: BUSINESS_HOURS.displayDayRange,
-    secondary: BUSINESS_HOURS.displayHours,
-    description: BUSINESS_HOURS.closedNote,
-    action: null,
-    color: "text-accent-bronze"
-  }
-];
-
-const workingHours = getWeeklyHours();
+const WORKING_HOURS = getWeeklyHours();
 
 interface LocationData {
   name: string;
@@ -91,283 +50,246 @@ export default function ContactSection() {
         console.error('Failed to fetch location data:', error);
       }
     };
-
     fetchLocationData();
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 }
-  };
-
   return (
-    <section id="contact" className="section-horizontal section-dark vibrant-bg-gradient">
+    <section
+      id="contact"
+      className="relative py-24 md:py-32 bg-black overflow-hidden"
+    >
       <div className="container-luxury">
+        <SectionMarker
+          number="06"
+          eyebrow="Visit"
+          headline="Three ways in. One workshop."
+          body="WhatsApp is fastest. Phone, email and a visit work too — addresses and hours below."
+        />
 
-        {/* Section Header */}
-        <motion.div
-          className="content-block mb-16"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-display font-light text-center mb-8 tracking-tight gradient-text">
-            Get in Touch
-          </h2>
-          <p className="text-subheading text-center text-body-enhanced max-w-3xl mx-auto leading-relaxed">
-            Ready to experience premium automotive service? Contact us today
-            for expert consultation and professional car care solutions.
-          </p>
-        </motion.div>
-
-        {/* Contact Information Grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-16"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          {contactInfo.map((info, index) => (
-            <motion.div
-              key={info.title}
-              variants={itemVariants}
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.3 }}
+        {/* Row 1 — three action cards. WhatsApp 2x width (the dominant
+            conversion channel), Call + Email half-width each. */}
+        <div className="mt-16 md:mt-20 grid grid-cols-1 md:grid-cols-4 gap-5">
+          {/* WhatsApp — dominant card, spans 2 columns on desktop */}
+          <a
+            href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20automotive%20service"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackWhatsAppClick('contact_primary', 'WhatsApp')}
+            className="group md:col-span-2 relative overflow-hidden rounded-2xl border border-white/10 hover:border-[var(--primary)]/50 transition-all duration-300 p-8 md:p-10 flex items-center gap-6"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(34,197,94,0.10) 0%, rgba(0,0,0,0) 60%), var(--surface-2)',
+            }}
+          >
+            <div
+              className="shrink-0 w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+              style={{
+                background: 'linear-gradient(145deg, #25D366, #128C7E)',
+                boxShadow: '0 8px 24px rgba(37,211,102,0.35)',
+              }}
             >
-              {info.action ? (
-                <a
-                  href={info.action}
-                  target={info.action.startsWith('http') ? '_blank' : undefined}
-                  rel={info.action.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className="block h-full"
-                  onClick={() => {
-                    if (info.action?.includes('wa.me')) {
-                      trackWhatsAppClick('contact_section', info.title);
-                    } else if (info.action?.startsWith('tel:')) {
-                      trackPhoneCall('contact_section', info.action.replace('tel:', ''));
-                    } else if (info.action?.startsWith('mailto:')) {
-                      trackEmailClick('contact_section', info.action.replace('mailto:', ''));
-                    } else if (info.action?.includes('maps')) {
-                      trackMapClick('contact_section');
-                    }
-                  }}
-                >
-                  <div className="glass-card p-6 h-full text-center group hover:bg-surface hover:glow-red transition-all duration-300">
-                    <info.icon className={`w-8 h-8 mx-auto mb-4 ${info.color} group-hover:scale-110 transition-transform`} />
-                    <h3 className="text-subheading text-white mb-2">
-                      {info.title}
-                    </h3>
-                    <p className="text-body text-white mb-1">
-                      {info.primary}
-                    </p>
-                    <p className="text-caption text-muted-enhanced mb-1">
-                      {info.secondary}
-                    </p>
-                    <p className="text-caption text-muted-enhanced">
-                      {info.description}
-                    </p>
-                  </div>
-                </a>
+              <FaWhatsapp className="w-7 h-7 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="text-eyebrow mb-2">WhatsApp</p>
+              <p className="text-2xl md:text-3xl text-white font-light tracking-tight mb-1">
+                +971 56 501 5800
+              </p>
+              <p className="text-sm text-[var(--text-muted)]">
+                Quick quotes, booking, and after-hours messages.
+              </p>
+            </div>
+            <span
+              className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[var(--accent-bronze)] text-xl"
+              aria-hidden="true"
+            >
+              →
+            </span>
+          </a>
+
+          {/* Call */}
+          <a
+            href="tel:8006272886"
+            onClick={() => trackPhoneCall('contact_section', '8006272886')}
+            className="group relative overflow-hidden rounded-2xl border border-white/10 hover:border-white/25 transition-colors duration-300 p-6 md:p-7 bg-[var(--surface-2)]"
+          >
+            <FaPhone className="w-5 h-5 text-[var(--accent-bronze)] mb-5" />
+            <p className="text-eyebrow mb-2">Call</p>
+            <p className="text-lg md:text-xl text-white font-light mb-1">
+              800-MBRAuto
+            </p>
+            <p className="text-xs text-[var(--text-muted)]">
+              Toll-free within the UAE.
+            </p>
+          </a>
+
+          {/* Email */}
+          <a
+            href="mailto:info@mbrme.com"
+            onClick={() => trackEmailClick('contact_section', 'info@mbrme.com')}
+            className="group relative overflow-hidden rounded-2xl border border-white/10 hover:border-white/25 transition-colors duration-300 p-6 md:p-7 bg-[var(--surface-2)]"
+          >
+            <FaEnvelope className="w-5 h-5 text-[var(--accent-bronze)] mb-5" />
+            <p className="text-eyebrow mb-2">Email</p>
+            <p className="text-lg md:text-xl text-white font-light mb-1">
+              info@mbrme.com
+            </p>
+            <p className="text-xs text-[var(--text-muted)]">
+              Service inquiries &amp; quotes — replies during working hours.
+            </p>
+          </a>
+        </div>
+
+        {/* Row 2 — Visit + Hours, 50/50 split on desktop. */}
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Visit / Location with embedded map */}
+          <div className="rounded-2xl border border-white/10 bg-[var(--surface-2)] p-6 md:p-8 flex flex-col">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <p className="text-eyebrow mb-2">Visit</p>
+                <p className="text-lg md:text-xl text-white font-light leading-snug">
+                  16 8 St Al Quoz Industrial 4<br />
+                  Dubai, UAE
+                </p>
+              </div>
+              <FaMapMarkerAlt className="w-5 h-5 text-[var(--accent-bronze)]" />
+            </div>
+
+            <div className="aspect-video bg-black rounded-xl overflow-hidden mb-5 relative">
+              {locationData ? (
+                <iframe
+                  src={locationData.embedUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="absolute inset-0 transition-all duration-700 hover:grayscale"
+                  title="MBR Auto Services location"
+                />
               ) : (
-                <div className="glass-card p-6 h-full text-center hover:glow-red transition-all duration-300">
-                  <info.icon className={`w-8 h-8 mx-auto mb-4 ${info.color}`} />
-                  <h3 className="text-subheading text-white mb-2">
-                    {info.title}
-                  </h3>
-                  <p className="text-body text-white mb-1">
-                    {info.primary}
-                  </p>
-                  <p className="text-caption text-muted-enhanced mb-1">
-                    {info.secondary}
-                  </p>
-                  <p className="text-caption text-muted-enhanced">
-                    {info.description}
-                  </p>
+                <div className="w-full h-full flex items-center justify-center">
+                  <div
+                    className="animate-spin rounded-full h-7 w-7 border-b-2"
+                    style={{ borderColor: 'var(--primary)' }}
+                  />
                 </div>
               )}
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Main Content Grid */}
-        <motion.div
-          className="grid-two gap-12"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          {/* Location & Hours */}
-          <motion.div variants={itemVariants} className="space-y-8">
-
-            {/* Map Embed */}
-            <div className="glass-card p-8">
-              <h3 className="text-heading text-white mb-6">
-                Our Location
-              </h3>
-              <div className="aspect-video bg-gray-950 rounded-3xl mb-6 overflow-hidden">
-                {locationData ? (
-                  <iframe
-                    src={locationData.embedUrl}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="filter grayscale hover:grayscale-0 transition-all duration-500"
-                    title="MBR Auto Services Location"
-                  ></iframe>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                )}
-              </div>
-              <div className="text-center">
-                <p className="text-body text-body-enhanced mb-2">
-                  {locationData?.address || "16 8 St Al Qouz Ind.fourth - Al Quoz - Dubai"}
-                </p>
-                {locationData && (
-                  <a
-                    href={locationData.googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-2 text-primary hover:text-red-400 transition-colors"
-                    onClick={() => trackMapClick('contact_section_map_embed')}
-                  >
-                    View on Google Maps
-                  </a>
-                )}
-              </div>
             </div>
 
-            {/* Working Hours — emergency surface sits ABOVE the day grid so
-                a closed-shop visitor sees the after-hours option first. */}
-            <div className="glass-card p-8">
-              <h3 className="text-heading text-white mb-6">
-                Working Hours
-              </h3>
-
-              {/* After-hours emergency surface — promoted */}
-              <div
-                className="mb-6 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 border"
-                style={{
-                  borderColor: 'rgba(165,120,66,0.35)',
-                  background:
-                    'linear-gradient(135deg, rgba(165,120,66,0.10) 0%, rgba(165,120,66,0.02) 100%)',
-                }}
-              >
-                <div className="flex-1">
-                  <p className="text-xs uppercase tracking-[0.25em] text-accent-bronze mb-1.5">
-                    After-hours / Emergency
-                  </p>
-                  <p className="text-body text-white leading-snug">
-                    Outside working hours? WhatsApp or call the line below — we
-                    try to respond the same evening for urgent matters.
-                  </p>
-                </div>
-                <a
-                  href="tel:+971565015800"
-                  onClick={() =>
-                    trackPhoneCall('contact_section_emergency', '+971565015800')
-                  }
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--accent-bronze)]/60 text-white whitespace-nowrap transition-colors"
-                >
-                  +971 56 501 5800
-                </a>
-              </div>
-
-              <div className="space-y-3">
-                {workingHours.map((schedule) => (
-                  <div key={schedule.day} className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0">
-                    <span className="text-body text-body-enhanced">
-                      {schedule.day}
-                    </span>
-                    <span className={`text-body ${schedule.hours === 'Closed' ? 'text-red-400' : 'text-white'}`}>
-                      {schedule.hours}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Quick Contact Actions */}
-        <motion.div
-          className="text-center mt-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-          viewport={{ once: true }}
-        >
-          <div className="inline-flex flex-col sm:flex-row gap-4 mb-8">
             <a
-              href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20immediate%20automotive%20assistance"
+              href={
+                locationData?.googleMapsUrl ||
+                'https://maps.app.goo.gl/gj9EXG4uchRBtZcE6'
+              }
               target="_blank"
               rel="noopener noreferrer"
-              className="liquid-glass-btn liquid-glass-btn-primary flex items-center space-x-2"
-              onClick={() => trackWhatsAppClick('contact_section_cta', 'WhatsApp Now')}
+              onClick={() => trackMapClick('contact_section_map')}
+              className="self-start inline-flex items-center text-eyebrow text-white border-b border-[var(--accent-bronze)] pb-1 hover:text-[var(--accent-bronze)] transition-colors"
             >
-              <FaWhatsapp className="w-5 h-5" />
-              <span>WhatsApp Now</span>
-            </a>
-            <a
-              href="tel:8006272886"
-              className="liquid-glass-btn liquid-glass-btn-secondary flex items-center space-x-2"
-              onClick={() => trackPhoneCall('contact_section_cta', '8006272886')}
-            >
-              <FaPhone className="w-4 h-4" />
-              <span>Call 800-MBRAuto</span>
+              Get directions →
             </a>
           </div>
 
-          {/* Social Media Links */}
-          <motion.div
-            className="flex justify-center items-center gap-6 pt-8 border-t border-white/10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-muted-enhanced text-sm mr-4">Follow Us:</p>
-            <a
-              href="https://www.instagram.com/mbr.auto/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center justify-center w-12 h-12 rounded-full glass-card hover:bg-white/10 transition-all duration-300 hover:scale-110"
-              aria-label="Follow us on Instagram"
-              onClick={() => trackSocialMediaClick('instagram', 'contact_section')}
-            >
-              <FaInstagram className="w-5 h-5 text-pink-500 group-hover:text-pink-400 transition-colors" />
-            </a>
-            <a
-              href="https://www.facebook.com/mbrautoservices/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center justify-center w-12 h-12 rounded-full glass-card hover:bg-white/10 transition-all duration-300 hover:scale-110"
-              aria-label="Follow us on Facebook"
-              onClick={() => trackSocialMediaClick('facebook', 'contact_section')}
-            >
-              <FaFacebook className="w-5 h-5 text-blue-500 group-hover:text-blue-400 transition-colors" />
-            </a>
-          </motion.div>
-        </motion.div>
+          {/* Hours — after-hours surface promoted ABOVE the day grid */}
+          <div className="rounded-2xl border border-white/10 bg-[var(--surface-2)] p-6 md:p-8 flex flex-col">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <p className="text-eyebrow mb-2">Hours</p>
+                <p className="text-lg md:text-xl text-white font-light leading-snug">
+                  {BUSINESS_HOURS.displayDayRange}
+                  <br />
+                  {BUSINESS_HOURS.displayHours}
+                </p>
+              </div>
+              <FaClock className="w-5 h-5 text-[var(--accent-bronze)]" />
+            </div>
 
+            {/* After-hours emergency — only place in this section with
+                .has-shimmer. The kinetic moment in the contact card. */}
+            <a
+              href="https://wa.me/+971565015800?text=Hello%20MBR%2C%20I%20need%20after-hours%20assistance"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() =>
+                trackWhatsAppClick(
+                  'contact_section_emergency',
+                  'After-hours WhatsApp',
+                )
+              }
+              className="has-shimmer relative overflow-hidden rounded-xl p-5 mb-6 flex items-center gap-4 border transition-colors duration-300 hover:border-[var(--accent-bronze)]"
+              style={{
+                borderColor: 'rgba(165,120,66,0.35)',
+                background:
+                  'linear-gradient(135deg, rgba(165,120,66,0.10) 0%, rgba(165,120,66,0.02) 100%)',
+              }}
+            >
+              <div className="flex-1 relative z-10">
+                <p className="text-eyebrow text-[var(--accent-bronze)] mb-1.5">
+                  After-hours · Emergency
+                </p>
+                <p className="text-sm text-white leading-snug">
+                  Outside working hours? WhatsApp the line below — we try to
+                  respond the same evening.
+                </p>
+              </div>
+              <FaWhatsapp className="w-5 h-5 text-[var(--accent-bronze)] flex-shrink-0 relative z-10" />
+            </a>
+
+            {/* Day-by-day grid */}
+            <div className="space-y-2.5 mt-auto">
+              {WORKING_HOURS.map((schedule) => (
+                <div
+                  key={schedule.day}
+                  className="flex justify-between items-center text-sm"
+                >
+                  <span className="text-[var(--text-body)]">{schedule.day}</span>
+                  <span
+                    className={
+                      schedule.hours === 'Closed'
+                        ? 'text-[var(--text-subtle)] italic'
+                        : 'text-white'
+                    }
+                  >
+                    {schedule.hours}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Social row — minimal, no third CTA competing. */}
+        <motion.div
+          className="mt-16 flex justify-center items-center gap-4 motion-calm"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="text-eyebrow text-[var(--text-subtle)]">Follow</p>
+          <a
+            href="https://www.instagram.com/mbr.auto/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="MBR on Instagram"
+            className="w-10 h-10 rounded-full flex items-center justify-center border border-white/10 text-[var(--text-muted)] hover:text-white hover:border-white/30 transition-colors"
+            onClick={() => trackSocialMediaClick('instagram', 'contact_section')}
+          >
+            <FaInstagram className="w-4 h-4" />
+          </a>
+          <a
+            href="https://www.facebook.com/mbrautoservices/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="MBR on Facebook"
+            className="w-10 h-10 rounded-full flex items-center justify-center border border-white/10 text-[var(--text-muted)] hover:text-white hover:border-white/30 transition-colors"
+            onClick={() => trackSocialMediaClick('facebook', 'contact_section')}
+          >
+            <FaFacebook className="w-4 h-4" />
+          </a>
+        </motion.div>
       </div>
     </section>
   );

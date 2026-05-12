@@ -1292,6 +1292,23 @@ body {
  * 0.01ms (effectively off), transitions same; smooth scroll disabled.
  * The hero video continues to play because that's browser-default
  * behaviour for <video autoplay> — we don't intercept it here. */
+/* Hero credentials ticker — slow horizontal scroll, paused on hover.
+   Used by SophisticatedHero. Two copies of the strip rendered side-by-side
+   in the markup, animation translates one full strip width over 60s. */
+@keyframes credential-track {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.hero-credential-track {
+  animation: credential-track 60s linear infinite;
+  will-change: transform;
+}
+
+.hero-credential-track:hover {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

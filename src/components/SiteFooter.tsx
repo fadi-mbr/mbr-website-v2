@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -9,12 +11,45 @@ import {
   FaEnvelope,
 } from 'react-icons/fa';
 import { BUSINESS_HOURS } from '@/lib/business-hours';
+import { triggerChat } from '@/lib/chat-cta';
 
 const buildYear = new Date().getFullYear();
 
 export default function SiteFooter() {
   return (
     <footer className="bg-[var(--surface-1)] border-t border-white/5 mt-0">
+      {/* Final CTA row — Phase B addition. Closes the page with the same
+          primary action the hero opens with. Bronze rule above/below
+          gives the band a deliberate "this is the last move" feel. */}
+      <div className="border-b border-white/5">
+        <div className="container-luxury py-14 md:py-16 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          <div>
+            <p className="text-eyebrow mb-3">Ready when you are</p>
+            <p className="text-2xl md:text-3xl text-white font-light tracking-tight">
+              The keys are yours.<br className="md:hidden" />
+              <span className="hidden md:inline"> </span>
+              The next move is ours.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              onClick={() => triggerChat('footer_final_cta')}
+              className="liquid-glass-btn liquid-glass-btn-primary inline-flex items-center justify-center gap-3"
+            >
+              <FaWhatsapp className="w-5 h-5" />
+              <span>Chat with us</span>
+            </button>
+            <Link
+              href="/book"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm tracking-wide text-[var(--text-body)] hover:text-white border border-[var(--accent-bronze)]/40 hover:border-[var(--accent-bronze)] hover:bg-[var(--accent-bronze)]/10 transition-all duration-300"
+            >
+              <span>Book Directly</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
       <div className="container-luxury py-16 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
           {/* Brand block */}
@@ -147,13 +182,25 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        {/* Copyright row */}
-        <div className="mt-14 pt-8 border-t border-white/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-[var(--text-subtle)]">
-          <div>
-            © {buildYear} MBR Auto Services. All rights reserved.
+        {/* Copyright row — tagline upgraded to the brand voice (911Porsche
+            via .font-marque), larger and centred. Was previously a tiny
+            tail-end string easy to miss. */}
+        <div className="mt-14 pt-8 border-t border-white/5">
+          <div className="text-center mb-6">
+            <p
+              className="font-marque text-[var(--accent-bronze)] text-sm md:text-base tracking-[0.35em]"
+              style={{ letterSpacing: '0.35em' }}
+            >
+              Making Better Rides
+            </p>
           </div>
-          <div className="tracking-[0.3em] uppercase">
-            Making Better Rides
+          <div className="flex flex-col md:flex-row items-center md:items-center justify-between gap-3 text-xs text-[var(--text-subtle)]">
+            <div>
+              © {buildYear} MBR Auto Services. All rights reserved.
+            </div>
+            <div className="tracking-wide">
+              Al Quoz Industrial 4 · Dubai · UAE
+            </div>
           </div>
         </div>
       </div>

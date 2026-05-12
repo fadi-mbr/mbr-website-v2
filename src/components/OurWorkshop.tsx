@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 import { WORKSHOP_PHOTOS } from '@/lib/workshop-photos';
+import SectionMarker from './SectionMarker';
 
 export default function OurWorkshop() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -46,16 +47,13 @@ export default function OurWorkshop() {
   if (WORKSHOP_PHOTOS.length === 0) {
     return (
       <section id="workshop" className="section-padding bg-black">
-        <div className="container-luxury text-center">
-          <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-accent-bronze mb-4">
-            Our Workshop
-          </p>
-          <h2 className="text-display font-light gradient-text mb-6">
-            Inside MBR
-          </h2>
-          <p className="text-subheading text-[var(--text-muted)] max-w-xl mx-auto">
-            Workshop photography is on the way.
-          </p>
+        <div className="container-luxury">
+          <SectionMarker
+            number="03"
+            eyebrow="Inside MBR"
+            headline="The bays. The tools. The cars."
+            body="Workshop photography is on the way."
+          />
         </div>
       </section>
     );
@@ -64,28 +62,15 @@ export default function OurWorkshop() {
   return (
     <section id="workshop" className="section-padding bg-[var(--surface-1)]">
       <div className="container-luxury">
-        {/* Header */}
-        <motion.div
-          className="content-block text-center mb-16"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-accent-bronze mb-4">
-            Our Workshop
-          </p>
-          <h2 className="text-display font-light gradient-text mb-6 leading-tight">
-            Inside MBR
-          </h2>
-          <p className="text-subheading text-[var(--text-body)] max-w-2xl mx-auto leading-relaxed">
-            The bays, the tooling, and the cars that come through —
-            an honest look at where the work happens.
-          </p>
-        </motion.div>
+        <SectionMarker
+          number="03"
+          eyebrow="Inside MBR"
+          headline="The bays. The tools. The cars that come through."
+          body="An honest look at where the work happens. Hover any tile for a one-line note."
+        />
 
         {/* Photo grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+        <div className="mt-16 md:mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
           {WORKSHOP_PHOTOS.map((photo, i) => (
             <motion.button
               key={photo.src}
@@ -94,7 +79,7 @@ export default function OurWorkshop() {
               className={[
                 'group relative block w-full overflow-hidden rounded-2xl border border-white/5',
                 'bg-[var(--surface-2)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:ring-offset-black',
-                'transition-all duration-300 hover:border-[var(--primary)]/40 hover:shadow-[0_20px_60px_rgba(227,6,19,0.15)]',
+                'transition-all duration-500 hover:border-[var(--accent-bronze)]/50',
                 photo.featured ? 'md:col-span-2 lg:col-span-2' : '',
               ].join(' ')}
               initial={{ opacity: 0, y: 24 }}
@@ -121,19 +106,44 @@ export default function OurWorkshop() {
                       ? '(min-width: 1024px) 66vw, (min-width: 768px) 100vw, 100vw'
                       : '(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw'
                   }
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  className="object-cover transition-transform duration-[1200ms] group-hover:scale-[1.05]"
                   loading={i === 0 ? 'eager' : 'lazy'}
                 />
               </div>
 
-              {/* Bottom gradient + caption */}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-5 md:p-6">
-                <span className="text-xs uppercase tracking-[0.25em] text-accent-bronze block mb-1">
-                  Workshop
-                </span>
-                <span className="text-white text-base md:text-lg font-light">
-                  {photo.caption}
-                </span>
+              {/* Bottom gradient — slightly deeper on hover for the story
+                  swap. Always-visible caption + metadata; story fades in. */}
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-0 p-5 md:p-7 transition-all duration-500"
+                style={{
+                  background:
+                    'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.92) 100%)',
+                }}
+              >
+                {photo.metadata && (
+                  <span className="block text-eyebrow text-[var(--accent-bronze)] text-[0.6rem] md:text-[0.7rem] mb-2 tracking-[0.25em]">
+                    {photo.metadata}
+                  </span>
+                )}
+
+                {/* Caption + story stack — caption fades out on hover,
+                    story fades in. Reserve roughly equal vertical space so
+                    the card doesn't reflow. */}
+                <div className="relative h-[2.5rem] md:h-[2.75rem]">
+                  <span
+                    className={[
+                      'absolute inset-0 text-white text-base md:text-lg font-light tracking-tight transition-opacity duration-300',
+                      photo.story ? 'group-hover:opacity-0' : '',
+                    ].join(' ')}
+                  >
+                    {photo.caption}
+                  </span>
+                  {photo.story && (
+                    <span className="absolute inset-0 text-[var(--text-body)] text-sm md:text-[0.95rem] leading-snug opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      {photo.story}
+                    </span>
+                  )}
+                </div>
               </div>
             </motion.button>
           ))}
@@ -210,12 +220,19 @@ export default function OurWorkshop() {
                 />
               </div>
               <div className="mt-5 text-center">
-                <p className="text-xs uppercase tracking-[0.3em] text-accent-bronze mb-1">
-                  Workshop
-                </p>
-                <p className="text-white text-lg font-light">
+                {WORKSHOP_PHOTOS[lightboxIndex].metadata && (
+                  <p className="text-eyebrow mb-2 text-[0.65rem] md:text-xs">
+                    {WORKSHOP_PHOTOS[lightboxIndex].metadata}
+                  </p>
+                )}
+                <p className="text-white text-lg md:text-xl font-light tracking-tight">
                   {WORKSHOP_PHOTOS[lightboxIndex].caption}
                 </p>
+                {WORKSHOP_PHOTOS[lightboxIndex].story && (
+                  <p className="mt-2 text-sm text-[var(--text-body)] max-w-md mx-auto leading-snug">
+                    {WORKSHOP_PHOTOS[lightboxIndex].story}
+                  </p>
+                )}
               </div>
             </motion.div>
           </motion.div>
