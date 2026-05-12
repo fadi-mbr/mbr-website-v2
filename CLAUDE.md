@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 MBR Auto Services v2 is a luxury automotive service website built with Next.js 15.3.1. The project focuses on premium car care services in Dubai with a sophisticated design system featuring black/red/white colors with gold/silver/platinum luxury accents.
 
+## Secrets — always use the `/secrets` skill or `infisical-mi` wrapper
+
+Never run `infisical login` interactively. It opens a TUI that breaks subagents and Bash automation. To fetch a secret (e.g. `GITHUB_MBR_FADI_PAT` for pushing to GitHub, or `GOOGLE_PLACES_API_KEY` for local dev):
+
+- **Inside Claude Code**: `/secrets <NAME>` — auto-routes to the TMFlix Infisical project at `/mbr/prod`. Pass `project=mbr` for QBO secrets in the dedicated MBR Infisical project.
+- **Bash / scripts**: `~/tmHead/mbr-brain/bin/infisical-mi <infisical-args...>` — drop-in wrapper around the Infisical CLI that auto-injects `--domain` + `--token` using the universal-auth machine identity at `~/.config/tmwhead/tmflix-client-{id,secret}`. Same arg surface as `infisical`.
+
+Full secret map and bootstrap: `~/tmHead/mbr-brain/secrets/infisical-mbr-paths.md`. Do not `curl` the Infisical API by hand — keep the auth path centralized.
+
 ## Development Commands
 
 ```bash
