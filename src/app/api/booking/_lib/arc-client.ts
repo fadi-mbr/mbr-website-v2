@@ -268,6 +268,212 @@ export async function submitBooking(
 }
 
 // ---------------------------------------------------------------------------
+// Worker-authenticated endpoints (real availability)
+// ---------------------------------------------------------------------------
+//
+// These bypass the public `shopToken` surface and authenticate as an ARC
+// worker user. They are used server-side only — never expose worker creds
+// or the worker bearer token to the browser.
+
+/**
+ * Minimal fetch wrapper for ARC worker-auth endpoints. Unlike `arcFetch`,
+ * this does NOT inject `shopToken` and uses the raw `Token: <token>` header
+ * (ARC's worker-auth convention — NOT `Authorization: Bearer`).
+ */
+async function arcWorkerFetch(
+  path: string,
+  init: RequestInit & {
+    qs?: Record<string, string | number>;
+    token?: string;
+  } = {}
+): Promise<Response> {
+  const { qs, token, ...rest } = init;
+  const qsParts: string[] = [];
+  if (qs) {
+    for (const [k, v] of Object.entries(qs)) {
+      qsParts.push(`${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`);
+    }
+  }
+  const finalUrl =
+    `${BASE}${path}` + (qsParts.length > 0 ? `?${qsParts.join("&")}` : "");
+
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(finalUrl, {
+      ...rest,
+      signal: ctrl.signal,
+      headers: {
+        Accept: "application/json",
+        ...(token ? { Token: token } : {}),
+        ...(rest.body ? { "Content-Type": "application/json" } : {}),
+        ...(rest.headers || {}),
+      },
+    });
+    return res;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+/**
+ * GET /auth/worker/login?phone=...&code=...
+ *
+ * Returns `{ token }` on success. Throws `ArcError` on failure.
+ *
+ * NOTE: ARC expects phone + code as QUERY parameters, not request body.
+ */
+export async function workerLogin(
+  phone: string,
+  password: string
+): Promise<{ token: string }> {
+  const res = await arcWorkerFetch("/auth/worker/login", {
+    qs: { phone, code: password },
+  });
+  const payload = await parseJsonSafe(res);
+  if (!res.ok) {
+    throw new ArcError(`ARC worker login failed: ${res.status}`, {
+      status: res.status,
+      code: extractArcCode(payload),
+      payload,
+    });
+  }
+  if (
+    !payload ||
+    typeof payload !== "object" ||
+    typeof (payload as { token?: unknown }).token !== "string"
+  ) {
+    throw new ArcError("ARC worker login: missing token in response", {
+      status: 500,
+      payload,
+    });
+  }
+  return { token: (payload as { token: string }).token };
+}
+
+export interface BookedInterval {
+  startMs: number;
+  endMs: number;
+  workerId: number;
+}
+
+interface ArcWeekAppointment {
+  timeStart?: number;
+  timeEnd?: number;
+  [k: string]: unknown;
+}
+
+interface ArcWeekWorkerEntry {
+  worker?: { id?: number; nameFirst?: string; [k: string]: unknown };
+  appointments?: ArcWeekAppointment[];
+  [k: string]: unknown;
+}
+
+interface ArcWeekDay {
+  name?: string;
+  date?: string;
+  data?: ArcWeekWorkerEntry[];
+  [k: string]: unknown;
+}
+
+interface ArcWeekResponse {
+  workerWeek?: ArcWeekDay[];
+  [k: string]: unknown;
+}
+
+/**
+ * Build the YYYY-MM-DD anchor list (Sun..Sat) for the week containing
+ * `dateStr`. ARC's API treats Sunday as the start of the week.
+ */
+function weekDatesFor(dateStr: string): {
+  sun: string;
+  mon: string;
+  tue: string;
+  wed: string;
+  thu: string;
+  fri: string;
+  sat: string;
+} {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    throw new Error(`weekDatesFor: invalid date ${dateStr}`);
+  }
+  const [y, m, d] = dateStr.split("-").map(Number);
+  // Anchor at UTC noon to avoid DST/TZ edge cases — only DOW matters.
+  const anchor = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+  const dow = anchor.getUTCDay(); // 0=Sun..6=Sat
+  const sunday = new Date(anchor.getTime() - dow * 24 * 60 * 60 * 1000);
+  const out: Record<string, string> = {};
+  const labels = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(sunday.getTime() + i * 24 * 60 * 60 * 1000);
+    const yy = day.getUTCFullYear();
+    const mm = String(day.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(day.getUTCDate()).padStart(2, "0");
+    out[labels[i]] = `${yy}-${mm}-${dd}`;
+  }
+  return out as {
+    sun: string;
+    mon: string;
+    tue: string;
+    wed: string;
+    thu: string;
+    fri: string;
+    sat: string;
+  };
+}
+
+/**
+ * GET /appointment/week/workers?sun=...&mon=...&...&sat=...
+ *
+ * Returns a Map of `YYYY-MM-DD` → list of `BookedInterval`s, flattened
+ * across all workers. (Any worker free at a given slot = the slot is
+ * available for the shop.)
+ *
+ * Throws `ArcError` on non-2xx (caller should fall back to candidates-only).
+ */
+export async function fetchWeekBookedIntervals(
+  workerToken: string,
+  dateAnchor: string
+): Promise<Map<string, BookedInterval[]>> {
+  const week = weekDatesFor(dateAnchor);
+  const res = await arcWorkerFetch("/appointment/week/workers", {
+    token: workerToken,
+    qs: week,
+  });
+  const payload = await parseJsonSafe(res);
+  if (!res.ok) {
+    throw new ArcError(`ARC week-workers fetch failed: ${res.status}`, {
+      status: res.status,
+      code: extractArcCode(payload),
+      payload,
+    });
+  }
+  const out = new Map<string, BookedInterval[]>();
+  const p = (payload ?? {}) as ArcWeekResponse;
+  const days = Array.isArray(p.workerWeek) ? p.workerWeek : [];
+  for (const day of days) {
+    if (!day || typeof day.date !== "string") continue;
+    const intervals: BookedInterval[] = [];
+    const data = Array.isArray(day.data) ? day.data : [];
+    for (const entry of data) {
+      const workerId = Number(entry?.worker?.id ?? 0);
+      const appts = Array.isArray(entry?.appointments) ? entry.appointments : [];
+      for (const a of appts) {
+        const s = typeof a?.timeStart === "number" ? a.timeStart : null;
+        const e = typeof a?.timeEnd === "number" ? a.timeEnd : null;
+        if (s === null || e === null || !(e > s)) continue;
+        intervals.push({ startMs: s, endMs: e, workerId });
+      }
+    }
+    out.set(day.date, intervals);
+  }
+  return out;
+}
+
+// Exported for unit tests only — does not affect production behaviour.
+export const _weekDatesForTests = weekDatesFor;
+
+// ---------------------------------------------------------------------------
 // Phone normalisation
 // ---------------------------------------------------------------------------
 

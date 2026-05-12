@@ -4,32 +4,35 @@
  * Returns proposed 30-min-aligned booking slots for the given local date
  * and requested service duration.
  *
- * V1 LIMITATION — read this before touching:
+ * Pipeline:
+ *   1. Derive candidate slots from the public shop timetable (open hours).
+ *   2. Fetch the week's booked intervals from ARC's worker-auth endpoint
+ *      `/appointment/week/workers`. Cached worker bearer token from
+ *      `worker-token-cache`.
+ *   3. Filter candidates: drop any whose [start, start+duration) window
+ *      overlaps an existing booked interval. We use the FULL service
+ *      duration, not the 30-min slot granularity, so a 2-hour service
+ *      can't be slotted on top of a 1-hour booking that ends partway in.
  *
- *   The full slot engine in the contract is supposed to read
- *   `/appointment/week/workers`, subtract existing appointments + open
- *   ROs, and emit only truly free per-worker slots. That endpoint is
- *   worker-authenticated (it requires a `Token:` header from a real ARC
- *   login session). We deliberately do NOT carry ARC worker credentials
- *   on the public Vercel deployment.
+ * If step 2 fails (network, 401, missing creds), we fall back to the
+ * candidates-only behaviour from v1. The confirm endpoint maps ARC's
+ * `NO_TIME` error to `SLOT_UNAVAILABLE`, so users will get a friendly
+ * message rather than a 500 even if a stale slot slips through.
  *
- *   So for v1 we generate naïve candidate slots from the public shop
- *   timetable only. Server-side collision detection at booking time
- *   (`POST /public/appointment` rejects overlapping slots) is the
- *   authority — if a slot is already taken, the booking call returns
- *   the right error and the UI re-fetches.
- *
- *   TODO(booking-v2): once we move worker creds onto the server (via
- *   Infisical fetch at boot), call `/appointment/week/workers` and do
- *   proper per-worker availability subtraction.
- *
- * The shop timezone is hardcoded to Asia/Dubai (UTC+4, no DST) for v1.
+ * The shop timezone is hardcoded to Asia/Dubai (UTC+4, no DST).
  *
  * Cache: 60 seconds.
  */
 
 import { NextResponse } from "next/server";
-import { fetchTimetable, ArcError, type ArcShopTimetableDay } from "../_lib/arc-client";
+import {
+  fetchTimetable,
+  fetchWeekBookedIntervals,
+  ArcError,
+  type ArcShopTimetableDay,
+  type BookedInterval,
+} from "../_lib/arc-client";
+import { getWorkerToken } from "../_lib/worker-token-cache";
 import { logBooking } from "../_lib/log";
 
 export const runtime = "nodejs";
@@ -173,7 +176,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     });
   }
 
-  const slots: Slot[] = [];
+  const candidates: Slot[] = [];
   const durationMs = durationH * 60 * 60 * 1000;
   const minStartMs = Date.now() + 30 * 60 * 1000; // 30-min future floor
 
@@ -202,13 +205,47 @@ export async function GET(req: Request): Promise<NextResponse> {
     const endMs = startMs + durationMs;
     if (startMs < minStartMs) continue;
     if (endMs > closeEpochMs) break;
-    slots.push({ startMs, endMs });
+    candidates.push({ startMs, endMs });
   }
+
+  // Fetch real availability from ARC. Soft-fail: if anything blows up, we
+  // serve the candidate list and rely on confirm-time NO_TIME → SLOT_UNAVAILABLE.
+  const dateKey = `${date.y.toString().padStart(4, "0")}-${date.m
+    .toString()
+    .padStart(2, "0")}-${date.d.toString().padStart(2, "0")}`;
+  let booked: BookedInterval[] = [];
+  let availabilityChecked = false;
+  try {
+    const token = await getWorkerToken();
+    const map = await fetchWeekBookedIntervals(token, dateKey);
+    booked = map.get(dateKey) ?? [];
+    availabilityChecked = true;
+  } catch (e) {
+    logBooking({
+      event: "slots.availability_check_failed",
+      status: 200,
+      code: e instanceof ArcError ? e.code : "UNKNOWN",
+      reason: e instanceof Error ? e.message : String(e),
+    });
+  }
+
+  // Conflict check uses the FULL booking duration, not the slot step.
+  // Two intervals [a,b) and [c,d) overlap iff a < d && c < b.
+  const slots: Slot[] = availabilityChecked
+    ? candidates.filter((c) => {
+        return !booked.some(
+          (b) => b.startMs < c.endMs && c.startMs < b.endMs
+        );
+      })
+    : candidates;
 
   logBooking({
     event: "slots.ok",
     latencyMs: Date.now() - t0,
     status: 200,
+    reason: availabilityChecked
+      ? `${slots.length}/${candidates.length} available (${booked.length} booked)`
+      : `${candidates.length} candidates (availability check skipped)`,
   });
 
   return new NextResponse(JSON.stringify(slots), {
