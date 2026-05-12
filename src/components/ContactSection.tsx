@@ -5,12 +5,13 @@ import { motion } from 'framer-motion';
 import {
   FaPhone,
   FaWhatsapp,
+  FaEnvelope,
   FaMapMarkerAlt,
   FaClock,
   FaInstagram,
   FaFacebook
 } from 'react-icons/fa';
-import { trackWhatsAppClick, trackPhoneCall, trackMapClick, trackSocialMediaClick } from '@/lib/analytics';
+import { trackWhatsAppClick, trackPhoneCall, trackMapClick, trackSocialMediaClick, trackEmailClick } from '@/lib/analytics';
 import { BUSINESS_HOURS, getWeeklyHours } from '@/lib/business-hours';
 
 const contactInfo = [
@@ -19,7 +20,7 @@ const contactInfo = [
     title: "Call Us",
     primary: "800-MBRAuto",
     secondary: "800-627-2886",
-    description: "Emergency Support Available",
+    description: "Toll-free within the UAE",
     action: "tel:8006272886",
     color: "text-blue-400"
   },
@@ -31,6 +32,15 @@ const contactInfo = [
     description: "Quick quotes and booking",
     action: "https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20automotive%20service",
     color: "text-green-400"
+  },
+  {
+    icon: FaEnvelope,
+    title: "Email Us",
+    primary: "info@mbrme.com",
+    secondary: "Service inquiries & quotes",
+    description: "We reply during working hours",
+    action: "mailto:info@mbrme.com",
+    color: "text-cyan-400"
   },
   {
     icon: FaMapMarkerAlt,
@@ -124,7 +134,7 @@ export default function ContactSection() {
 
         {/* Contact Information Grid */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-16"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -148,6 +158,8 @@ export default function ContactSection() {
                       trackWhatsAppClick('contact_section', info.title);
                     } else if (info.action?.startsWith('tel:')) {
                       trackPhoneCall('contact_section', info.action.replace('tel:', ''));
+                    } else if (info.action?.startsWith('mailto:')) {
+                      trackEmailClick('contact_section', info.action.replace('mailto:', ''));
                     } else if (info.action?.includes('maps')) {
                       trackMapClick('contact_section');
                     }
