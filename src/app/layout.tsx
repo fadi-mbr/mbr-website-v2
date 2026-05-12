@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/react';
 import FloatingWhatsAppButton from "@/components/FloatingWhatsAppButton";
@@ -18,6 +18,24 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+/**
+ * Fraunces — editorial serif. Replaces the stencil/digital 911Porsche
+ * font that the first revamp pass mistakenly leaned on. Used for:
+ *   - hero + section headlines (`.text-display` consumers)
+ *   - section chapter numerals (`.text-marker`)
+ *   - large stat numerals (`.text-numeric`)
+ *
+ * Body copy, eyebrow labels and UI chrome stay in Geist/Inter — sans.
+ * This creates a serif/sans contrast which reads as editorial workshop,
+ * not racing-game HUD.
+ */
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ['300', '400', '500'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -134,17 +152,11 @@ export default function RootLayout({
           href="/images/hero-poster.jpg"
           fetchPriority="high"
         />
-        {/* Phase C: preload the 911Porsche brand font used above-the-fold. */}
-        <link
-          rel="preload"
-          as="font"
-          href="/fonts/911porschav3.ttf"
-          type="font/ttf"
-          crossOrigin="anonymous"
-        />
+        {/* Fraunces is loaded via next/font (Google Fonts) — auto-preloaded
+            and inlined by Next, no manual <link rel="preload"> needed. */}
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased`}
       >
         {/* Phase C: skip-to-content link for keyboard users. */}
         <a href="#main-content" className="skip-link">Skip to content</a>

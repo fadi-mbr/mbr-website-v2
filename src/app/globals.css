@@ -1,15 +1,13 @@
 @import "tailwindcss";
 
-/* Porsche 911 Font Import */
-@font-face {
-  font-family: '911Porsche';
-  src: url('/fonts/911porschav3.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-  /* tnum = tabular figures (aligned stat numerals); kern = pair-kerning. */
-  font-feature-settings: "tnum" 1, "kern" 1;
-}
+/*
+ * Type system — editorial serif (Fraunces) for display, Inter/Geist for
+ * everything else. Fraunces is loaded via next/font in app/layout.tsx and
+ * exposed as --font-fraunces. The previous "911Porsche" stencil display
+ * face was retired in this revamp — it read as racing-game HUD on stats
+ * and stencil-military on eyebrows, which clashed with the luxury
+ * workshop positioning.
+ */
 
 /* BMW/Mercedes-Inspired Luxury Automotive Design System */
 :root {
@@ -132,58 +130,84 @@ body {
   letter-spacing: -0.02em;
 }
 
+/*
+ * Headline / display — Fraunces serif. Variable optical-size + weight axes
+ * let us pull a confident, editorial display feel without needing a custom
+ * licensed face. Sits above body Inter/Geist for a serif/sans contrast
+ * that reads as workshop-craftsmanship, not racing-game HUD.
+ */
 .text-display {
+  font-family: var(--font-fraunces), 'Iowan Old Style', Georgia, serif;
+  font-feature-settings: "ss01" 1, "ss02" 1, "kern" 1;
   font-size: var(--text-display);
   font-weight: 300;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
 }
 
-/* Phase A: 911Porsche font system.
+/*
+ * Type system utilities — single source of truth for the section rhythm.
  *
- * The Porsche-style display face is already loaded from /fonts. Until now
- * it was only used for a single logo accent. The revamp activates it as
- * the brand voice for numerics, eyebrows, and section markers.
+ * The previous "911Porsche" stencil face was retired here. The new system:
  *
- * - .font-marque  → base utility, applies the family + uppercase + caps tracking
- * - .text-eyebrow → small uppercase label that sits above section headlines
- * - .text-marker  → section-number ("01", "02") rendered above eyebrow
- * - .text-numeric → large stat numerals (Why MBR, hero highlights, etc.)
+ * - .font-display → Fraunces serif shorthand. Use for one-off display
+ *   surfaces (heroes, oversize numbers, pull-quotes).
+ * - .text-eyebrow → small uppercase Geist sans label above section
+ *   headlines. Sans + uppercase + bronze is the section-label treatment.
+ * - .text-marker  → small chapter numeral "01 / 02 / 03". Fraunces serif
+ *   with tabular figures, sober size.
+ * - .text-numeric → oversize editorial numerals (stats, hero callouts).
+ *   Fraunces serif at 300 weight, tabular figures.
+ * - .font-marque  → legacy alias; resolves to Fraunces. Kept so existing
+ *   consumers still work during the switchover.
  */
+.font-display {
+  font-family: var(--font-fraunces), 'Iowan Old Style', Georgia, serif;
+  font-feature-settings: "ss01" 1, "kern" 1;
+}
+
 .font-marque {
-  font-family: '911Porsche', 'Inter Display', -apple-system, sans-serif;
+  /* Legacy alias — was 911Porsche during Phase A, now resolves to the
+     Fraunces system. Components using .font-marque inherit the serif
+     identity automatically. */
+  font-family: var(--font-fraunces), 'Iowan Old Style', Georgia, serif;
   font-feature-settings: "tnum" 1, "kern" 1;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
+  letter-spacing: 0;
 }
 
 .text-eyebrow {
-  font-family: '911Porsche', 'Inter Display', -apple-system, sans-serif;
+  /* Sans-serif eyebrow — geist sans for crisp uppercase at small size.
+     Pairs with the Fraunces serif headlines for the editorial contrast. */
+  font-family: var(--font-geist-sans), 'Inter', -apple-system, sans-serif;
   font-feature-settings: "tnum" 1, "kern" 1;
-  font-size: clamp(0.75rem, 1.05vw, 0.875rem);
-  font-weight: 400;
-  letter-spacing: 0.3em;
+  font-size: clamp(0.7rem, 0.9vw, 0.8rem);
+  font-weight: 500;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
   color: var(--accent-bronze);
 }
 
 .text-marker {
-  font-family: '911Porsche', 'Inter Display', -apple-system, sans-serif;
-  font-feature-settings: "tnum" 1, "kern" 1;
-  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  /* Chapter numeral — Fraunces tabular figures, sober size + tracking.
+     Looks like the chapter mark in a magazine, not a HUD readout. */
+  font-family: var(--font-fraunces), 'Iowan Old Style', Georgia, serif;
+  font-feature-settings: "tnum" 1, "lnum" 1, "kern" 1;
+  font-size: clamp(0.85rem, 1.05vw, 1rem);
   font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
 }
 
 .text-numeric {
-  font-family: '911Porsche', 'Inter Display', -apple-system, sans-serif;
-  font-feature-settings: "tnum" 1, "kern" 1;
-  font-size: clamp(3.25rem, 7.5vw, 6rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1;
+  /* Oversize editorial numerals — Fraunces 300 with tabular alignment.
+     Stat strip (15+ / 5,000+ / 10,000+ / 100%) reads as confident,
+     gallery-style numbers. */
+  font-family: var(--font-fraunces), 'Iowan Old Style', Georgia, serif;
+  font-feature-settings: "tnum" 1, "lnum" 1, "ss01" 1, "kern" 1;
+  font-size: clamp(3.5rem, 8vw, 6.5rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
   color: var(--text-primary);
 }
 

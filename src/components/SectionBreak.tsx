@@ -43,10 +43,16 @@ export default function SectionBreak({
       ? 'h-[60vh] min-h-[420px] md:min-h-[520px]'
       : 'h-[28vh] min-h-[220px] md:min-h-[280px]';
 
+  /*
+   * Bold variant: large Fraunces serif headline (sentence-case for the
+   * film-title feel — no uppercase tracking that would read as stencil).
+   * Slim variant: smaller Fraunces serif for the address-ribbon — also
+   * sentence case so it reads like an editorial pull, not a stencil sign.
+   */
   const headlineClass =
     variant === 'bold'
-      ? 'font-marque text-white text-3xl md:text-5xl lg:text-6xl tracking-[0.18em] leading-tight'
-      : 'font-marque text-white text-lg md:text-2xl tracking-[0.3em]';
+      ? 'font-display text-white text-4xl md:text-6xl lg:text-7xl leading-[1.05] tracking-[-0.02em] font-light'
+      : 'font-display text-white text-2xl md:text-3xl tracking-[-0.01em] font-light';
 
   return (
     <section
