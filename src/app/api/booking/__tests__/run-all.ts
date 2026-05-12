@@ -9,11 +9,15 @@
 import phoneSuite from "./phone.test";
 import validateSuite from "./validate.test";
 import rateLimitSuite from "./rate-limit.test";
+import embedModeSuite from "./embed-mode.test";
+import chatwootSuite from "./chatwoot.test";
 
 async function main(): Promise<void> {
   await phoneSuite();
   await validateSuite();
   await rateLimitSuite();
+  await embedModeSuite();
+  await chatwootSuite();
   console.log("\nAll booking unit tests passed.");
 }
 
