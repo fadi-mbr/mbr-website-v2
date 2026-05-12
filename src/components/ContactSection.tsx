@@ -255,11 +255,42 @@ export default function ContactSection() {
               </div>
             </div>
 
-            {/* Working Hours */}
+            {/* Working Hours — emergency surface sits ABOVE the day grid so
+                a closed-shop visitor sees the after-hours option first. */}
             <div className="glass-card p-8">
               <h3 className="text-heading text-white mb-6">
                 Working Hours
               </h3>
+
+              {/* After-hours emergency surface — promoted */}
+              <div
+                className="mb-6 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4 border"
+                style={{
+                  borderColor: 'rgba(165,120,66,0.35)',
+                  background:
+                    'linear-gradient(135deg, rgba(165,120,66,0.10) 0%, rgba(165,120,66,0.02) 100%)',
+                }}
+              >
+                <div className="flex-1">
+                  <p className="text-xs uppercase tracking-[0.25em] text-accent-bronze mb-1.5">
+                    After-hours / Emergency
+                  </p>
+                  <p className="text-body text-white leading-snug">
+                    Outside working hours? WhatsApp or call the line below — we
+                    try to respond the same evening for urgent matters.
+                  </p>
+                </div>
+                <a
+                  href="tel:+971565015800"
+                  onClick={() =>
+                    trackPhoneCall('contact_section_emergency', '+971565015800')
+                  }
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--accent-bronze)]/60 text-white whitespace-nowrap transition-colors"
+                >
+                  +971 56 501 5800
+                </a>
+              </div>
+
               <div className="space-y-3">
                 {workingHours.map((schedule) => (
                   <div key={schedule.day} className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0">
@@ -271,18 +302,6 @@ export default function ContactSection() {
                     </span>
                   </div>
                 ))}
-              </div>
-              <div className="mt-6 pt-6 border-t border-gray-700 text-center">
-                <p className="text-caption text-muted-enhanced mb-2">
-                  Emergency Services Available
-                </p>
-                <a
-                  href="tel:+971565015800"
-                  className="text-primary hover:text-red-400 transition-colors"
-                  onClick={() => trackPhoneCall('contact_section_emergency', '+971565015800')}
-                >
-                  Call +971 56 501 5800
-                </a>
               </div>
             </div>
           </motion.div>

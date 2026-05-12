@@ -3,10 +3,24 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { FaVolumeUp, FaVolumeMute, FaPlay, FaPause, FaStar, FaGoogle, FaInstagram, FaFacebook, FaMapMarkerAlt } from 'react-icons/fa';
+import Link from 'next/link';
+import {
+  FaVolumeUp,
+  FaVolumeMute,
+  FaPlay,
+  FaPause,
+  FaStar,
+  FaGoogle,
+  FaInstagram,
+  FaFacebook,
+  FaMapMarkerAlt,
+  FaWhatsapp,
+  FaCalendarAlt,
+  FaChevronDown,
+} from 'react-icons/fa';
 import { useGoogleReviews } from './GoogleReviewsHook';
-import { trackWhatsAppClick } from '@/lib/analytics';
 import { isShopOpen } from '@/lib/business-hours';
+import { triggerChat } from '@/lib/chat-cta';
 
 interface SophisticatedHeroProps {
   googleReviews?: {
@@ -104,19 +118,34 @@ export default function SophisticatedHero({
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 1.5, duration: 0.8 }}
         >
-          <div className="backdrop-blur-sm bg-black/20 border border-white/10 rounded-full px-4 py-2 flex items-center space-x-3">
-            <div className={`w-2 h-2 rounded-full ${isOpen ? 'bg-green-400' : 'bg-red-400'}`}></div>
-            <span className="text-white text-sm font-light">
-              {isOpen ? 'Open Now' : 'Closed'}
-            </span>
-            <div className="text-white/60 text-xs">
-              {currentTime.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: 'Asia/Dubai'
-              })}
+          {isOpen ? (
+            <div className="backdrop-blur-sm bg-black/20 border border-white/10 rounded-full px-4 py-2 flex items-center space-x-3">
+              <div className="w-2 h-2 rounded-full bg-green-400" />
+              <span className="text-white text-sm font-light">Open Now</span>
+              <div className="text-white/60 text-xs">
+                {currentTime.toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  timeZone: 'Asia/Dubai',
+                })}
+              </div>
             </div>
-          </div>
+          ) : (
+            <a
+              href="https://wa.me/+971565015800?text=Hello%20MBR%2C%20I%20need%20after-hours%20assistance"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group backdrop-blur-sm bg-black/30 border border-white/15 hover:border-[var(--primary)]/50 rounded-full px-4 py-2 flex items-center gap-3 transition-colors"
+              aria-label="Closed now — WhatsApp for after-hours assistance"
+            >
+              <div className="w-2 h-2 rounded-full bg-red-400" />
+              <span className="text-white text-sm font-light">Closed</span>
+              <span className="hidden sm:inline text-white/40 text-xs">·</span>
+              <span className="hidden sm:inline text-accent-bronze text-xs uppercase tracking-[0.18em] group-hover:text-white transition-colors">
+                WhatsApp after-hours
+              </span>
+            </a>
+          )}
         </motion.div>
 
         {/* Video Controls - Bottom Right */}
@@ -206,7 +235,8 @@ export default function SophisticatedHero({
       <section className="relative bg-gradient-to-b from-black via-black to-gray-950 py-20 vibrant-bg-gradient">
         <div className="container-luxury">
 
-          {/* Main Hero Content */}
+          {/* Main Hero Content — wordmark is already in the video corner;
+              we don't repeat it here. */}
           <motion.div
             className="text-center mb-20"
             initial={{ opacity: 0, y: 50 }}
@@ -214,47 +244,44 @@ export default function SophisticatedHero({
             transition={{ duration: 1, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            <div className="mb-8 flex justify-center">
-              <Image
-                src="/images/Logo_horizontal.svg"
-                alt="MBR Making Better Rides - Premium Car Repair Dubai, Luxury Auto Service UAE"
-                width={400}
-                height={150}
-                className="logo-lg object-contain filter brightness-100"
-                priority
-              />
-            </div>
             <div className="max-w-4xl mx-auto">
-              <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-accent-bronze mb-3">
+              <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-accent-bronze mb-4">
                 Trusted by Ferrari · Lamborghini · Rolls-Royce owners
               </p>
-              <p className="text-xl md:text-2xl font-light gradient-text mb-4">
+              <h1 className="text-display font-light gradient-text mb-6 leading-tight">
                 Dubai&rsquo;s Independent Luxury &amp; Exotic-Car Workshop
-              </p>
-              <p className="text-base md:text-lg text-muted-enhanced mb-12 leading-relaxed">
-                Leonardo exotic diagnostics &middot; OEM-level tooling &middot; genuine OEM parts &middot; Bosch-authorised &middot; 15+ years &middot; 5,000+ owners trust us
+              </h1>
+              <p className="text-subheading text-[var(--text-body)] mb-10 leading-relaxed max-w-2xl mx-auto">
+                Bosch-authorised. Leonardo exotic diagnostics. OEM-level
+                tooling and genuine OEM parts. Fifteen years in Al Quoz
+                Industrial 4.
               </p>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
-              <a
-                href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large"
-                onClick={() => trackWhatsAppClick('hero_sophisticated', 'Book Premium Service')}
+            {/* Dual primary CTAs: Chat with us / Book Directly */}
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center mb-10">
+              <button
+                type="button"
+                onClick={() => triggerChat('hero_primary')}
+                className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large inline-flex items-center justify-center gap-3"
               >
-                Book Premium Service
-              </a>
+                <FaWhatsapp className="w-5 h-5" />
+                <span>Chat with us</span>
+              </button>
 
-              <a
-                href="#services"
-                className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-large"
+              <Link
+                href="/book"
+                className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-large inline-flex items-center justify-center gap-3"
               >
-                Explore Services
-              </a>
+                <FaCalendarAlt className="w-4 h-4" />
+                <span>Book Directly</span>
+              </Link>
             </div>
+
+            {/* Tight credentials strip */}
+            <p className="text-xs md:text-sm uppercase tracking-[0.25em] text-[var(--text-muted)] mb-10">
+              Bosch Authorised · Leonardo Diagnostics · 15+ Years · 5,000+ Owners
+            </p>
 
             {/* Social Media Links */}
             <motion.div
@@ -283,6 +310,26 @@ export default function SophisticatedHero({
                 <FaFacebook className="w-5 h-5 text-blue-500 group-hover:text-blue-400 transition-colors" />
               </a>
             </motion.div>
+
+            {/* Scroll cue */}
+            <motion.a
+              href="#trusted-brands"
+              className="mt-12 inline-flex flex-col items-center gap-2 text-[var(--text-muted)] hover:text-white transition-colors group"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.4, duration: 0.8 }}
+              aria-label="Scroll to brands and services"
+            >
+              <span className="text-[0.65rem] uppercase tracking-[0.35em]">
+                Brands &amp; Services
+              </span>
+              <motion.span
+                animate={{ y: [0, 6, 0] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <FaChevronDown className="w-3 h-3 group-hover:text-[var(--primary)] transition-colors" />
+              </motion.span>
+            </motion.a>
           </motion.div>
 
           {/* Key Highlights Grid */}
