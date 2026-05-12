@@ -13,7 +13,7 @@ export default function QboLandingPage() {
       <div className="container-luxury max-w-4xl mx-auto px-4">
         <Link
           href="/"
-          className="inline-flex items-center text-red-400 hover:text-red-300 mb-8 transition-colors"
+          className="inline-flex items-center text-link mb-8 transition-colors"
         >
           ← Back to Home
         </Link>
@@ -78,11 +78,11 @@ export default function QboLandingPage() {
             <h2 className="text-heading font-light text-white mb-4">Terms &amp; privacy</h2>
             <p>
               Use of this integration is governed by our{' '}
-              <Link href="/integrations-terms" className="text-red-400 hover:text-red-300 underline">Integrations Terms</Link>,{' '}
-              <Link href="/privacy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link>, and{' '}
-              <Link href="/cookie-policy" className="text-red-400 hover:text-red-300 underline">Cookie Policy</Link>.
+              <Link href="/integrations-terms" className="text-link">Integrations Terms</Link>,{' '}
+              <Link href="/privacy" className="text-link">Privacy Policy</Link>, and{' '}
+              <Link href="/cookie-policy" className="text-link">Cookie Policy</Link>.
               Intuit&apos;s use of authorized data is governed by{' '}
-              <a href="https://www.intuit.com/privacy/" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300 underline">Intuit&apos;s privacy notice</a>.
+              <a href="https://www.intuit.com/privacy/" target="_blank" rel="noopener noreferrer" className="text-link">Intuit&apos;s privacy notice</a>.
             </p>
           </section>
 
@@ -93,8 +93,8 @@ export default function QboLandingPage() {
               requests:
             </p>
             <div className="mt-4 space-y-2">
-              <p>Email: <a href="mailto:info@mbrme.com" className="text-red-400 hover:text-red-300">info@mbrme.com</a></p>
-              <p>Phone: <a href="tel:+971565015800" className="text-red-400 hover:text-red-300">+971 56 501 5800</a></p>
+              <p>Email: <a href="mailto:info@mbrme.com" className="text-link">info@mbrme.com</a></p>
+              <p>Phone: <a href="tel:+971565015800" className="text-link">+971 56 501 5800</a></p>
               <p>Address: 16 8 St Al Qouz Ind. Fourth — Al Quoz, Dubai, UAE</p>
             </div>
           </section>

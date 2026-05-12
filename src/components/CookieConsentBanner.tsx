@@ -108,7 +108,7 @@ export default function CookieConsentBanner() {
                       <p className="text-sm text-muted-enhanced mb-4">
                         <a
                           href="/privacy"
-                          className="text-red-400 hover:text-red-300 underline transition-colors"
+                          className="text-link"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -117,7 +117,7 @@ export default function CookieConsentBanner() {
                         {' • '}
                         <a
                           href="/cookie-policy"
-                          className="text-red-400 hover:text-red-300 underline transition-colors"
+                          className="text-link"
                           target="_blank"
                           rel="noopener noreferrer"
                         >

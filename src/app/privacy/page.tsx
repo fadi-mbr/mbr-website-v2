@@ -20,7 +20,7 @@ export default function PrivacyPolicyPage() {
       <div className="container-luxury max-w-4xl mx-auto px-4">
         <Link
           href="/"
-          className="inline-flex items-center text-red-400 hover:text-red-300 mb-8 transition-colors"
+          className="inline-flex items-center text-link mb-8 transition-colors"
         >
           ← Back to Home
         </Link>
@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage() {
             <p>
               This Privacy Policy describes how MBR Making Better Rides (&quot;MBR&quot;, &quot;we&quot;, &quot;our&quot;,
               or &quot;us&quot;) collects, uses, shares, and protects personal data when you visit{' '}
-              <a href="https://mbrme.com" className="text-red-400 hover:text-red-300 underline">
+              <a href="https://mbrme.com" className="text-link">
                 mbrme.com
               </a>
               , contact us by phone, WhatsApp, email, or social media, or use our automotive services in
@@ -79,7 +79,7 @@ export default function PrivacyPolicyPage() {
               browser type and version, operating system, referring page, time zone, language preference,
               pages viewed, and timestamps. This information is collected through cookies and similar
               technologies — see our{' '}
-              <Link href="/cookie-policy" className="text-red-400 hover:text-red-300 underline">
+              <Link href="/cookie-policy" className="text-link">
                 Cookie Policy
               </Link>{' '}
               for details and your choices.
@@ -303,24 +303,24 @@ export default function PrivacyPolicyPage() {
               <p>16 8 St, Al Quoz Industrial Fourth, Al Quoz, Dubai, United Arab Emirates</p>
               <p>
                 Email:{' '}
-                <a href="mailto:info@mbrme.com" className="text-red-400 hover:text-red-300">
+                <a href="mailto:info@mbrme.com" className="text-link">
                   info@mbrme.com
                 </a>
               </p>
               <p>
                 Phone:{' '}
-                <a href="tel:+971565015800" className="text-red-400 hover:text-red-300">
+                <a href="tel:+971565015800" className="text-link">
                   +971 56 501 5800
                 </a>
               </p>
             </div>
             <p className="mt-4">
               See also our{' '}
-              <Link href="/cookie-policy" className="text-red-400 hover:text-red-300 underline">
+              <Link href="/cookie-policy" className="text-link">
                 Cookie Policy
               </Link>{' '}
               and{' '}
-              <Link href="/integrations-terms" className="text-red-400 hover:text-red-300 underline">
+              <Link href="/integrations-terms" className="text-link">
                 Integrations Terms
               </Link>
               .
