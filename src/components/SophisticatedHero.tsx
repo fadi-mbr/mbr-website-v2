@@ -16,7 +16,6 @@ import {
   FaMapMarkerAlt,
   FaWhatsapp,
   FaCalendarAlt,
-  FaChevronDown,
 } from 'react-icons/fa';
 import { useGoogleReviews } from './GoogleReviewsHook';
 import { isShopOpen } from '@/lib/business-hours';
@@ -245,25 +244,26 @@ export default function SophisticatedHero({
             viewport={{ once: true }}
           >
             <div className="max-w-4xl mx-auto">
-              <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-accent-bronze mb-4">
+              <p className="text-eyebrow mb-5">
                 Trusted by Ferrari · Lamborghini · Rolls-Royce owners
               </p>
-              <h1 className="text-display font-light gradient-text mb-6 leading-tight">
+              <h1 className="text-display font-light gradient-text mb-8 leading-tight">
                 Dubai&rsquo;s Independent Luxury &amp; Exotic-Car Workshop
               </h1>
-              <p className="text-subheading text-[var(--text-body)] mb-10 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-subheading text-[var(--text-body)] mb-12 leading-relaxed max-w-2xl mx-auto">
                 Bosch-authorised. Leonardo exotic diagnostics. OEM-level
                 tooling and genuine OEM parts. Fifteen years in Al Quoz
                 Industrial 4.
               </p>
             </div>
 
-            {/* Dual primary CTAs: Chat with us / Book Directly */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center mb-10">
+            {/* Dual primary CTAs — Chat is the dominant action; Book is a
+                ghost option (bronze-bordered, smaller, less colour). */}
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center items-stretch sm:items-center mb-12">
               <button
                 type="button"
                 onClick={() => triggerChat('hero_primary')}
-                className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large inline-flex items-center justify-center gap-3"
+                className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-large has-shimmer inline-flex items-center justify-center gap-3"
               >
                 <FaWhatsapp className="w-5 h-5" />
                 <span>Chat with us</span>
@@ -271,17 +271,49 @@ export default function SophisticatedHero({
 
               <Link
                 href="/book"
-                className="liquid-glass-btn liquid-glass-btn-secondary liquid-glass-btn-large inline-flex items-center justify-center gap-3"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-sm tracking-wide text-[var(--text-body)] hover:text-white border border-[var(--accent-bronze)]/40 hover:border-[var(--accent-bronze)] hover:bg-[var(--accent-bronze)]/10 transition-all duration-300"
               >
-                <FaCalendarAlt className="w-4 h-4" />
+                <FaCalendarAlt className="w-3.5 h-3.5" />
                 <span>Book Directly</span>
               </Link>
             </div>
 
-            {/* Tight credentials strip */}
-            <p className="text-xs md:text-sm uppercase tracking-[0.25em] text-[var(--text-muted)] mb-10">
-              Bosch Authorised · Leonardo Diagnostics · 15+ Years · 5,000+ Owners
-            </p>
+            {/* Credentials ticker — slow 60s horizontal scroll, 911Porsche
+                lettering, fades at edges. Soft brand-voice signal without
+                competing with the main copy above. */}
+            <div className="relative overflow-hidden mb-12 -mx-6 md:mx-0">
+              <div
+                className="pointer-events-none absolute inset-y-0 left-0 w-12 md:w-24 z-10"
+                style={{ background: 'linear-gradient(90deg, var(--background), transparent)' }}
+                aria-hidden="true"
+              />
+              <div
+                className="pointer-events-none absolute inset-y-0 right-0 w-12 md:w-24 z-10"
+                style={{ background: 'linear-gradient(-90deg, var(--background), transparent)' }}
+                aria-hidden="true"
+              />
+              <div className="flex hero-credential-track" aria-hidden="true">
+                {[0, 1].map((dupKey) => (
+                  <div key={dupKey} className="flex shrink-0 items-center gap-12 md:gap-16 pr-12 md:pr-16 text-eyebrow text-[var(--text-muted)]">
+                    <span>Bosch Authorised</span>
+                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span>Leonardo Diagnostics</span>
+                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span>OEM-Level Tooling</span>
+                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span>15+ Years</span>
+                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span>5,000+ Owners</span>
+                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span>Al Quoz Industrial 4</span>
+                    <span className="text-[var(--accent-bronze)]">·</span>
+                  </div>
+                ))}
+              </div>
+              <span className="sr-only">
+                Bosch Authorised, Leonardo Diagnostics, OEM-Level Tooling, 15+ years, 5,000+ owners, Al Quoz Industrial 4.
+              </span>
+            </div>
 
             {/* Social Media Links */}
             <motion.div
@@ -311,24 +343,22 @@ export default function SophisticatedHero({
               </a>
             </motion.div>
 
-            {/* Scroll cue */}
+            {/* Scroll cue — horizontal hairline + 911Porsche SCROLL label.
+                Replaces the bouncing chevron. The hairline animates its
+                left edge inward on hover (subtle, intentional). */}
             <motion.a
               href="#trusted-brands"
-              className="mt-12 inline-flex flex-col items-center gap-2 text-[var(--text-muted)] hover:text-white transition-colors group"
+              className="mt-16 inline-flex items-center gap-4 text-[var(--text-muted)] hover:text-white transition-colors group"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.4, duration: 0.8 }}
-              aria-label="Scroll to brands and services"
+              aria-label="Scroll to the next section"
             >
-              <span className="text-[0.65rem] uppercase tracking-[0.35em]">
-                Brands &amp; Services
+              <span className="block h-px w-12 md:w-20 bg-[var(--text-muted)] group-hover:bg-[var(--accent-bronze)] transition-colors duration-300" />
+              <span className="text-marker group-hover:text-white transition-colors">
+                Scroll
               </span>
-              <motion.span
-                animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <FaChevronDown className="w-3 h-3 group-hover:text-[var(--primary)] transition-colors" />
-              </motion.span>
+              <span className="block h-px w-12 md:w-20 bg-[var(--text-muted)] group-hover:bg-[var(--accent-bronze)] transition-colors duration-300" />
             </motion.a>
           </motion.div>
 
