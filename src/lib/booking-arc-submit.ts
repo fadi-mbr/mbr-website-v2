@@ -51,6 +51,7 @@ export interface SubmitErr {
     | "UNKNOWN_SERVICE"
     | "PHONE_PROBLEM"
     | "SLOT_TAKEN"
+    | "SLOT_UNAVAILABLE"
     | "EXISTING_CUSTOMER"
     | "ARC_DOWN";
   message: string;
@@ -282,6 +283,23 @@ export async function submitConfirmedBooking(
           ok: false,
           code: "SLOT_TAKEN",
           message: "That slot was just booked — please pick another.",
+        };
+      }
+      // ARC returns 400 NO_TIME when the requested slot isn't actually
+      // available — the day is fully booked, the technician is off, or
+      // ARC has the day marked unavailable for the service. The /slots
+      // endpoint can show false positives because it derives from open
+      // hours, not real availability. Surface a useful message instead
+      // of the generic "system unavailable".
+      if (
+        e.code === "NO_TIME" ||
+        (typeof e.code === "string" && /NO_TIME|TIME_NOT_AVAILABLE/.test(e.code))
+      ) {
+        return {
+          ok: false,
+          code: "SLOT_UNAVAILABLE",
+          message:
+            "That time slot isn't actually available — the shop is fully booked or closed at that hour. Please pick a different day or time, or message us on WhatsApp at +971 56 501 5800 and we'll find a slot for you.",
         };
       }
       // ARC's /public/appointment refuses to create a duplicate owner

@@ -274,7 +274,8 @@ export async function POST(req: Request): Promise<NextResponse> {
         ? 409
         : result.code === 'UNKNOWN_SERVICE' ||
             result.code === 'PHONE_PROBLEM' ||
-            result.code === 'EXISTING_CUSTOMER'
+            result.code === 'EXISTING_CUSTOMER' ||
+            result.code === 'SLOT_UNAVAILABLE'
           ? 400
           : 503; // SERVICE_LOOKUP_FAILED / ARC_DOWN
     logBooking({
