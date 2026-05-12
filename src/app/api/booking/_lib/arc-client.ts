@@ -96,18 +96,27 @@ async function arcFetch(
   init: RequestInit & { qs?: Record<string, string | number> } = {}
 ): Promise<Response> {
   const { qs, ...rest } = init;
-  const url = new URL(BASE + path);
-  // shopToken is always present on /public/* endpoints.
-  url.searchParams.set("shopToken", SHOP_TOKEN);
+  // ARC's shopToken (e.g. `b/AMKISNzrs/FF1ZqOg3ag==`) contains `/` and `=`
+  // characters. The standard URL class percent-encodes those, and ARC's
+  // server doesn't accept the encoded form for the appointment write path
+  // (the encoded token passes auth but fails downstream slot validation
+  // with NO_TIME). Build the query string manually so the shopToken stays
+  // literal. Other qs values are still encoded normally.
+  const otherQs: string[] = [];
   if (qs) {
     for (const [k, v] of Object.entries(qs)) {
-      url.searchParams.set(k, String(v));
+      otherQs.push(`${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`);
     }
   }
+  const query =
+    `shopToken=${SHOP_TOKEN}` +
+    (otherQs.length > 0 ? `&${otherQs.join("&")}` : "");
+  const finalUrl = `${BASE}${path}?${query}`;
+
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(url.toString(), {
+    const res = await fetch(finalUrl, {
       ...rest,
       signal: ctrl.signal,
       headers: {
