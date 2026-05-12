@@ -169,7 +169,7 @@ export default function SiteFooter() {
               <div className="relative aspect-[16/9]">
                 <Image
                   src="/images/hero-poster.jpg"
-                  alt="MBR workshop — Al Quoz Industrial 4, Dubai"
+                  alt="MBR workshop. Al Quoz Industrial 4, Dubai"
                   fill
                   sizes="(min-width: 768px) 33vw, 100vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"

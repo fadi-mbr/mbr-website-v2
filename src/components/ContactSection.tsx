@@ -115,7 +115,7 @@ export default function ContactSection() {
                 // SDK never came up — fall back to a friendly nudge.
                 // (Chatwoot ad-blocked or failed to load.)
                 alert(
-                  'Live chat is taking a moment to load. WhatsApp or call us in the meantime — both reach the team instantly.',
+                  'Live chat is taking a moment to load. WhatsApp or call us in the meantime. Both reach the team instantly.',
                 );
               })
             }
@@ -140,7 +140,7 @@ export default function ContactSection() {
               MBR Connect
             </p>
             <p className="text-xs text-[var(--text-muted)]">
-              Web chat — replies straight to our team during working hours.
+              Web chat. Replies straight to our team during working hours.
             </p>
           </button>
 
@@ -176,7 +176,7 @@ export default function ContactSection() {
               info@mbrme.com
             </p>
             <p className="text-xs text-[var(--text-muted)]">
-              Service inquiries &amp; quotes — replies during working hours.
+              Service inquiries &amp; quotes. Replies during working hours.
             </p>
           </a>
         </div>
@@ -271,7 +271,7 @@ export default function ContactSection() {
                   After-hours · Emergency
                 </p>
                 <p className="text-sm text-white leading-snug">
-                  Outside working hours? WhatsApp the line below — we try to
+                  Outside working hours? WhatsApp the line below. We try to
                   respond the same evening.
                 </p>
               </div>

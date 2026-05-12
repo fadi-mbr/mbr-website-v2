@@ -67,7 +67,7 @@ export default function TeamSection() {
                   <div className="relative aspect-[3/4]">
                     <Image
                       src={member.image}
-                      alt={`${member.name} — ${member.position}, MBR Auto Services`}
+                      alt={`${member.name}, ${member.position}, MBR Auto Services`}
                       fill
                       sizes="(min-width: 768px) 40vw, 90vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"

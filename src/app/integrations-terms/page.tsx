@@ -40,13 +40,13 @@ export default function IntegrationsTermsPage() {
             <p>MBR currently maintains authorized connections to the following third-party platforms:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
-                <strong>QuickBooks Online (Intuit)</strong> — read-only access to MBR&apos;s books for
+                <strong>QuickBooks Online (Intuit).</strong> Read-only access to MBR&apos;s books for
                 internal financial reporting (accounts receivable, accounts payable,
                 cash flow, profit and loss, balance sheet). No write operations are
                 performed against MBR&apos;s QuickBooks data.
               </li>
               <li>
-                <strong>Google Places API</strong> — read-only access to public review data for
+                <strong>Google Places API.</strong> Read-only access to public review data for
                 MBR&apos;s Google Business Profile, surfaced on the public website.
               </li>
             </ul>
@@ -188,7 +188,7 @@ export default function IntegrationsTermsPage() {
             </p>
             <div className="mt-4 space-y-2">
               <p><strong>MBR Making Better Rides</strong></p>
-              <p>16 8 St Al Qouz Ind. Fourth — Al Quoz, Dubai, UAE</p>
+              <p>16 8 St Al Qouz Ind. Fourth, Al Quoz, Dubai, UAE</p>
               <p>Phone: <a href="tel:+971565015800" className="text-link">+971 56 501 5800</a></p>
               <p>Email: <a href="mailto:info@mbrme.com" className="text-link">info@mbrme.com</a></p>
             </div>

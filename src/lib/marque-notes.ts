@@ -24,7 +24,7 @@ export const MARQUE_NOTES: Record<string, MarqueNote> = {
   lamborghini: {
     name: 'Lamborghini',
     tier: 'Supercar',
-    note: 'Aventador, Huracán and Urus — engine, drivetrain, chassis.',
+    note: 'Aventador, Huracán and Urus. Engine, drivetrain, chassis.',
   },
   mclaren: {
     name: 'McLaren',
@@ -34,7 +34,7 @@ export const MARQUE_NOTES: Record<string, MarqueNote> = {
   'rolls-royce': {
     name: 'Rolls-Royce',
     tier: 'Ultra-Luxury',
-    note: 'Phantom, Ghost, Cullinan — coachwork-grade attention.',
+    note: 'Phantom, Ghost, Cullinan. Coachwork-grade attention.',
   },
   bentley: {
     name: 'Bentley',
@@ -44,32 +44,32 @@ export const MARQUE_NOTES: Record<string, MarqueNote> = {
   porsche: {
     name: 'Porsche',
     tier: 'Luxury & Sport',
-    note: '911, Cayenne, Macan — air-cooled to current-gen.',
+    note: '911, Cayenne, Macan. Air-cooled to current-gen.',
   },
   maserati: {
     name: 'Maserati',
     tier: 'Luxury & Sport',
-    note: 'Ghibli, Levante, Quattroporte — Italian luxury sport.',
+    note: 'Ghibli, Levante, Quattroporte. Italian luxury sport.',
   },
   'mercedes-benz': {
     name: 'Mercedes-Benz',
     tier: 'Luxury & Sport',
-    note: 'S-Class, G-Wagen, AMG — Bosch-authorised expertise.',
+    note: 'S-Class, G-Wagen, AMG. Bosch-authorised expertise.',
   },
   bmw: {
     name: 'BMW',
     tier: 'Luxury & Sport',
-    note: 'M-cars and the wider line — diagnostics and engine work.',
+    note: 'M-cars and the wider line. Diagnostics and engine work.',
   },
   audi: {
     name: 'Audi',
     tier: 'Luxury & Sport',
-    note: 'RS, S-line and the regular range — full service.',
+    note: 'RS, S-line and the regular range. Full service.',
   },
   'land-rover': {
     name: 'Range Rover',
     tier: 'Luxury & Sport',
-    note: 'Range Rover, Sport, Defender — air suspension specialists.',
+    note: 'Range Rover, Sport, Defender. Air suspension specialists.',
   },
   jaguar: {
     name: 'Jaguar',
