@@ -402,17 +402,29 @@ export default function BookingFormClient({
                   'text-left rounded-lg border p-4 transition-colors',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
                   selected
-                    ? 'border-[#b08d57] bg-[#b08d57]/10'
-                    : 'border-neutral-700 bg-neutral-900 hover:border-[#b08d57]',
+                    ? 'bg-[#b08d57] border-[#b08d57] text-black shadow-md'
+                    : 'border-neutral-700 bg-neutral-900 text-white hover:border-[#b08d57] hover:bg-neutral-800',
                 ].join(' ')}
               >
                 <div className="font-medium">{s.title}</div>
-                <div className="mt-1 text-xs text-neutral-400">
+                <div
+                  className={[
+                    'mt-1 text-xs',
+                    selected ? 'text-black/70' : 'text-neutral-400',
+                  ].join(' ')}
+                >
                   {s.duration_h === 1
                     ? '1 hour'
                     : `${s.duration_h} hours`}
                   {s.price != null && (
-                    <span className="ml-2 text-[#b08d57]">
+                    <span
+                      className={[
+                        'ml-2',
+                        selected
+                          ? 'text-black/80 font-medium'
+                          : 'text-[#b08d57]',
+                      ].join(' ')}
+                    >
                       AED {s.price.toLocaleString('en-US')}
                     </span>
                   )}
@@ -483,6 +495,7 @@ export default function BookingFormClient({
             error={errors.firstName}
             required
             autoComplete="given-name"
+            enterKeyHint="next"
           />
           <Field
             id="lastName"
@@ -495,6 +508,7 @@ export default function BookingFormClient({
             error={errors.lastName}
             required
             autoComplete="family-name"
+            enterKeyHint="next"
           />
         </div>
         <Field
@@ -509,6 +523,7 @@ export default function BookingFormClient({
           required
           inputMode="tel"
           autoComplete="tel"
+          enterKeyHint="next"
           placeholder="+971 50 123 4567"
           hint="UAE mobile only — we’ll text the appointment confirmation."
         />
@@ -525,6 +540,7 @@ export default function BookingFormClient({
           type="email"
           inputMode="email"
           autoComplete="email"
+          enterKeyHint="next"
         />
       </section>
 
@@ -553,6 +569,8 @@ export default function BookingFormClient({
             error={errors.vehicleYear}
             required
             inputMode="numeric"
+            autoComplete="off"
+            enterKeyHint="next"
           />
           <Field
             id="vehicleMake"
@@ -567,6 +585,8 @@ export default function BookingFormClient({
             }
             error={errors.vehicleMake}
             required
+            autoComplete="off"
+            enterKeyHint="next"
           />
           <Field
             id="vehicleModel"
@@ -581,12 +601,16 @@ export default function BookingFormClient({
             }
             error={errors.vehicleModel}
             required
+            autoComplete="off"
+            enterKeyHint="next"
           />
           <Field
             id="vehiclePlate"
             label="Plate"
             value={vehiclePlate}
             onChange={setVehiclePlate}
+            autoComplete="off"
+            enterKeyHint="next"
           />
         </div>
       </section>
@@ -610,6 +634,8 @@ export default function BookingFormClient({
             rows={4}
             maxLength={500}
             placeholder="Anything we should know? (optional)"
+            autoComplete="off"
+            enterKeyHint="done"
             className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]"
             aria-describedby="booking-notes-count"
           />
@@ -672,6 +698,7 @@ interface FieldProps {
   placeholder?: string;
   hint?: string;
   autoComplete?: string;
+  enterKeyHint?: 'enter' | 'done' | 'go' | 'next' | 'previous' | 'search' | 'send';
 }
 
 function Field({
@@ -687,6 +714,7 @@ function Field({
   placeholder,
   hint,
   autoComplete,
+  enterKeyHint,
 }: FieldProps) {
   const fieldId = `booking-${id}`;
   const hintId = hint ? `${fieldId}-hint` : undefined;
@@ -716,6 +744,7 @@ function Field({
         placeholder={placeholder}
         required={required}
         autoComplete={autoComplete}
+        enterKeyHint={enterKeyHint}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         className={[

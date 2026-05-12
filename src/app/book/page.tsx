@@ -11,7 +11,9 @@
  */
 
 import type { Metadata } from 'next';
-import BookingForm from '@/components/booking/BookingForm';
+import BookingFormClient from '@/components/booking/BookingFormClient';
+import ProfessionalNavigation from '@/components/ProfessionalNavigation';
+import BookingFooter from '@/components/BookingFooter';
 import type { BookingService } from '@/lib/booking-types';
 import type {
   BookingSubmitPayload,
@@ -103,10 +105,17 @@ export default async function BookPage() {
   }
 
   return (
-    <BookingForm
-      mode="public"
-      services={services}
-      serverAction={publicSubmit}
-    />
+    <div className="min-h-screen bg-black text-white flex flex-col">
+      <ProfessionalNavigation />
+      <main className="flex-1 max-w-3xl w-full mx-auto px-4 pt-28 pb-12">
+        <h1 className="text-3xl font-light mb-6">Book an appointment</h1>
+        <BookingFormClient
+          mode="public"
+          services={services}
+          serverAction={publicSubmit}
+        />
+      </main>
+      <BookingFooter />
+    </div>
   );
 }
