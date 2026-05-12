@@ -56,11 +56,11 @@ export default function SiteFooter() {
           <div className="flex flex-col items-start">
             <Link href="/" className="inline-flex items-center gap-3 group">
               <Image
-                src="/images/Logo_mark.svg"
-                alt="MBR"
-                width={32}
-                height={34}
-                className="opacity-90 group-hover:opacity-100 transition-opacity"
+                src="/images/MBR_Logo_shield.svg"
+                alt="MBR Auto Services"
+                width={44}
+                height={44}
+                className="w-10 h-10 md:w-11 md:h-11 opacity-95 group-hover:opacity-100 transition-opacity"
               />
               <span className="text-white text-lg tracking-[0.18em] uppercase font-light">
                 MBR Auto
@@ -108,13 +108,18 @@ export default function SiteFooter() {
             </h2>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/#services" className="text-[var(--text-body)] hover:text-white transition-colors">
-                  Services
+                <Link href="/about" className="text-[var(--text-body)] hover:text-white transition-colors">
+                  About
                 </Link>
               </li>
               <li>
-                <Link href="/#workshop" className="text-[var(--text-body)] hover:text-white transition-colors">
+                <Link href="/workshop" className="text-[var(--text-body)] hover:text-white transition-colors">
                   Workshop
+                </Link>
+              </li>
+              <li>
+                <Link href="/#services" className="text-[var(--text-body)] hover:text-white transition-colors">
+                  Services
                 </Link>
               </li>
               <li>

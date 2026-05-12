@@ -11,13 +11,23 @@ import {
   FaTools,
 } from 'react-icons/fa';
 import SectionMarker from './SectionMarker';
+import CountUp from './CountUp';
 
 /* Three editorial stats. Tabular Fraunces numerals render as a clean
- * 3-up row — better than a stretched 4-up with a hollow fourth slot. */
-const STATS = [
-  { value: '4.9★', label: 'Google rating' },
-  { value: '5,000+', label: 'Owners trust us' },
-  { value: '100%', label: 'Workmanship guarantee' },
+ * 3-up row — better than a stretched 4-up with a hollow fourth slot.
+ * Numeric values count up on scroll; the suffix (★ / + / %) is held
+ * still so the eye lands on the moving figure. */
+type Stat = {
+  to: number;
+  decimals?: number;
+  suffix: string;
+  label: string;
+};
+
+const STATS: Stat[] = [
+  { to: 4.9, decimals: 1, suffix: '★', label: 'Google rating' },
+  { to: 5000, suffix: '+', label: 'Owners trust us' },
+  { to: 100, suffix: '%', label: 'Workmanship guarantee' },
 ];
 
 const PILLARS = [
@@ -112,7 +122,10 @@ export default function WhyMbr() {
         >
           {STATS.map((stat) => (
             <div key={stat.label} className="text-center motion-calm">
-              <div className="text-numeric mb-3">{stat.value}</div>
+              <div className="text-numeric mb-3">
+                <CountUp to={stat.to} decimals={stat.decimals ?? 0} />
+                <span className="text-[var(--primary)]">{stat.suffix}</span>
+              </div>
               <div
                 className="block h-px w-12 mx-auto mb-3"
                 style={{
