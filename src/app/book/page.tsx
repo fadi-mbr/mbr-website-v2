@@ -7,9 +7,7 @@ export const metadata: Metadata = {
   title: 'Book Service — MBR Auto Services',
   description:
     'Book your luxury or exotic-car service at MBR Auto Services in Al Quoz, Dubai. Online booking opens soon — chat with us or call to confirm a slot.',
-  // Keep the placeholder out of search results until the real booking
-  // experience lands. Re-enable when the booking widget ships.
-  robots: { index: false, follow: false },
+  robots: { index: true, follow: true },
 };
 
 export default function BookPage() {
