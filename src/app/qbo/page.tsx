@@ -85,6 +85,19 @@ export default function QboLandingPage() {
               <a href="https://www.intuit.com/privacy/" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300 underline">Intuit&apos;s privacy notice</a>.
             </p>
           </section>
+
+          <section>
+            <h2 className="text-heading font-light text-white mb-4">Support &amp; contact</h2>
+            <p>
+              Integration support, data-access requests, or off-cycle disconnection
+              requests:
+            </p>
+            <div className="mt-4 space-y-2">
+              <p>Email: <a href="mailto:info@mbrme.com" className="text-red-400 hover:text-red-300">info@mbrme.com</a></p>
+              <p>Phone: <a href="tel:+971565015800" className="text-red-400 hover:text-red-300">+971 56 501 5800</a></p>
+              <p>Address: 16 8 St Al Qouz Ind. Fourth — Al Quoz, Dubai, UAE</p>
+            </div>
+          </section>
         </div>
       </div>
     </div>

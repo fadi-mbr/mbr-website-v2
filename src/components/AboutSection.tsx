@@ -35,15 +35,18 @@ const achievements = [
 
 const certifications = [
   {
-    title: "Bosch Authorized Service",
-    description: "Certified for premium diagnostic equipment and genuine parts",
-    image: "/images/Bosch_Logo24.webp"
+    title: "Bosch Authorised Service",
+    description: "Certified for premium diagnostic equipment and genuine parts.",
+    image: "/images/Bosch_Logo24.webp",
+    link: null,
   },
   {
-    title: "Advanced Diagnostics",
-    description: "State-of-the-art equipment for all vehicle systems",
-    image: "/images/mbr_electrical.webp"
-  }
+    title: "Leonardo Exotic-Car Diagnostics",
+    description: "Specialist diagnostic platform purpose-built for Ferrari, Lamborghini and the wider exotic and supercar lineup.",
+    image: "/images/mbr_electrical.webp",
+    link: "https://www.leonardodiagnostictool.com/",
+    linkLabel: "leonardodiagnostictool.com",
+  },
 ];
 
 export default function AboutSection() {
@@ -79,9 +82,11 @@ export default function AboutSection() {
             About MBR Auto Services
           </h2>
           <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
-            Founded on the principles of excellence and integrity, MBR Auto Services has been
-            Dubai&apos;s trusted automotive partner for over 15 years. We combine traditional
-            craftsmanship with cutting-edge technology to deliver unparalleled service quality.
+            Dubai&apos;s independent luxury and exotic-car workshop. Trusted by Ferrari,
+            Lamborghini, and Rolls-Royce owners, and experienced with Bentley, McLaren,
+            Maserati, Porsche, and the German luxury marques. Fifteen years in Al Quoz,
+            Bosch-authorised, with the Leonardo exotic-car diagnostic platform and genuine
+            OEM parts.
           </p>
         </motion.div>
 
@@ -103,22 +108,25 @@ export default function AboutSection() {
             <div>
               <h3 className="text-heading font-light text-white mb-6">Our Story</h3>
               <p className="text-body text-body-enhanced leading-relaxed mb-6">
-                What began as a small workshop in Al Quoz has evolved into one of Dubai&apos;s
-                most respected automotive service centers. Our journey is built on a simple
-                philosophy: treat every vehicle as if it were our own.
+                What began as a small workshop in Al Quoz has grown into a trusted name across
+                Dubai. Over fifteen years we&apos;ve cared for everything from daily-driven
+                luxury sedans to the exotics, supercars and ultra-luxury vehicles Dubai is
+                famous for.
               </p>
               <p className="text-body text-body-enhanced leading-relaxed">
-                Today, we serve a diverse clientele of automotive enthusiasts, luxury car
-                owners, and everyday drivers who demand nothing but the best for their vehicles.
+                Today our regulars include Ferrari, Lamborghini, and Rolls-Royce owners
+                alongside the German luxury and British SUV crowd. Every car is served with
+                the same principle: treat each vehicle as if it were our own.
               </p>
             </div>
 
             <div>
               <h3 className="text-heading font-light text-white mb-6">Our Mission</h3>
               <p className="text-body text-body-enhanced leading-relaxed">
-                To provide exceptional automotive services that exceed expectations while
-                building lasting relationships with our customers through transparency,
-                expertise, and unwavering commitment to quality.
+                Independent expertise for owners who want dealership-grade work without the
+                dealership runaround. Genuine OEM parts, OEM-level diagnostics including the
+                Leonardo exotic-car platform, transparent pricing, and a workshop process
+                built around the cars our customers actually drive.
               </p>
             </div>
           </motion.div>
@@ -225,9 +233,20 @@ export default function AboutSection() {
                   <h4 className="text-subheading font-medium text-white mb-3">
                     {cert.title}
                   </h4>
-                  <p className="text-body text-body-enhanced leading-relaxed">
+                  <p className="text-body text-body-enhanced leading-relaxed mb-2">
                     {cert.description}
                   </p>
+                  {cert.link && (
+                    <a
+                      href={cert.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-xs uppercase tracking-[0.2em] text-luxury-gold hover:text-white transition-colors duration-300"
+                    >
+                      {cert.linkLabel}
+                      <span className="ml-2" aria-hidden="true">&rarr;</span>
+                    </a>
+                  )}
                 </div>
               </motion.div>
             ))}

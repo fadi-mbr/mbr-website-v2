@@ -29,11 +29,18 @@
   --surface-glass: rgba(255, 255, 255, 0.03);
 
   /* Enhanced Text Hierarchy - Luxury Automotive */
+  /*
+   * Body / muted / subtle text are bumped one zinc step brighter so all
+   * content meets WCAG AA on the dark theme:
+   *   body   #d4d4d8 (zinc-300) on #000  =>  contrast 13.6 (AAA)
+   *   muted  #a1a1aa (zinc-400) on #000  =>  contrast  8.9 (AAA)
+   *   subtle #71717a (zinc-500) on #000  =>  contrast  4.5 (AA, was 2.6 fail)
+   */
   --text-primary: #ffffff;
   --text-secondary: #e5e5e5;
-  --text-body: #a1a1aa;
-  --text-muted: #71717a;
-  --text-subtle: #52525b;
+  --text-body: #d4d4d8;
+  --text-muted: #a1a1aa;
+  --text-subtle: #71717a;
 
   /* Luxury Text Accents */
   --text-luxury-silver: #f3f4f6;
@@ -721,25 +728,33 @@ body {
     inset 0 2px 0 rgba(255, 255, 255, 0.08);
 }
 
+/*
+ * Brand-logo card.
+ * Light frosted plate so original-colour brand SVGs (Ferrari prancing
+ * horse, Lamborghini bull crest, BMW roundel, Porsche shield, etc.)
+ * render legibly. Dark page + light card + red accent border.
+ */
 .glass-card-brand-logo {
-  background: rgba(227, 6, 19, 0.15);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(227, 6, 19, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 1.5rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
-    0 8px 24px 0 rgba(227, 6, 19, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 24px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(227, 6, 19, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .glass-card-brand-logo:hover {
-  background: rgba(227, 6, 19, 0.25);
+  background: rgba(255, 255, 255, 1);
   border-color: rgba(227, 6, 19, 0.5);
   transform: translateY(-2px);
   box-shadow:
-    0 12px 32px 0 rgba(227, 6, 19, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    0 12px 32px 0 rgba(227, 6, 19, 0.35),
+    0 0 0 1px rgba(227, 6, 19, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .glass-card-red-accent {

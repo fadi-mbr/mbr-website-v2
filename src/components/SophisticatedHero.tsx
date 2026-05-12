@@ -224,11 +224,14 @@ export default function SophisticatedHero({
               />
             </div>
             <div className="max-w-4xl mx-auto">
-              <p className="text-xl md:text-2xl font-light gradient-text mb-4">
-                Expert Car Care in Dubai
+              <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-luxury-gold mb-3">
+                Trusted by Ferrari · Lamborghini · Rolls-Royce owners
               </p>
-              <p className="text-lg text-muted-enhanced mb-12">
-                Premium Automotive Excellence • Trusted by 5,000+ Customers • 15+ Years Experience
+              <p className="text-xl md:text-2xl font-light gradient-text mb-4">
+                Dubai&rsquo;s Independent Luxury &amp; Exotic-Car Workshop
+              </p>
+              <p className="text-base md:text-lg text-muted-enhanced mb-12 leading-relaxed">
+                Leonardo exotic diagnostics &middot; OEM-level tooling &middot; genuine OEM parts &middot; Bosch-authorised &middot; 15+ years &middot; 5,000+ owners trust us
               </p>
             </div>
 
@@ -283,7 +286,7 @@ export default function SophisticatedHero({
 
           {/* Key Highlights Grid */}
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20"
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
@@ -302,14 +305,6 @@ export default function SophisticatedHero({
                 <div className="text-4xl font-light gradient-text-vibrant mb-4">5000+</div>
                 <div className="text-lg text-luxury-silver mb-2">Customers</div>
                 <div className="text-sm text-muted-enhanced">Trust Our Service</div>
-              </div>
-            </div>
-
-            <div className="text-center group cursor-pointer">
-              <div className="glass-card glass-shimmer p-8 hover:glow-red transition-all duration-300">
-                <div className="text-4xl font-light gradient-text-vibrant mb-4">24/7</div>
-                <div className="text-lg text-luxury-silver mb-2">Emergency</div>
-                <div className="text-sm text-muted-enhanced">Support Available</div>
               </div>
             </div>
           </motion.div>

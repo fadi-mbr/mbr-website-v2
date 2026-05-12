@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/react';
 import FloatingWhatsAppButton from "@/components/FloatingWhatsAppButton";
+import FloatingChatwootButton from "@/components/FloatingChatwootButton";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import ConditionalGoogleAnalytics from "@/components/ConditionalGoogleAnalytics";
 import { autoRepairSchema, organizationSchema, aggregateRatingSchema } from '@/lib/structured-data';
@@ -19,19 +20,64 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Premium Car Repair Dubai | Luxury Auto Service UAE | MBR Auto Services",
-  description: "Expert luxury car repair & premium auto service in Dubai, UAE. 15+ years experience servicing Mercedes, BMW, Audi, Porsche & all premium brands. Bosch authorized service center in Al Quoz. Expert technicians, genuine parts, warranty coverage.",
-  keywords: "luxury car repair Dubai, premium car service UAE, Mercedes repair Dubai, BMW service Dubai, Audi maintenance Dubai, Porsche service Dubai, Range Rover repair Dubai, Lexus service Dubai, luxury auto service Dubai, premium car maintenance UAE, car service Al Quoz, auto repair Dubai, Bosch service center Dubai, luxury car diagnostics Dubai, premium vehicle repair UAE, Mercedes mechanic Dubai, BMW service center Dubai, Audi repair shop Dubai, Porsche maintenance Dubai, luxury car electrical repair Dubai, premium car suspension service Dubai, expert car mechanic Dubai, certified auto service Dubai, 15 years experience car repair Dubai, best luxury car service Dubai",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://mbrme.com"),
+  // Title leads with "MBR Auto Services" so the browser tab (which
+  // truncates long titles) always shows the brand first. Full title
+  // still feeds Google SERP with the high-intent luxury-marque keywords.
+  title: {
+    default: "MBR Auto Services | Ferrari, Lamborghini & Rolls-Royce Service Dubai",
+    template: "%s | MBR Auto Services",
+  },
+  applicationName: "MBR Auto Services",
+  description: "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, Leonardo exotic-car diagnostics, genuine OEM parts. 15+ years in Al Quoz Industrial 4.",
+  keywords: [
+    "Ferrari service Dubai",
+    "Ferrari repair Dubai",
+    "Lamborghini service Dubai",
+    "Lamborghini repair Dubai",
+    "Rolls-Royce service Dubai",
+    "Rolls Royce repair Dubai",
+    "Bentley service Dubai",
+    "McLaren service Dubai",
+    "Maserati service Dubai",
+    "Porsche service Dubai",
+    "Mercedes AMG service Dubai",
+    "Mercedes-Benz repair Dubai",
+    "BMW M service Dubai",
+    "Audi RS service Dubai",
+    "Range Rover service Dubai",
+    "Jaguar service Dubai",
+    "luxury car service Dubai",
+    "supercar mechanic Dubai",
+    "exotic car service UAE",
+    "independent luxury workshop Dubai",
+    "Bosch authorised service center Dubai",
+    "Al Quoz Industrial 4 car service",
+    "ECU diagnostics Dubai luxury",
+    "supercar maintenance Dubai",
+    "ultra-luxury car repair UAE",
+    "exotic car service Dubai",
+    "Leonardo diagnostic tool Dubai",
+    "MBR Auto Services",
+  ].join(", "),
   authors: [{ name: "MBR Auto Services" }],
   robots: "index, follow",
   alternates: {
     canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://mbrme.com",
   },
+  // Multi-format favicon coverage:
+  //   - favicon.ico (multi-resolution 16/32) for legacy browsers + Safari URL bar
+  //   - PNG 16/32 for Chrome / Firefox tab
+  //   - apple-touch-icon (180) for iOS home-screen
+  //   - android-chrome 192/512 for Android home-screen + PWA install
+  //   - mstile-150 for Windows Start tile (paired with msapplication-TileColor)
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
@@ -46,33 +92,36 @@ export const metadata: Metadata = {
   },
   other: {
     'msapplication-TileColor': '#E30613',
+    'msapplication-TileImage': '/mstile-150x150.png',
+    'msapplication-config': 'none',
   },
   openGraph: {
-    title: "Premium Car Repair Dubai | Luxury Auto Service UAE | MBR Auto Services",
-    description: "Expert luxury car repair & premium auto service in Dubai, UAE. 15+ years experience servicing Mercedes, BMW, Audi, Porsche & all premium brands. Bosch authorized service center in Al Quoz.",
+    title: "MBR Auto Services | Ferrari, Lamborghini & Rolls-Royce Service Dubai",
+    description: "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners. Bosch-authorised, Leonardo exotic diagnostics, 15+ years in Al Quoz Industrial 4.",
     type: "website",
     locale: "en_US",
-    siteName: "MBR Making Better Rides",
+    siteName: "MBR Auto Services",
     images: [
       {
         url: 'https://mbrme.com/images/Logo_MBRauto_noWhite_small.png',
         width: 1200,
         height: 630,
-        alt: 'MBR Making Better Rides - Premium Car Repair Dubai',
+        alt: 'MBR Auto Services. Independent luxury and exotic-car workshop in Dubai.',
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Premium Car Repair Dubai | Luxury Auto Service UAE | MBR Auto Services",
-    description: "Expert luxury car repair & premium auto service in Dubai, UAE. 15+ years experience servicing Mercedes, BMW, Audi, Porsche & all premium brands.",
+    title: "MBR Auto Services | Ferrari, Lamborghini & Rolls-Royce Service Dubai",
+    description: "Independent luxury and exotic-car workshop in Dubai. Bosch-authorised, Leonardo exotic diagnostics, OEM-level tooling, 15+ years.",
     images: ['https://mbrme.com/images/Logo_MBRauto_noWhite_small.png'],
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  themeColor: '#E30613',
 };
 
 export default function RootLayout({
@@ -112,6 +161,7 @@ export default function RootLayout({
         />
         {children}
         <FloatingWhatsAppButton />
+        <FloatingChatwootButton />
         <CookieConsentBanner />
         <ConditionalGoogleAnalytics />
         <Analytics />

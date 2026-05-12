@@ -1,5 +1,5 @@
 /**
- * Business hours — single source of truth.
+ * Business hours: single source of truth.
  *
  * Used by:
  *   - structured-data.ts  (Schema.org openingHoursSpecification)

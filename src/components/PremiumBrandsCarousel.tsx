@@ -1,152 +1,58 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
-// Premium car brands data with local SVG logo paths
-// All logos are hosted locally in /public/images/brands/ as SVG files
-// SVGs are converted to greyscale/white for better contrast on red background
-const premiumBrands = [
-  {
-    name: "Mercedes-Benz",
-    slug: "mercedes-benz",
-    keywords: "Mercedes repair Dubai, Mercedes service UAE, Mercedes-Benz maintenance",
-    logo: "/images/brands/mercedes-benz.svg",
-    color: "#00ADEF"
-  },
-  {
-    name: "BMW",
-    slug: "bmw",
-    keywords: "BMW repair Dubai, BMW service UAE, BMW maintenance",
-    logo: "/images/brands/bmw.svg",
-    color: "#1C69D4"
-  },
-  {
-    name: "Audi",
-    slug: "audi",
-    keywords: "Audi repair Dubai, Audi service UAE, Audi maintenance",
-    logo: "/images/brands/audi.svg",
-    color: "#BB0A30"
-  },
-  {
-    name: "Porsche",
-    slug: "porsche",
-    keywords: "Porsche repair Dubai, Porsche service UAE, Porsche maintenance",
-    logo: "/images/brands/porsche.svg",
-    color: "#000000"
-  },
-  {
-    name: "Land Rover",
-    slug: "land-rover",
-    keywords: "Land Rover repair Dubai, Land Rover service UAE, Range Rover service Dubai",
-    logo: "/images/brands/land-rover.svg",
-    color: "#005A2B"
-  },
-  {
-    name: "Lexus",
-    slug: "lexus",
-    keywords: "Lexus repair Dubai, Lexus service UAE, Lexus maintenance",
-    logo: "/images/brands/lexus.svg",
-    color: "#000000"
-  },
-  {
-    name: "Jaguar",
-    slug: "jaguar",
-    keywords: "Jaguar repair Dubai, Jaguar service UAE, Jaguar maintenance",
-    logo: "/images/brands/jaguar.svg",
-    color: "#000000"
-  },
-  {
-    name: "Maserati",
-    slug: "maserati",
-    keywords: "Maserati repair Dubai, Maserati service UAE",
-    logo: "/images/brands/maserati.svg",
-    color: "#0C2340"
-  },
-  {
-    name: "Bentley",
-    slug: "bentley",
-    keywords: "Bentley repair Dubai, Bentley service UAE",
-    logo: "/images/brands/bentley.svg",
-    color: "#000000"
-  },
-  {
-    name: "Rolls-Royce",
-    slug: "rolls-royce",
-    keywords: "Rolls-Royce repair Dubai, Rolls-Royce service UAE",
-    logo: "/images/brands/rolls-royce.svg",
-    color: "#000000"
-  },
-  {
-    name: "Lamborghini",
-    slug: "lamborghini",
-    keywords: "Lamborghini repair Dubai, Lamborghini service UAE",
-    logo: "/images/brands/lamborghini.svg",
-    color: "#FFB800"
-  },
-  {
-    name: "Ferrari",
-    slug: "ferrari",
-    keywords: "Ferrari repair Dubai, Ferrari service UAE",
-    logo: "/images/brands/ferrari.svg",
-    color: "#DC143C"
-  },
-  {
-    name: "McLaren",
-    slug: "mclaren",
-    keywords: "McLaren repair Dubai, McLaren service UAE",
-    logo: "/images/brands/mclaren.svg",
-    color: "#FF8000"
-  },
-  {
-    name: "Tesla",
-    slug: "tesla",
-    keywords: "Tesla repair Dubai, Tesla service UAE, Tesla maintenance",
-    logo: "/images/brands/tesla.svg",
-    color: "#E31937"
-  }
-];
+/**
+ * Luxury car brands serviced by MBR.
+ *
+ * Order matters: the user-facing prioritization leads with the
+ * supercars and ultra-luxury marques (Ferrari, Lamborghini,
+ * Rolls-Royce) before the German luxury and British SUV tier.
+ * Mainstream brands (Tesla, Lexus) were intentionally removed.
+ * MBR's positioning is luxury and exotic-car focused.
+ */
+const luxuryBrands = [
+  { name: "Ferrari",       slug: "ferrari",       tier: "supercar",     logo: "/images/brands/ferrari.svg",       keywords: "Ferrari repair Dubai, Ferrari service UAE, Ferrari maintenance, Ferrari mechanic Dubai" },
+  { name: "Lamborghini",   slug: "lamborghini",   tier: "supercar",     logo: "/images/brands/lamborghini.svg",   keywords: "Lamborghini repair Dubai, Lamborghini service UAE, Lamborghini maintenance, Lamborghini mechanic Dubai" },
+  { name: "Rolls-Royce",   slug: "rolls-royce",   tier: "ultra-luxury", logo: "/images/brands/rolls-royce.svg",   keywords: "Rolls-Royce repair Dubai, Rolls-Royce service UAE, Rolls Royce maintenance Dubai" },
+  { name: "Bentley",       slug: "bentley",       tier: "ultra-luxury", logo: "/images/brands/bentley.svg",       keywords: "Bentley repair Dubai, Bentley service UAE, Bentley maintenance Dubai" },
+  { name: "McLaren",       slug: "mclaren",       tier: "supercar",     logo: "/images/brands/mclaren.svg",       keywords: "McLaren repair Dubai, McLaren service UAE, McLaren maintenance Dubai" },
+  { name: "Maserati",      slug: "maserati",      tier: "luxury-gt",    logo: "/images/brands/maserati.svg",      keywords: "Maserati repair Dubai, Maserati service UAE, Maserati maintenance Dubai" },
+  { name: "Porsche",       slug: "porsche",       tier: "luxury-sport", logo: "/images/brands/porsche.svg",       keywords: "Porsche repair Dubai, Porsche service UAE, Porsche maintenance Dubai" },
+  { name: "Mercedes-Benz", slug: "mercedes-benz", tier: "luxury",       logo: "/images/brands/mercedes-benz.svg", keywords: "Mercedes repair Dubai, Mercedes service UAE, Mercedes-Benz maintenance, Mercedes AMG service Dubai" },
+  { name: "BMW",           slug: "bmw",           tier: "luxury",       logo: "/images/brands/bmw.svg",           keywords: "BMW repair Dubai, BMW service UAE, BMW M-series service Dubai" },
+  { name: "Audi",          slug: "audi",          tier: "luxury",       logo: "/images/brands/audi.svg",          keywords: "Audi repair Dubai, Audi service UAE, Audi RS service Dubai" },
+  { name: "Range Rover",   slug: "land-rover",    tier: "luxury-suv",   logo: "/images/brands/land-rover.svg",    keywords: "Range Rover repair Dubai, Land Rover service UAE, Range Rover maintenance Dubai" },
+  { name: "Jaguar",        slug: "jaguar",        tier: "luxury",       logo: "/images/brands/jaguar.svg",        keywords: "Jaguar repair Dubai, Jaguar service UAE, Jaguar maintenance Dubai" },
+] as const;
 
-// Duplicate brands for seamless infinite scroll
-const duplicatedBrands = [...premiumBrands, ...premiumBrands];
+type Brand = typeof luxuryBrands[number];
 
-// Brand logo component with fallback
-function BrandLogo({ brand }: { brand: typeof premiumBrands[0] }) {
+// Duplicate for seamless infinite scroll
+const carouselBrands: Brand[] = [...luxuryBrands, ...luxuryBrands];
+
+function BrandLogo({ brand }: { brand: Brand }) {
   const [imageError, setImageError] = useState(false);
 
+  if (imageError) {
+    return (
+      <div className="text-base font-light tracking-[0.18em] uppercase text-black/80 text-center px-2">
+        {brand.name}
+      </div>
+    );
+  }
+
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
-      {imageError ? (
-        // Fallback to text if image fails to load
-        <div 
-          className="text-sm font-light tracking-wider opacity-80 group-hover:opacity-100 transition-opacity duration-300 text-center px-2"
-          style={{ 
-            color: brand.color !== '#000000' ? brand.color : '#ffffff',
-            textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)'
-          }}
-        >
-          {brand.name}
-        </div>
-      ) : (
-        <div className="relative flex items-center justify-center" style={{ width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%' }}>
-          <Image
-            src={brand.logo}
-            alt={`${brand.name} repair and service in Dubai, UAE`}
-            width={140}
-            height={70}
-            className="object-contain opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-            onError={() => setImageError(true)}
-            style={{ 
-              maxWidth: 'calc(100% - 32px)', 
-              maxHeight: 'calc(100% - 32px)',
-              width: 'auto',
-              height: 'auto'
-            }}
-          />
-        </div>
-      )}
-    </div>
+    <Image
+      src={brand.logo}
+      alt={`${brand.name} repair and service in Dubai, UAE | MBR Auto Services`}
+      width={140}
+      height={70}
+      className="object-contain w-auto h-auto max-w-[70%] max-h-[70%] opacity-100 group-hover:scale-[1.04] transition-transform duration-300"
+      onError={() => setImageError(true)}
+    />
   );
 }
 
@@ -156,7 +62,7 @@ export default function PremiumBrandsCarousel() {
       {/* Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-96 h-96 bg-red-600/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/3 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative container-luxury">
@@ -168,40 +74,64 @@ export default function PremiumBrandsCarousel() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
+          <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-luxury-gold mb-4">
+            Marques We Care For
+          </p>
           <h2 className="text-display font-light gradient-text mb-6 tracking-tight">
-            Premium Car Brands We Service
+            Ferrari, Lamborghini, Rolls-Royce &amp; the World&rsquo;s Finest
           </h2>
           <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
-            Expert service and repair for all luxury and premium car brands in Dubai, UAE.
-            Our certified technicians have extensive experience with the world&apos;s finest automotive marques.
+            From Maranello to Crewe to Stuttgart, MBR is trusted by owners of the exotic,
+            supercar, ultra-luxury, and luxury marques driven across Dubai. OEM-level
+            diagnostic equipment, genuine OEM parts, Bosch-authorised workshop.
           </p>
         </motion.div>
 
         {/* Infinite Scrolling Carousel */}
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden" aria-label="Luxury car brands serviced">
           {/* Gradient Overlays for fade effect */}
           <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black via-black to-transparent z-10 pointer-events-none"></div>
           <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black via-black to-transparent z-10 pointer-events-none"></div>
 
           {/* Carousel Container */}
           <div className="flex gap-8 brand-carousel-scroll">
-            {duplicatedBrands.map((brand, index) => (
+            {carouselBrands.map((brand, index) => (
               <motion.div
                 key={`${brand.slug}-${index}`}
                 className="flex-shrink-0 group"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
+                transition={{ duration: 0.5, delay: (index % luxuryBrands.length) * 0.04 }}
                 viewport={{ once: true }}
               >
-                <div className="glass-card-brand-logo w-48 h-32 flex items-center justify-center p-4 transition-all duration-500 group overflow-hidden">
-                  {/* Brand Logo - SVG with proper containment */}
+                <div className="glass-card-brand-logo w-48 h-32 flex items-center justify-center p-4 transition-all duration-500 overflow-hidden">
                   <BrandLogo brand={brand} />
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
+
+        {/* Tier Captions */}
+        <motion.div
+          className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+          viewport={{ once: true }}
+        >
+          {[
+            { label: "Exotic & Supercars", brands: "Ferrari · Lamborghini · McLaren" },
+            { label: "Ultra-luxury", brands: "Rolls-Royce · Bentley" },
+            { label: "Luxury & Sport", brands: "Porsche · Maserati · Mercedes · BMW · Audi" },
+            { label: "Luxury SUV", brands: "Range Rover · Jaguar" },
+          ].map((tier) => (
+            <div key={tier.label} className="px-2">
+              <div className="text-[0.7rem] md:text-xs uppercase tracking-[0.2em] text-luxury-gold mb-2 font-medium">{tier.label}</div>
+              <div className="text-sm md:text-base text-white/80 leading-relaxed font-light">{tier.brands}</div>
+            </div>
+          ))}
+        </motion.div>
 
         {/* SEO-Friendly Content Section */}
         <motion.div
@@ -213,37 +143,35 @@ export default function PremiumBrandsCarousel() {
         >
           <div className="glass-card-premium p-8 max-w-4xl mx-auto">
             <h3 className="text-heading font-light text-white mb-4">
-              Expert Service for Every Premium Brand
+              Experienced with every luxury and exotic marque
             </h3>
             <p className="text-body-enhanced leading-relaxed mb-6">
-              At MBR Auto Services, we specialize in servicing and repairing all premium and luxury car brands 
-              available in Dubai and the UAE. Whether you drive a Mercedes-Benz, BMW, Audi, Porsche, Land Rover, 
-              Lexus, Jaguar, Maserati, Bentley, Rolls-Royce, Lamborghini, Ferrari, McLaren, Tesla, or any other premium 
-              vehicle, our certified technicians have the expertise and genuine parts to keep your luxury car 
-              performing at its best.
+              MBR Auto Services counts Ferrari, Lamborghini, and Rolls-Royce owners among its
+              regular customers in Dubai, alongside Bentley, McLaren, Maserati, Porsche,
+              Mercedes-Benz, BMW, Audi, Range Rover, and Jaguar. Every service is carried out
+              with OEM-level diagnostic equipment, including the Leonardo exotic-car diagnostic
+              platform, and genuine OEM parts.
             </p>
             <p className="text-body-enhanced leading-relaxed">
-              With 15+ years of experience and Bosch authorized service certification, we provide comprehensive 
-              mechanical repairs, electrical diagnostics, suspension services, and preventive maintenance for all 
-              premium car brands. Trust MBR for expert luxury car service in Dubai.
+              With 15+ years in Dubai and Bosch-authorised certification, our team handles
+              engine and transmission work, electrical and ECU diagnostics, suspension and
+              brake service, and preventive maintenance. Scheduled service intervals,
+              pre-purchase inspections, and accident repairs are all delivered to the same
+              workshop standard.
             </p>
           </div>
         </motion.div>
 
-        {/* Brand List for SEO (Hidden visually, but accessible to search engines) */}
+        {/* Brand List for SEO (Hidden visually, accessible to search engines) */}
         <div className="sr-only">
-          <h3>Premium Car Brands Serviced in Dubai, UAE</h3>
+          <h3>Luxury car brands serviced in Dubai, UAE by MBR Auto Services</h3>
           <ul>
-            {premiumBrands.map((brand) => (
-              <li key={brand.slug}>
-                {brand.name} repair Dubai, {brand.name} service UAE, {brand.name} maintenance Dubai
-              </li>
+            {luxuryBrands.map((brand) => (
+              <li key={brand.slug}>{brand.keywords}</li>
             ))}
           </ul>
         </div>
       </div>
-
     </section>
   );
 }
-

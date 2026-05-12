@@ -10,7 +10,7 @@ const services = [
   {
     title: "Mechanical Repairs",
     subtitle: "Engine & Transmission",
-    description: "Complete mechanical solutions from engine diagnostics to transmission rebuilds. Our certified technicians handle everything from routine maintenance to complex repairs with precision and expertise.",
+    description: "Engine, transmission, clutch and brake work for Ferrari, Lamborghini, Porsche and the wider luxury lineup. Routine service to full rebuilds, carried out with OEM-level tooling and genuine parts.",
     features: ["Engine Diagnostics", "Transmission Service", "Brake Systems", "Clutch Repair"],
     image: "/images/mbr_mechanic.webp",
     icon: FaCogs,
@@ -18,27 +18,28 @@ const services = [
   },
   {
     title: "Electrical & Diagnostics",
-    subtitle: "Advanced Systems",
-    description: "State-of-the-art diagnostic equipment for all electrical systems. From battery issues to complex ECU problems, we diagnose and repair with manufacturer-level precision.",
-    features: ["ECU Diagnostics", "Battery & Alternator", "Wiring Repair", "Computer Systems"],
+    subtitle: "Advanced & Exotic Systems",
+    description: "OEM-level diagnostic equipment for every electrical system, including the Leonardo platform purpose-built for Ferrari, Lamborghini and the wider exotic-car lineup. From battery and alternator work to deep ECU diagnostics, we read, code and repair to manufacturer-level precision.",
+    features: ["Leonardo Exotic Diagnostics", "ECU Coding & Reset", "Battery & Alternator", "Wiring & Comfort Systems"],
     image: "/images/mbr_electrical.webp",
     icon: FaBolt,
-    color: "from-yellow-600/20 to-orange-600/20"
+    color: "from-yellow-600/20 to-orange-600/20",
+    externalLink: { url: "https://www.leonardodiagnostictool.com/", label: "About the Leonardo platform" }
   },
   {
     title: "Suspension & Steering",
     subtitle: "Precision Handling",
-    description: "Professional wheel alignment, suspension tuning, and steering system services. Experience smooth, controlled driving with our precision alignment and suspension expertise.",
-    features: ["Wheel Alignment", "Shock Absorbers", "Steering Systems", "Suspension Tuning"],
+    description: "Air-suspension service, alignment, ride-height calibration and steering work for ultra-luxury and supercar chassis. The fine handling owners pay for, recovered and preserved.",
+    features: ["Wheel Alignment", "Air Suspension", "Steering Systems", "Suspension Tuning"],
     image: "/images/mbr_suspension.webp",
     icon: FaWrench,
     color: "from-purple-600/20 to-indigo-600/20"
   },
   {
-    title: "Maintenance Services",
-    subtitle: "Preventive Care",
-    description: "Comprehensive vehicle maintenance to keep your car running at peak performance. Regular service intervals, quality parts, and detailed inspections for long-term reliability.",
-    features: ["Oil Changes", "AC Service", "Filter Replacement", "Fluid Checks"],
+    title: "Preventive Maintenance",
+    subtitle: "Scheduled Care",
+    description: "Manufacturer-schedule servicing, fluid changes, AC service and pre-purchase inspections for luxury and exotic vehicles. Detailed inspections, transparent pricing, full service history.",
+    features: ["Oil & Fluid Service", "AC Service", "Filter Replacement", "Pre-purchase Inspections"],
     image: "/images/mbr_maintainence.webp",
     icon: FaOilCan,
     color: "from-green-600/20 to-emerald-600/20"
@@ -90,11 +91,13 @@ export default function SophisticatedServices() {
           viewport={{ once: true }}
         >
           <h2 className="text-display font-light gradient-text mb-8 tracking-tight">
-            Premium Services
+            Luxury, Exotic &amp; Supercar Services
           </h2>
           <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
-            Comprehensive automotive solutions backed by 15+ years of expertise,
-            certified technicians, and state-of-the-art equipment.
+            Engine, transmission, electrical and chassis work, performed with OEM-level
+            diagnostics, the Leonardo exotic-car platform, and genuine OEM parts. Trusted by
+            Ferrari, Lamborghini, and Rolls-Royce owners; experienced with Bentley, Porsche,
+            and the German luxury lineup.
           </p>
         </motion.div>
 
@@ -170,14 +173,27 @@ export default function SophisticatedServices() {
                   </p>
 
                   {/* Features */}
-                  <div className="grid grid-cols-2 gap-3 mb-8">
+                  <div className="grid grid-cols-2 gap-3 mb-6">
                     {service.features.map((feature, idx) => (
                       <div key={idx} className="flex items-center text-sm text-muted-enhanced">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-600 mr-3"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-600 mr-3 flex-shrink-0"></div>
                         {feature}
                       </div>
                     ))}
                   </div>
+
+                  {/* Optional external reference (e.g. Leonardo Diagnostic Tool) */}
+                  {'externalLink' in service && service.externalLink && (
+                    <a
+                      href={service.externalLink.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-xs uppercase tracking-[0.2em] text-luxury-gold hover:text-white transition-colors duration-300 mb-6"
+                    >
+                      {service.externalLink.label}
+                      <span className="ml-2" aria-hidden="true">&rarr;</span>
+                    </a>
+                  )}
 
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-3">

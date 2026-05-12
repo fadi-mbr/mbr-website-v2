@@ -95,6 +95,15 @@ export default function QboConnectPage() {
               .
             </p>
           </section>
+
+          <section>
+            <h2 className="text-heading font-light text-white mb-4">Support</h2>
+            <p>
+              For help connecting, troubleshooting an authorization failure, or
+              requesting a fresh consent URL: <a href="mailto:info@mbrme.com" className="text-red-400 hover:text-red-300">info@mbrme.com</a> ·{' '}
+              <a href="tel:+971565015800" className="text-red-400 hover:text-red-300">+971 56 501 5800</a>.
+            </p>
+          </section>
         </div>
       </div>
     </div>
