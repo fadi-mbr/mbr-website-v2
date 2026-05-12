@@ -187,6 +187,52 @@ body {
   color: var(--text-primary);
 }
 
+/* Phase C: canonical link colour for inline body/legal-page links.
+   Replaces the scattered `text-red-400 hover:text-red-300` Tailwind
+   usage across privacy / cookie-policy / integrations-terms / qbo. */
+.text-link {
+  color: var(--text-brand-red);
+  text-decoration: none;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+.text-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-bronze);
+  text-underline-offset: 3px;
+}
+
+/* Phase C: skip-to-content link. Visible only when focused. */
+.skip-link {
+  position: fixed;
+  top: -48px;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 1rem;
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Phase C: global :focus-visible safety net. Critical for keyboard a11y
+   when components don't define their own focus ring. */
+:focus-visible {
+  outline: 2px solid var(--accent-bronze);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+.liquid-glass-btn:focus-visible {
+  outline-offset: 4px;
+}
+
 .text-heading {
   font-size: var(--text-heading);
   font-weight: 400;
