@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/react';
 import FloatingWhatsAppButton from "@/components/FloatingWhatsAppButton";
+import FloatingChatwootButton from "@/components/FloatingChatwootButton";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import ConditionalGoogleAnalytics from "@/components/ConditionalGoogleAnalytics";
 import { autoRepairSchema, organizationSchema, aggregateRatingSchema } from '@/lib/structured-data';
@@ -160,6 +161,7 @@ export default function RootLayout({
         />
         {children}
         <FloatingWhatsAppButton />
+        <FloatingChatwootButton />
         <CookieConsentBanner />
         <ConditionalGoogleAnalytics />
         <Analytics />
