@@ -40,8 +40,13 @@ export interface BookingSubmitPayload {
 /**
  * Discriminated result the Server Action returns back to the client form.
  *
- *   ok:true   → show success state with the confirmation details
- *   ok:false  → show inline error with `message`, allow Retry
+ *   ok:true, pending:true   → public flow accepted the request and sent
+ *                              the confirmation email; show a generic
+ *                              "check your inbox" message. No appointment
+ *                              has been created yet.
+ *   ok:true, pending:false  → agent flow created an ARC appointment in
+ *                              one shot; show confirmation details.
+ *   ok:false                → inline error with `message`, allow Retry.
  *
  * Field names mirror the agent-endpoint response so the action can pass it
  * through without remapping.
@@ -49,10 +54,16 @@ export interface BookingSubmitPayload {
 export type ServerActionResult =
   | {
       ok: true;
+      pending?: false;
       arcAppointmentId?: number;
       confirmAt: string;
       serviceName: string;
       estimatedDuration: number;
+    }
+  | {
+      ok: true;
+      pending: true;
+      message: string;
     }
   | {
       ok: false;
@@ -132,6 +143,8 @@ export default function BookingFormClient({
     when: string;
     arcAppointmentId?: number;
     isPreview?: boolean;
+    /** Public flow: email sent, waiting for the user to click the magic link. */
+    pendingMessage?: string;
   } | null>(null);
   const [lastPayload, setLastPayload] = useState<BookingSubmitPayload | null>(
     null
@@ -204,11 +217,19 @@ export default function BookingFormClient({
       if (serverAction) {
         const result = await serverAction(payload);
         if (result.ok) {
-          setSuccess({
-            serviceTitle: result.serviceName || selectedService?.title || 'Your booking',
-            when: formatWhen(payload.timeStartMs),
-            arcAppointmentId: result.arcAppointmentId,
-          });
+          if (result.pending === true) {
+            setSuccess({
+              serviceTitle: selectedService?.title ?? 'Your booking',
+              when: formatWhen(payload.timeStartMs),
+              pendingMessage: result.message,
+            });
+          } else {
+            setSuccess({
+              serviceTitle: result.serviceName || selectedService?.title || 'Your booking',
+              when: formatWhen(payload.timeStartMs),
+              arcAppointmentId: result.arcAppointmentId,
+            });
+          }
         } else {
           setBanner(
             result.message ||
@@ -285,18 +306,25 @@ export default function BookingFormClient({
   };
 
   if (success) {
+    const heading = success.pendingMessage
+      ? 'Check your email'
+      : success.isPreview
+        ? 'Booking request received'
+        : 'Booking confirmed';
     return (
       <div
         className="rounded-lg border border-[#b08d57]/40 bg-neutral-900 p-6 text-white"
         role="status"
         aria-live="polite"
       >
-        <h2 className="text-xl font-light mb-2">
-          {success.isPreview ? 'Booking request received' : 'Booking confirmed'}
-        </h2>
-        <p className="text-sm text-neutral-300">
-          {success.serviceTitle} — {success.when}
-        </p>
+        <h2 className="text-xl font-light mb-2">{heading}</h2>
+        {success.pendingMessage ? (
+          <p className="text-sm text-neutral-300">{success.pendingMessage}</p>
+        ) : (
+          <p className="text-sm text-neutral-300">
+            {success.serviceTitle} — {success.when}
+          </p>
+        )}
         {success.arcAppointmentId !== undefined && (
           <p className="text-xs text-neutral-500 mt-2">
             Reference #{success.arcAppointmentId}
@@ -305,6 +333,12 @@ export default function BookingFormClient({
         {success.isPreview && (
           <p className="text-xs text-neutral-500 mt-4">
             This is a preview screen. No appointment was created.
+          </p>
+        )}
+        {success.pendingMessage && (
+          <p className="text-xs text-neutral-500 mt-4">
+            The link in the email expires in 30 minutes. If you don&apos;t see
+            it, check your spam folder.
           </p>
         )}
       </div>
