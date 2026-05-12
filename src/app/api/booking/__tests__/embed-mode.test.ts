@@ -5,7 +5,11 @@
  * helpers are pure and that's where the load-bearing parsing lives.
  */
 
-import { isEmbedMode, readContextFromUrl } from '../../../../lib/embed-mode';
+import {
+  isEmbedMode,
+  readContactIdFromUrl,
+  readContextFromUrl,
+} from '../../../../lib/embed-mode';
 import { runSuite, assertEqual, assert } from './_harness';
 
 export default function suite() {
@@ -124,6 +128,57 @@ export default function suite() {
         const ctx = readContextFromUrl(`name=${long}`);
         assert(ctx.name !== undefined);
         assert((ctx.name as string).length <= 80, 'name capped at 80');
+      },
+    },
+
+    // readContactIdFromUrl --------------------------------------------------
+    {
+      name: 'readContactIdFromUrl returns null when absent',
+      fn: () => {
+        assertEqual(readContactIdFromUrl(''), null);
+        assertEqual(readContactIdFromUrl('embed=1'), null);
+      },
+    },
+    {
+      name: 'readContactIdFromUrl parses a positive integer',
+      fn: () => {
+        assertEqual(readContactIdFromUrl('contact_id=123'), 123);
+      },
+    },
+    {
+      name: 'readContactIdFromUrl rejects negative numbers',
+      fn: () => {
+        assertEqual(readContactIdFromUrl('contact_id=-5'), null);
+      },
+    },
+    {
+      name: 'readContactIdFromUrl rejects zero',
+      fn: () => {
+        assertEqual(readContactIdFromUrl('contact_id=0'), null);
+      },
+    },
+    {
+      name: 'readContactIdFromUrl rejects non-numeric values',
+      fn: () => {
+        assertEqual(readContactIdFromUrl('contact_id=abc'), null);
+        assertEqual(readContactIdFromUrl('contact_id=1.5'), null);
+        assertEqual(readContactIdFromUrl('contact_id=1e3'), null);
+      },
+    },
+    {
+      name: 'readContactIdFromUrl rejects values larger than MAX_SAFE_INTEGER',
+      fn: () => {
+        // 2^53 + 1 — first integer JS can't represent exactly.
+        assertEqual(readContactIdFromUrl('contact_id=9007199254740993'), null);
+      },
+    },
+    {
+      name: 'readContactIdFromUrl extracts the value alongside other params',
+      fn: () => {
+        assertEqual(
+          readContactIdFromUrl('embed=1&contact_id=42&phone=971501234567'),
+          42
+        );
       },
     },
   ]);
