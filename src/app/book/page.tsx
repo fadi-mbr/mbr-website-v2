@@ -13,7 +13,6 @@
 import type { Metadata } from 'next';
 import BookingFormClient from '@/components/booking/BookingFormClient';
 import ProfessionalNavigation from '@/components/ProfessionalNavigation';
-import BookingFooter from '@/components/BookingFooter';
 import type { BookingService } from '@/lib/booking-types';
 import type {
   BookingSubmitPayload,
@@ -104,6 +103,8 @@ export default async function BookPage() {
     }
   }
 
+  // Layout note: dev's app/layout.tsx renders <SiteFooter /> globally, so
+  // we don't render a footer here — that would duplicate it.
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       <ProfessionalNavigation />
@@ -115,7 +116,6 @@ export default async function BookPage() {
           serverAction={publicSubmit}
         />
       </main>
-      <BookingFooter />
     </div>
   );
 }
