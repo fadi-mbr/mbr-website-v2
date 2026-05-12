@@ -294,7 +294,7 @@ export default function SophisticatedHero({
               />
               <div className="flex hero-credential-track" aria-hidden="true">
                 {[0, 1].map((dupKey) => (
-                  <div key={dupKey} className="flex shrink-0 items-center gap-12 md:gap-16 pr-12 md:pr-16 text-eyebrow text-[var(--text-muted)]">
+                  <div key={dupKey} className="flex shrink-0 items-center gap-14 md:gap-20 pr-14 md:pr-20 text-eyebrow text-[var(--text-subtle)] opacity-70" style={{ fontSize: '0.6rem', letterSpacing: '0.32em' }}>
                     <span>Bosch Authorised</span>
                     <span className="text-[var(--accent-bronze)]">·</span>
                     <span>Leonardo Diagnostics</span>

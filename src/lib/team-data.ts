@@ -62,9 +62,9 @@ function getStaticTeamMembers(): TeamMember[] {
   return [
     {
       name: "Basel Kelzia",
-      position: "Owner & CEO - MBR Leader",
-      image: "/images/team-photos/Basel.webp", // Updated to match CSV
-      description: "Passionate automotive expert leading MBR Auto Services. Committed to quality service and customer satisfaction.",
+      position: "Owner & Founder",
+      image: "/images/team-photos/Basel.webp",
+      description: "Founded MBR to bring dealership-grade exotic-car service to Dubai without the dealership lock-in. On the workshop floor most days — every Ferrari, Lamborghini and Rolls-Royce that comes through passes a personal check.",
       socialType: "instagram",
       socialUrl: "https://www.instagram.com/dr.abu.adam/"
     },
@@ -72,7 +72,7 @@ function getStaticTeamMembers(): TeamMember[] {
       name: "Michael Touma",
       position: "Workshop Manager",
       image: "/images/team-photos/Michael.webp",
-      description: "Experienced workshop manager ensuring smooth operations and quality control across all automotive services.",
+      description: "Runs the bays day-to-day — the schedule, the parts orders, the final QC before keys go back. The constant face every returning owner deals with from intake to handover.",
       socialType: "instagram",
       socialUrl: "https://www.instagram.com/michael_touma/"
     }

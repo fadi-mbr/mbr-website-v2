@@ -1371,7 +1371,9 @@ body {
 }
 
 .hero-credential-track {
-  animation: credential-track 60s linear infinite;
+  /* Slower scroll (90s vs 60s prior) so the ticker reads as a quiet
+     atmospheric layer rather than competing with the headline. */
+  animation: credential-track 90s linear infinite;
   will-change: transform;
 }
 

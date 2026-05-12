@@ -209,7 +209,7 @@ export default function SophisticatedReviews() {
                 href={review.author_url || 'https://maps.app.goo.gl/gj9EXG4uchRBtZcE6'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group mb-6 inline-block w-full break-inside-avoid p-7 md:p-8 rounded-2xl border border-white/8 bg-[var(--surface-2)] hover:border-white/20 transition-colors duration-300"
+                className="group mb-6 inline-block w-full break-inside-avoid p-7 md:p-8 rounded-2xl border border-white/10 bg-[var(--surface-2)] hover:border-white/25 transition-colors duration-300"
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
