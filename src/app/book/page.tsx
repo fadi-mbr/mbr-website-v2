@@ -1,41 +1,15 @@
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { FaWhatsapp, FaPhone } from 'react-icons/fa';
+import { FaWhatsapp, FaPhone, FaCalendarAlt } from 'react-icons/fa';
 import { BUSINESS_HOURS } from '@/lib/business-hours';
-import './booking.css';
-
-/**
- * /book — multi-step booking wizard.
- *
- * The page itself is server-rendered (good for LCP + SEO chrome). The
- * wizard is a client component, lazy-loaded so we don't ship the
- * date/slot/form logic until the user actually lands here.
- *
- * The WhatsApp + Call CTAs at the top are intentional fallback paths —
- * keep them visible so users who don't want to fill the form can reach
- * us instantly.
- */
-const BookingWizard = dynamic(
-  () => import('@/components/booking/BookingWizard'),
-  {
-    loading: () => (
-      <div className="booking-loading" role="status" aria-live="polite">
-        <span className="booking-spinner" aria-hidden="true" />
-        <span>Loading booking…</span>
-      </div>
-    ),
-    ssr: false,
-  },
-);
 
 export const metadata: Metadata = {
   title: 'Book Service — MBR Auto Services',
   description:
-    'Book your luxury or exotic-car service at MBR Auto Services in Al Quoz, Dubai. Pick a service, pick a slot, and we will confirm right away.',
-  alternates: {
-    canonical: 'https://mbrme.com/book',
-  },
+    'Book your luxury or exotic-car service at MBR Auto Services in Al Quoz, Dubai. Online booking opens soon — chat with us or call to confirm a slot.',
+  // Keep the placeholder out of search results until the real booking
+  // experience lands. Re-enable when the booking widget ships.
+  robots: { index: false, follow: false },
 };
 
 export default function BookPage() {
@@ -50,44 +24,56 @@ export default function BookPage() {
 
           {/* Headline */}
           <h1 className="text-display font-light gradient-text mb-6 leading-tight">
-            Book your service.
+            Online booking opens soon.
           </h1>
 
-          <p className="text-subheading text-[var(--text-body)] max-w-2xl leading-relaxed mb-10">
-            Pick a service, choose a slot, and we&apos;ll confirm right away.
-            Prefer to chat? The buttons below open WhatsApp or place a call —
-            both reach our team instantly during working hours.
+          <p className="text-subheading text-[var(--text-body)] max-w-2xl leading-relaxed mb-12">
+            We&apos;re finishing the new booking experience right now. In the
+            meantime, our team confirms appointments directly — usually within
+            minutes during working hours.
           </p>
 
-          {/* Fallback CTAs — kept above the wizard so users who don't want
-              to use the form can still reach us in one tap. */}
+          {/* Primary CTAs — Chat / Call */}
           <div className="flex flex-col sm:flex-row gap-4 mb-16">
             <a
               href="https://wa.me/+971565015800?text=Hello%20MBR%2C%20I%27d%20like%20to%20book%20a%20service%20appointment."
               target="_blank"
               rel="noopener noreferrer"
-              className="liquid-glass-btn liquid-glass-btn-secondary inline-flex items-center justify-center gap-3"
+              className="liquid-glass-btn liquid-glass-btn-primary inline-flex items-center justify-center gap-3"
             >
-              <FaWhatsapp className="w-5 h-5" aria-hidden="true" />
+              <FaWhatsapp className="w-5 h-5" />
               <span>Chat to book</span>
             </a>
             <a
               href="tel:+971565015800"
               className="liquid-glass-btn liquid-glass-btn-secondary inline-flex items-center justify-center gap-3"
             >
-              <FaPhone className="w-4 h-4" aria-hidden="true" />
+              <FaPhone className="w-4 h-4" />
               <span>Call +971 56 501 5800</span>
             </a>
           </div>
 
-          {/* Wizard mount — the multi-step booking flow lives here.
-              <section data-booking-mount> is the slot the contract names. */}
+          {/*
+            Future booking experience mounts here. The other Claude session
+            handling the booking system should render its widget/form into
+            <section data-booking-mount>. Until then, the section renders as
+            a soft "coming soon" card so the page doesn't feel empty.
+          */}
           <section
             data-booking-mount
-            className="glass-card-premium p-6 md:p-10"
-            aria-label="Online booking form"
+            className="glass-card p-10 md:p-12 text-center"
+            aria-label="Booking widget — placeholder"
           >
-            <BookingWizard />
+            <FaCalendarAlt className="w-10 h-10 text-accent-bronze mx-auto mb-5 opacity-90" />
+            <h2 className="text-heading font-light text-white mb-3">
+              Direct online booking — coming soon
+            </h2>
+            <p className="text-body text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
+              Pick a service, choose a slot, get an instant confirmation.
+              We&apos;re currently building the calendar integration with our
+              workshop. Until it ships, the fastest path is a quick chat or
+              call — most appointments are confirmed the same day.
+            </p>
           </section>
 
           {/* Working hours footnote */}

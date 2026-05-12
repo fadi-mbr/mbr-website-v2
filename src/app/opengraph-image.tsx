@@ -1,11 +1,34 @@
 import { ImageResponse } from 'next/og';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 export const alt =
   'MBR Auto Services. Independent luxury and exotic-car workshop in Dubai.';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-export default function OpenGraphImage() {
+/**
+ * Dynamic 1200×630 social preview. The MBR wordmark and credential
+ * strip render in the 911Porsche brand-voice font (embedded from
+ * /public/fonts at request time). Tagline stays default sans for
+ * legibility at thumbnail sizes.
+ */
+export default async function OpenGraphImage() {
+  let porscheFont: ArrayBuffer | null = null;
+  try {
+    const buf = await readFile(
+      join(process.cwd(), 'public', 'fonts', '911porschav3.ttf'),
+    );
+    porscheFont = buf.buffer.slice(
+      buf.byteOffset,
+      buf.byteOffset + buf.byteLength,
+    ) as ArrayBuffer;
+  } catch {
+    porscheFont = null;
+  }
+
+  const brandFont = porscheFont ? '911Porsche' : 'sans-serif';
+
   return new ImageResponse(
     (
       <div
@@ -37,52 +60,55 @@ export default function OpenGraphImage() {
           }}
         />
 
-        {/* Wordmark */}
+        {/* Wordmark — 911Porsche */}
         <div
           style={{
-            fontSize: 184,
-            fontWeight: 700,
-            letterSpacing: -8,
+            fontFamily: brandFont,
+            fontSize: 200,
+            letterSpacing: 8,
             lineHeight: 1,
             display: 'flex',
+            color: 'white',
           }}
         >
-          <span style={{ color: 'white' }}>MBR</span>
+          MBR
         </div>
 
-        {/* Sub-wordmark */}
+        {/* Sub-wordmark — bronze accent in 911Porsche */}
         <div
           style={{
+            fontFamily: brandFont,
             fontSize: 28,
-            letterSpacing: 12,
+            letterSpacing: 14,
             textTransform: 'uppercase',
             color: '#A57842',
-            marginTop: 12,
+            marginTop: 16,
           }}
         >
           Making Better Rides
         </div>
 
-        {/* Divider */}
+        {/* Bronze hairline divider */}
         <div
           style={{
-            width: 120,
-            height: 2,
-            background: '#E30613',
-            marginTop: 40,
-            marginBottom: 32,
+            width: 96,
+            height: 1,
+            background: '#A57842',
+            marginTop: 44,
+            marginBottom: 36,
           }}
         />
 
         {/* Tagline */}
         <div
           style={{
-            fontSize: 38,
+            fontSize: 40,
             fontWeight: 300,
             color: '#e5e5e5',
             textAlign: 'center',
-            maxWidth: 880,
+            maxWidth: 920,
             lineHeight: 1.25,
+            letterSpacing: -0.5,
           }}
         >
           Independent Luxury &amp; Exotic-Car Workshop
@@ -91,17 +117,18 @@ export default function OpenGraphImage() {
         {/* Location */}
         <div
           style={{
-            fontSize: 22,
+            fontFamily: brandFont,
+            fontSize: 20,
             color: '#a1a1aa',
-            marginTop: 18,
-            letterSpacing: 2,
+            marginTop: 22,
+            letterSpacing: 4,
             textTransform: 'uppercase',
           }}
         >
           Al Quoz Industrial 4 · Dubai · UAE
         </div>
 
-        {/* Bottom credentials strip */}
+        {/* Credentials strip — 911Porsche */}
         <div
           style={{
             position: 'absolute',
@@ -110,21 +137,34 @@ export default function OpenGraphImage() {
             right: 0,
             display: 'flex',
             justifyContent: 'center',
-            gap: 36,
+            gap: 40,
+            fontFamily: brandFont,
             fontSize: 20,
             color: '#d4d4d8',
-            letterSpacing: 2,
+            letterSpacing: 4,
             textTransform: 'uppercase',
           }}
         >
           <span>Bosch Authorised</span>
-          <span style={{ color: '#E30613' }}>·</span>
+          <span style={{ color: '#A57842' }}>·</span>
           <span>Leonardo Diagnostics</span>
-          <span style={{ color: '#E30613' }}>·</span>
+          <span style={{ color: '#A57842' }}>·</span>
           <span>15+ Years</span>
         </div>
       </div>
     ),
-    { ...size },
+    {
+      ...size,
+      fonts: porscheFont
+        ? [
+            {
+              name: '911Porsche',
+              data: porscheFont,
+              style: 'normal',
+              weight: 400,
+            },
+          ]
+        : undefined,
+    },
   );
 }
