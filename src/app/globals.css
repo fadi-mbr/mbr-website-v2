@@ -7,6 +7,8 @@
   font-weight: normal;
   font-style: normal;
   font-display: swap;
+  /* tnum = tabular figures (aligned stat numerals); kern = pair-kerning. */
+  font-feature-settings: "tnum" 1, "kern" 1;
 }
 
 /* BMW/Mercedes-Inspired Luxury Automotive Design System */
@@ -57,6 +59,7 @@
    */
   --text-luxury-silver: #f3f4f6;
   --accent-bronze: #A57842;
+  --accent-bronze-soft: rgba(165, 120, 66, 0.18);
   --star-gold: #fbbf24;
   --text-brand-red: #f87171;
   --text-success: #34d399;
@@ -87,12 +90,14 @@
   --blur-medium: blur(16px);
   --blur-strong: blur(24px);
 
-  /* Vibrant Gradient Colors */
+  /* Gradient Colors (Phase A: collapsed from a 5-stop red→pink→burgundy
+     cacophony to disciplined two-stop reds. Red is action; gradients are
+     subtle background tone, not feature signaling.) */
   --gradient-primary: linear-gradient(135deg, #E30613 0%, #FF1A2E 50%, #E30613 100%);
-  --gradient-vibrant: linear-gradient(135deg, #E30613 0%, #FF4757 25%, #FF6B9D 50%, #C44569 75%, #E30613 100%);
+  --gradient-vibrant: linear-gradient(135deg, #8B0000 0%, #E30613 100%);
   --gradient-glow: linear-gradient(135deg, rgba(227, 6, 19, 0.4) 0%, rgba(255, 26, 46, 0.3) 50%, rgba(227, 6, 19, 0.4) 100%);
   --gradient-text: linear-gradient(135deg, #ffffff 0%, #f3f4f6 50%, #ffffff 100%);
-  --gradient-accent: linear-gradient(135deg, #E30613 0%, #FF1A2E 25%, #FF4757 50%, #FF1A2E 75%, #E30613 100%);
+  --gradient-accent: linear-gradient(135deg, #8B0000 0%, #E30613 100%);
 }
 
 @theme inline {
@@ -130,8 +135,56 @@ body {
 .text-display {
   font-size: var(--text-display);
   font-weight: 300;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+/* Phase A: 911Porsche font system.
+ *
+ * The Porsche-style display face is already loaded from /fonts. Until now
+ * it was only used for a single logo accent. The revamp activates it as
+ * the brand voice for numerics, eyebrows, and section markers.
+ *
+ * - .font-marque  → base utility, applies the family + uppercase + caps tracking
+ * - .text-eyebrow → small uppercase label that sits above section headlines
+ * - .text-marker  → section-number ("01", "02") rendered above eyebrow
+ * - .text-numeric → large stat numerals (Why MBR, hero highlights, etc.)
+ */
+.font-marque {
+  font-family: '911Porsche', 'Inter Display', -apple-system, sans-serif;
+  font-feature-settings: "tnum" 1, "kern" 1;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+}
+
+.text-eyebrow {
+  font-family: '911Porsche', 'Inter Display', -apple-system, sans-serif;
+  font-feature-settings: "tnum" 1, "kern" 1;
+  font-size: clamp(0.75rem, 1.05vw, 0.875rem);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--accent-bronze);
+}
+
+.text-marker {
+  font-family: '911Porsche', 'Inter Display', -apple-system, sans-serif;
+  font-feature-settings: "tnum" 1, "kern" 1;
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.text-numeric {
+  font-family: '911Porsche', 'Inter Display', -apple-system, sans-serif;
+  font-feature-settings: "tnum" 1, "kern" 1;
+  font-size: clamp(3.25rem, 7.5vw, 6rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  color: var(--text-primary);
 }
 
 .text-heading {
@@ -840,11 +893,24 @@ body {
   }
 }
 
+/* Phase A motion split:
+ *
+ * `.has-shimmer` is the canonical opt-in shimmer modifier. Apply it only to
+ * surfaces that should feel kinetic (hero stats, persistent enquire CTA in
+ * nav). Calm surfaces (contact info cards, why-mbr pillars, workshop captions)
+ * should NOT carry the class. The legacy `.glass-shimmer` selector is kept as
+ * an alias so we can migrate consumers progressively without breaking.
+ *
+ * Animation slowed from 4s → 7s — multiple slow shimmers read as luxurious
+ * where multiple fast shimmers read as anxious.
+ */
+.has-shimmer,
 .glass-shimmer {
   position: relative;
   overflow: hidden;
 }
 
+.has-shimmer::before,
 .glass-shimmer::before {
   content: '';
   position: absolute;
@@ -861,11 +927,12 @@ body {
     transparent
   );
   background-size: 200% 100%;
-  animation: vibrant-shimmer 4s infinite;
+  animation: vibrant-shimmer 7s infinite;
   pointer-events: none;
   z-index: 1;
 }
 
+.has-shimmer::after,
 .glass-shimmer::after {
   content: '';
   position: absolute;
@@ -884,8 +951,20 @@ body {
   z-index: 1;
 }
 
+.has-shimmer:hover::after,
 .glass-shimmer:hover::after {
   opacity: 1;
+}
+
+/* Phase A: explicit opt-out for calm sections. Anything inside .motion-calm
+ * gets its animations + transitions stripped. Useful on Why-MBR pillars,
+ * contact info cards, footer columns — places where stillness is the point. */
+.motion-calm,
+.motion-calm *,
+.motion-calm *::before,
+.motion-calm *::after {
+  animation: none !important;
+  transition: none !important;
 }
 
 /* Advanced Liquid Glass Button System */
@@ -1204,4 +1283,22 @@ body {
 .brand-logo-filter:hover {
   filter: grayscale(100%) brightness(0) invert(1) brightness(1.1);
   /* Slightly brighter on hover */
+}
+
+/* Phase A — `prefers-reduced-motion` honored aggressively.
+ *
+ * Users with vestibular sensitivities or who've opted out of motion in
+ * their OS settings get a static experience. Animations are clipped to
+ * 0.01ms (effectively off), transitions same; smooth scroll disabled.
+ * The hero video continues to play because that's browser-default
+ * behaviour for <video autoplay> — we don't intercept it here. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -189,7 +189,7 @@ export default function SophisticatedReviews() {
             rel="noopener noreferrer"
             className="block w-full max-w-4xl mx-auto"
           >
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 glass-card-premium glass-shimmer p-4 md:p-8 cursor-pointer hover:scale-105 hover:glow-red transition-all duration-300">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 glass-card-premium p-4 md:p-8 cursor-pointer hover:scale-105 hover:glow-red transition-all duration-300">
               <FaGoogle className="text-4xl md:text-6xl text-red-500 flex-shrink-0" />
 
               <div className="text-center flex-1">
@@ -238,7 +238,7 @@ export default function SophisticatedReviews() {
                 rel="noopener noreferrer"
                 className="block h-full"
               >
-                <div className="glass-card glass-shimmer p-8 h-full cursor-pointer hover:glow-red transition-all duration-300">
+                <div className="glass-card p-8 h-full cursor-pointer hover:glow-red transition-all duration-300">
 
                 {/* Quote Icon */}
                 <FaQuoteLeft className="text-red-600/60 text-2xl mb-6" />

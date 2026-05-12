@@ -131,7 +131,7 @@ export default function WhyMbr() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {CERTIFICATIONS.map((cert) => {
               const Inner = (
-                <div className="glass-card glass-shimmer h-full p-7 md:p-8 flex flex-col items-start gap-4 transition-all duration-300 hover:glow-red border border-[var(--accent-bronze)]/15">
+                <div className="glass-card h-full p-7 md:p-8 flex flex-col items-start gap-4 transition-all duration-300 hover:glow-red border border-[var(--accent-bronze)]/15">
                   <div
                     className="inline-flex items-center justify-center w-12 h-12 rounded-full"
                     style={{
