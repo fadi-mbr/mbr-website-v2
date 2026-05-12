@@ -11,6 +11,7 @@ import validateSuite from "./validate.test";
 import rateLimitSuite from "./rate-limit.test";
 import embedModeSuite from "./embed-mode.test";
 import chatwootSuite from "./chatwoot.test";
+import embedContextSuite from "./embed-context.test";
 
 async function main(): Promise<void> {
   await phoneSuite();
@@ -18,6 +19,7 @@ async function main(): Promise<void> {
   await rateLimitSuite();
   await embedModeSuite();
   await chatwootSuite();
+  await embedContextSuite();
   console.log("\nAll booking unit tests passed.");
 }
 

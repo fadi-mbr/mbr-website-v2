@@ -42,6 +42,13 @@ export interface EmbedContext {
   conversationId?: number;
   /** Where the customer originally reached out — purely informational. */
   channel?: string;
+  /**
+   * The Chatwoot contact ID this booking is associated with. Used to
+   * fetch the contact server-side via `/api/booking/embed-context` and
+   * prefill Details when the wizard runs inside the Chatwoot Dashboard
+   * App iframe. Not surfaced to the customer.
+   */
+  contactId?: number;
 }
 
 export interface BookingCompletedPayload {
@@ -111,6 +118,78 @@ export function readContextFromUrl(search?: URLSearchParams | string): EmbedCont
     if (trimmed.length > 0) out.channel = trimmed;
   }
   return out;
+}
+
+/* ---------------- contact_id → server-side prefill ---------------- */
+
+/**
+ * Extract a positive integer `contact_id` query param. Returns null on
+ * absent / malformed / out-of-range input. Bounded to MAX_SAFE_INTEGER so
+ * the value can safely round-trip through JSON.
+ *
+ * The Chatwoot Dashboard App appends `contact_id` to the iframe URL when
+ * the advisor opens the booking app from inside a conversation. We use it
+ * to look up the contact server-side via `/api/booking/embed-context`.
+ */
+export function readContactIdFromUrl(
+  search?: URLSearchParams | string
+): number | null {
+  const sp = resolveSearch(search);
+  if (!sp) return null;
+  const raw = sp.get('contact_id');
+  if (!raw) return null;
+  if (!/^\d+$/.test(raw)) return null;
+  const n = Number(raw);
+  if (!Number.isSafeInteger(n) || n <= 0) return null;
+  return n;
+}
+
+/**
+ * Fetch the embed-mode contact prefill from our own server. Silently
+ * returns `{}` on any failure — the wizard always remains usable, even
+ * without prefill (the advisor can type the customer's details manually).
+ *
+ * The response shape from `/api/booking/embed-context`:
+ *   { ok: true,  contact: { name?, email?, phone? } | null }
+ *   { ok: false, reason?: string }
+ *
+ * Either of those — plus network errors, JSON parse failures, etc — all
+ * resolve to `{}` here. By design.
+ */
+export async function fetchContactPrefill(
+  contactId: number
+): Promise<Partial<EmbedContext>> {
+  if (typeof window === 'undefined') return {};
+  if (!Number.isSafeInteger(contactId) || contactId <= 0) return {};
+  try {
+    const r = await fetch('/api/booking/embed-context', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contact_id: contactId }),
+      // No credentials needed — same-origin and the route has its own
+      // server-side auth to Chatwoot.
+      cache: 'no-store',
+    });
+    if (!r.ok) return {};
+    const body: unknown = await r.json();
+    if (!body || typeof body !== 'object') return {};
+    const obj = body as { ok?: unknown; contact?: unknown };
+    if (obj.ok !== true) return {};
+    if (!obj.contact || typeof obj.contact !== 'object') return {};
+    const c = obj.contact as { name?: unknown; email?: unknown; phone?: unknown };
+    const out: Partial<EmbedContext> = {};
+    if (typeof c.name === 'string' && c.name.trim()) out.name = c.name.trim().slice(0, 80);
+    if (typeof c.email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email.trim())) {
+      out.email = c.email.trim();
+    }
+    if (typeof c.phone === 'string') {
+      const cleaned = c.phone.trim().replace(/^\+/, '');
+      if (/^\d{6,15}$/.test(cleaned)) out.phone = cleaned;
+    }
+    return out;
+  } catch {
+    return {};
+  }
 }
 
 /* ---------------- postMessage bridge ---------------- */
