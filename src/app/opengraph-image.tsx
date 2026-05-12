@@ -198,7 +198,7 @@ export default async function OpenGraphImage() {
           <span style={{ color: '#A57842' }}>·</span>
           <span>Leonardo Diagnostics</span>
           <span style={{ color: '#A57842' }}>·</span>
-          <span>15+ Years</span>
+          <span>OEM Parts</span>
         </div>
       </div>
     ),

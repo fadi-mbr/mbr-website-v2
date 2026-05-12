@@ -56,7 +56,7 @@ export function useGoogleReviews(): UseGoogleReviewsReturn {
 
       // Fallback to static data if API fails
       setData({
-        overallRating: 4.8,
+        overallRating: 4.9,
         totalReviews: 883,
         lastUpdated: new Date().toISOString(),
         reviews: []

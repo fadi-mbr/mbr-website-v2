@@ -29,7 +29,7 @@ interface SophisticatedHeroProps {
 }
 
 export default function SophisticatedHero({
-  googleReviews = { overallRating: 4.8, totalReviews: 883 }
+  googleReviews = { overallRating: 4.9, totalReviews: 883 }
 }: SophisticatedHeroProps) {
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -197,7 +197,7 @@ export default function SophisticatedHero({
               <FaGoogle className="text-red-500 text-sm md:text-base" />
               <FaStar className="text-star-gold text-sm md:text-base" />
               <span className="text-white font-bold text-sm md:text-lg">
-                {reviewsLoading ? '4.8' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.8)}
+                {reviewsLoading ? '4.9' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.9)}
               </span>
             </div>
             <div className="text-left">
@@ -252,8 +252,7 @@ export default function SophisticatedHero({
               </h1>
               <p className="text-subheading text-[var(--text-body)] mb-12 leading-relaxed max-w-2xl mx-auto">
                 Bosch-authorised. Leonardo exotic diagnostics. OEM-level
-                tooling and genuine OEM parts. Fifteen years in Al Quoz
-                Industrial 4.
+                tooling and genuine OEM parts. Based in Al Quoz Industrial 4.
               </p>
             </div>
 
@@ -302,9 +301,9 @@ export default function SophisticatedHero({
                     <span className="text-[var(--accent-bronze)]">·</span>
                     <span>OEM-Level Tooling</span>
                     <span className="text-[var(--accent-bronze)]">·</span>
-                    <span>15+ Years</span>
+                    <span>Genuine OEM Parts</span>
                     <span className="text-[var(--accent-bronze)]">·</span>
-                    <span>5,000+ Owners</span>
+                    <span>Independent Workshop</span>
                     <span className="text-[var(--accent-bronze)]">·</span>
                     <span>Al Quoz Industrial 4</span>
                     <span className="text-[var(--accent-bronze)]">·</span>
@@ -312,7 +311,7 @@ export default function SophisticatedHero({
                 ))}
               </div>
               <span className="sr-only">
-                Bosch Authorised, Leonardo Diagnostics, OEM-Level Tooling, 15+ years, 5,000+ owners, Al Quoz Industrial 4.
+                Bosch Authorised, Leonardo Diagnostics, OEM-Level Tooling, Genuine OEM Parts, Independent Workshop, Al Quoz Industrial 4.
               </span>
             </div>
 

@@ -61,7 +61,7 @@ export const autoRepairSchema = {
   image: LOGO_URL,
   logo: LOGO_URL,
   description:
-    "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, Leonardo exotic-car diagnostics, genuine OEM parts. 15+ years in Al Quoz Industrial 4.",
+    "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, Leonardo exotic-car diagnostics, genuine OEM parts in Al Quoz Industrial 4.",
   address: {
     '@type': 'PostalAddress',
     streetAddress: '16 8 St Al Quoz Industrial 4',
@@ -163,7 +163,7 @@ export const aggregateRatingSchema = {
   url: SITE_URL,
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '4.8',
+    ratingValue: '4.9',
     reviewCount: '883',
     bestRating: '5',
     worstRating: '1',

@@ -153,7 +153,7 @@ export default function PremiumBrandsCarousel() {
               platform, and genuine OEM parts.
             </p>
             <p className="text-body-enhanced leading-relaxed">
-              With 15+ years in Dubai and Bosch-authorised certification, our team handles
+              An independent workshop in Dubai with Bosch-authorised certification, our team handles
               engine and transmission work, electrical and ECU diagnostics, suspension and
               brake service, and preventive maintenance. Scheduled service intervals,
               pre-purchase inspections, and accident repairs are all delivered to the same

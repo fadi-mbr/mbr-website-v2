@@ -11,6 +11,7 @@ import {
   FaInstagram,
   FaFacebook,
 } from 'react-icons/fa';
+import { HiOutlineChatBubbleLeftRight } from 'react-icons/hi2';
 import {
   trackWhatsAppClick,
   trackPhoneCall,
@@ -18,6 +19,7 @@ import {
   trackSocialMediaClick,
   trackEmailClick,
 } from '@/lib/analytics';
+import { triggerChat } from '@/lib/chat-cta';
 import { BUSINESS_HOURS, getWeeklyHours } from '@/lib/business-hours';
 import SectionMarker from './SectionMarker';
 
@@ -60,52 +62,78 @@ export default function ContactSection() {
     >
       <div className="container-luxury">
         <SectionMarker
-          number="06"
+          number="07"
           eyebrow="Visit"
-          headline="Three ways in. One workshop."
-          body="WhatsApp is fastest. Phone, email and a visit work too — addresses and hours below."
+          headline="Four ways in. One workshop."
+          body="Pick whichever is fastest for you. WhatsApp and live chat reach the team instantly during working hours; phone and email are always available."
         />
 
-        {/* Row 1 — three action cards. WhatsApp 2x width (the dominant
-            conversion channel), Call + Email half-width each. */}
-        <div className="mt-16 md:mt-20 grid grid-cols-1 md:grid-cols-4 gap-5">
-          {/* WhatsApp — dominant card, spans 2 columns on desktop */}
+        {/* Row 1 — four channels, equal width. WhatsApp keeps a green
+            gradient so it reads as the warmest path, but Live Chat is
+            a true peer (the Chatwoot widget already lives at app level —
+            this card just gives it a real surface in the contact UI). */}
+        <div className="mt-16 md:mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* WhatsApp */}
           <a
             href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20automotive%20service"
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('contact_primary', 'WhatsApp')}
-            className="group md:col-span-2 relative overflow-hidden rounded-2xl border border-white/10 hover:border-[var(--primary)]/50 transition-all duration-300 p-8 md:p-10 flex items-center gap-6"
+            className="group relative overflow-hidden rounded-2xl border border-white/10 hover:border-[var(--primary)]/50 transition-all duration-300 p-6 md:p-7"
             style={{
               background:
                 'linear-gradient(135deg, rgba(34,197,94,0.10) 0%, rgba(0,0,0,0) 60%), var(--surface-2)',
             }}
           >
             <div
-              className="shrink-0 w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+              className="w-11 h-11 rounded-full flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
               style={{
                 background: 'linear-gradient(145deg, #25D366, #128C7E)',
-                boxShadow: '0 8px 24px rgba(37,211,102,0.35)',
+                boxShadow: '0 8px 20px rgba(37,211,102,0.30)',
               }}
             >
-              <FaWhatsapp className="w-7 h-7 text-white" />
+              <FaWhatsapp className="w-5 h-5 text-white" />
             </div>
-            <div className="flex-1">
-              <p className="text-eyebrow mb-2">WhatsApp</p>
-              <p className="text-2xl md:text-3xl text-white font-light tracking-tight mb-1">
-                +971 56 501 5800
-              </p>
-              <p className="text-sm text-[var(--text-muted)]">
-                Quick quotes, booking, and after-hours messages.
-              </p>
-            </div>
-            <span
-              className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[var(--accent-bronze)] text-xl"
-              aria-hidden="true"
-            >
-              →
-            </span>
+            <p className="text-eyebrow mb-2">WhatsApp</p>
+            <p className="text-lg md:text-xl text-white font-light leading-tight mb-1">
+              +971 56 501 5800
+            </p>
+            <p className="text-xs text-[var(--text-muted)]">
+              Quick quotes, booking, after-hours messages.
+            </p>
           </a>
+
+          {/* Live Chat — Chatwoot widget. The floating launcher lives at
+              app level (FloatingChatwootButton, desktop only). This card
+              gives the channel a discoverable surface inside the contact
+              section so visitors don't have to spot the floating button. */}
+          <button
+            type="button"
+            onClick={() => triggerChat('contact_section_live_chat')}
+            className="group text-left relative overflow-hidden rounded-2xl border border-white/10 hover:border-[var(--primary)]/50 transition-all duration-300 p-6 md:p-7"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(227,6,19,0.08) 0%, rgba(0,0,0,0) 60%), var(--surface-2)',
+            }}
+          >
+            <div
+              className="w-11 h-11 rounded-full flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
+              style={{
+                background: 'linear-gradient(145deg, #1a1a1a, #0a0a0a)',
+                border: '1px solid var(--primary)',
+                boxShadow: '0 8px 20px rgba(227,6,19,0.20)',
+              }}
+            >
+              <HiOutlineChatBubbleLeftRight className="w-5 h-5 text-[var(--primary)]" />
+            </div>
+            <p className="text-eyebrow mb-2">Live Chat</p>
+            <p className="text-lg md:text-xl text-white font-light leading-tight mb-1">
+              MBR Connect
+            </p>
+            <p className="text-xs text-[var(--text-muted)]">
+              Web chat — replies straight to our team during working hours.
+            </p>
+          </button>
 
           {/* Call */}
           <a
@@ -113,9 +141,11 @@ export default function ContactSection() {
             onClick={() => trackPhoneCall('contact_section', '8006272886')}
             className="group relative overflow-hidden rounded-2xl border border-white/10 hover:border-white/25 transition-colors duration-300 p-6 md:p-7 bg-[var(--surface-2)]"
           >
-            <FaPhone className="w-5 h-5 text-[var(--accent-bronze)] mb-5" />
+            <div className="w-11 h-11 rounded-full flex items-center justify-center mb-5 bg-black/40 border border-white/10">
+              <FaPhone className="w-4 h-4 text-[var(--accent-bronze)]" />
+            </div>
             <p className="text-eyebrow mb-2">Call</p>
-            <p className="text-lg md:text-xl text-white font-light mb-1">
+            <p className="text-lg md:text-xl text-white font-light leading-tight mb-1">
               800-MBRAuto
             </p>
             <p className="text-xs text-[var(--text-muted)]">
@@ -129,9 +159,11 @@ export default function ContactSection() {
             onClick={() => trackEmailClick('contact_section', 'info@mbrme.com')}
             className="group relative overflow-hidden rounded-2xl border border-white/10 hover:border-white/25 transition-colors duration-300 p-6 md:p-7 bg-[var(--surface-2)]"
           >
-            <FaEnvelope className="w-5 h-5 text-[var(--accent-bronze)] mb-5" />
+            <div className="w-11 h-11 rounded-full flex items-center justify-center mb-5 bg-black/40 border border-white/10">
+              <FaEnvelope className="w-4 h-4 text-[var(--accent-bronze)]" />
+            </div>
             <p className="text-eyebrow mb-2">Email</p>
-            <p className="text-lg md:text-xl text-white font-light mb-1">
+            <p className="text-lg md:text-xl text-white font-light leading-tight mb-1">
               info@mbrme.com
             </p>
             <p className="text-xs text-[var(--text-muted)]">

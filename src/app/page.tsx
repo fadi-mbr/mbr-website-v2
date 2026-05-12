@@ -9,6 +9,7 @@ import SophisticatedServices from '@/components/SophisticatedServices';
 import SectionBreak from '@/components/SectionBreak';
 import OurWorkshop from '@/components/OurWorkshop';
 import WhyMbr from '@/components/WhyMbr';
+import TeamSection from '@/components/TeamSection';
 import SophisticatedReviews from '@/components/SophisticatedReviews';
 import ContactSection from '@/components/ContactSection';
 
@@ -38,10 +39,11 @@ export default function HomePage() {
 
           <OurWorkshop />
           <WhyMbr />
+          <TeamSection />
           <SophisticatedReviews />
 
-          {/* Contact interrupt — slim full-bleed strip with the address in
-              911Porsche and a direct-to-Maps link. */}
+          {/* Contact interrupt — slim full-bleed strip with the address
+              and a direct-to-Maps link. McLaren end-of-page pattern. */}
           <SectionBreak
             image="/images/mbr_mechanic.webp"
             alt="MBR workshop exterior in Al Quoz"

@@ -82,7 +82,7 @@ async function fetchGoogleReviews(useDatabase: boolean = true): Promise<ReviewsD
         );
 
         return {
-          overallRating: dbStats.metadata.overallRating || 4.8,
+          overallRating: dbStats.metadata.overallRating || 4.9,
           totalReviews: dbStats.metadata.totalReviews || 883,
           lastUpdated: dbStats.metadata.lastUpdated,
           reviews: selectedReviews.map(sr => sr.review)

@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     template: "%s | MBR Auto Services",
   },
   applicationName: "MBR Auto Services",
-  description: "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, Leonardo exotic-car diagnostics, genuine OEM parts. 15+ years in Al Quoz Industrial 4.",
+  description: "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners; experienced with Bentley, McLaren, Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover and Jaguar. Bosch-authorised, Leonardo exotic-car diagnostics, genuine OEM parts in Al Quoz Industrial 4.",
   keywords: [
     "Ferrari service Dubai",
     "Ferrari repair Dubai",
@@ -116,7 +116,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "MBR Auto Services | Ferrari, Lamborghini & Rolls-Royce Service Dubai",
-    description: "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners. Bosch-authorised, Leonardo exotic diagnostics, 15+ years in Al Quoz Industrial 4.",
+    description: "Independent luxury and exotic-car workshop in Dubai. Trusted by Ferrari, Lamborghini and Rolls-Royce owners. Bosch-authorised, Leonardo exotic diagnostics in Al Quoz Industrial 4.",
     type: "website",
     locale: "en_US",
     siteName: "MBR Auto Services",
@@ -126,7 +126,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "MBR Auto Services | Ferrari, Lamborghini & Rolls-Royce Service Dubai",
-    description: "Independent luxury and exotic-car workshop in Dubai. Bosch-authorised, Leonardo exotic diagnostics, OEM-level tooling, 15+ years.",
+    description: "Independent luxury and exotic-car workshop in Dubai. Bosch-authorised, Leonardo exotic diagnostics, OEM-level tooling. Genuine OEM parts.",
     // Twitter image inherits from opengraph-image.tsx when card=summary_large_image.
   },
 };
