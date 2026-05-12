@@ -1,4 +1,8 @@
 /**
+ * NOT WIRED in v2.0 (2026-05-12 decision: skip Upstash).
+ * The booking flow uses stateless HMAC tokens (booking-token.ts v:2) instead.
+ * This module is preserved for future analytics or if we re-introduce KV later.
+ *
  * KV-backed rate-limit for the booking endpoints.
  *
  * Replaces the in-memory `src/app/api/booking/_lib/rate-limit.ts` for the

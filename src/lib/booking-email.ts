@@ -1,6 +1,12 @@
 /**
- * SendGrid wrapper — sends the pre-relationship "Confirm your booking" email
- * for the public booking flow.
+ * Nodemailer wrapper — sends the pre-relationship "Confirm your booking" email
+ * for the public booking flow over SMTP.
+ *
+ * Transport: ImprovMX SMTP relay (smtp.improvmx.com:587, STARTTLS).
+ * Configured at runtime via env vars:
+ *   BOOKING_SMTP_HOST, BOOKING_SMTP_PORT,
+ *   BOOKING_SMTP_USER, BOOKING_SMTP_PASSWORD,
+ *   BOOKING_FROM_EMAIL  (e.g. booking@mail.mbrme.com — DKIM-authenticated)
  *
  * Failure mode: never throws. Returns `{ ok: false, error }` so the route
  * can decide how to surface it (typically: log + return a generic 200 so
@@ -11,21 +17,28 @@
  * round-trip its base64url segments through the `href` attribute; callers
  * MUST pass an already-validated absolute URL.
  *
- * Tests use a module seam (`_setMailerForTests`) to inject a fake mailer
- * — `@sendgrid/mail` is awkward to deep-mock because its default export
- * is a singleton.
+ * Tests use a module seam (`_setMailerForTests`) to inject a fake
+ * transporter — nodemailer's `createTransport` returns a stateful object
+ * that's awkward to re-construct per test.
  */
 
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
+
+export interface SmtpConfig {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+}
 
 export interface ConfirmationEmailInput {
-  apiKey: string;
+  smtp: SmtpConfig;
   fromEmail: string;
   to: string;
   firstName: string;
   serviceName: string;
-  /** Epoch ms — formatted in Asia/Dubai locale for display. */
-  requestedAt: number;
+  /** Epoch ms or Date — formatted in Asia/Dubai locale for display. */
+  requestedAt: Date | number;
   /** Fully-qualified confirm URL with `?token=...`. */
   confirmUrl: string;
 }
@@ -36,22 +49,33 @@ export interface SendResult {
 }
 
 // ---------------------------------------------------------------------------
-// Test seam — lets unit tests inject a fake mailer without touching SendGrid.
+// Test seam — lets unit tests inject a fake transporter without touching
+// nodemailer's network layer.
 // ---------------------------------------------------------------------------
 
-export interface MailerLike {
-  setApiKey(key: string): void;
-  send(msg: Record<string, unknown>): Promise<unknown>;
+export interface TransporterLike {
+  sendMail(msg: Record<string, unknown>): Promise<unknown>;
 }
 
-let activeMailer: MailerLike = sgMail as unknown as MailerLike;
+let injectedTransporter: TransporterLike | null = null;
 
-export function _setMailerForTests(impl: MailerLike): void {
-  activeMailer = impl;
+export function _setMailerForTests(impl: TransporterLike): void {
+  injectedTransporter = impl;
 }
 
 export function _resetMailerForTests(): void {
-  activeMailer = sgMail as unknown as MailerLike;
+  injectedTransporter = null;
+}
+
+function buildTransporter(smtp: SmtpConfig): TransporterLike {
+  if (injectedTransporter) return injectedTransporter;
+  return nodemailer.createTransport({
+    host: smtp.host,
+    port: smtp.port,
+    secure: false,
+    requireTLS: true,
+    auth: { user: smtp.user, pass: smtp.password },
+  }) as unknown as TransporterLike;
 }
 
 // ---------------------------------------------------------------------------
@@ -71,7 +95,8 @@ export function escapeHtml(s: string): string {
 // Date formatting (Asia/Dubai)
 // ---------------------------------------------------------------------------
 
-export function formatDubai(epochMs: number): string {
+export function formatDubai(when: Date | number): string {
+  const epochMs = typeof when === "number" ? when : when.getTime();
   try {
     return new Intl.DateTimeFormat("en-GB", {
       timeZone: "Asia/Dubai",
@@ -104,7 +129,7 @@ const FOOTER_TEXT =
 export function renderConfirmationHtml(input: {
   firstName: string;
   serviceName: string;
-  requestedAt: number;
+  requestedAt: Date | number;
   confirmUrl: string;
 }): string {
   const safeFirstName = escapeHtml(input.firstName || "there");
@@ -133,7 +158,7 @@ export function renderConfirmationHtml(input: {
 export function renderConfirmationText(input: {
   firstName: string;
   serviceName: string;
-  requestedAt: number;
+  requestedAt: Date | number;
   confirmUrl: string;
 }): string {
   const when = formatDubai(input.requestedAt);
@@ -157,13 +182,15 @@ export function renderConfirmationText(input: {
 export async function sendConfirmationEmail(
   input: ConfirmationEmailInput,
 ): Promise<SendResult> {
-  if (!input.apiKey) return { ok: false, error: "missing_api_key" };
+  if (!input.smtp || !input.smtp.host) return { ok: false, error: "missing_smtp_host" };
+  if (!input.smtp.user) return { ok: false, error: "missing_smtp_user" };
+  if (!input.smtp.password) return { ok: false, error: "missing_smtp_password" };
   if (!input.fromEmail) return { ok: false, error: "missing_from_email" };
   if (!input.to) return { ok: false, error: "missing_to" };
 
   try {
-    activeMailer.setApiKey(input.apiKey);
-    await activeMailer.send({
+    const transporter = buildTransporter(input.smtp);
+    await transporter.sendMail({
       to: input.to,
       from: input.fromEmail,
       replyTo: input.fromEmail,

@@ -1,36 +1,83 @@
 /**
- * HMAC-SHA256 magic-link token for the public booking flow.
+ * HMAC-SHA256 magic-link token for the public booking flow (v:2).
  *
  * Wire format: `<base64url(json)>.<base64url(hmacSha256(json, secret))>`
  *
- * Payload JSON shape:
- *   { v: 1, id: string, exp: number (epoch-ms), iat: number, fp: string }
+ * Payload JSON shape (v:2):
+ *   {
+ *     v: 2,
+ *     id: string,
+ *     exp: number (epoch-ms),
+ *     iat: number,
+ *     fp: string,
+ *     intent: BookingIntent
+ *   }
  *
  * Why Web Crypto (not node:crypto)? This module runs in both Node and Edge
  * runtimes — `crypto.subtle` is the only API available in both. The signing
  * secret is passed as a 64-char hex string (32 bytes) and decoded to raw
  * bytes inside this module.
  *
+ * Storage decision (2026-05-12): the booking intent travels inside the
+ * token itself rather than being stashed in Vercel KV / Upstash. Tokens
+ * grow to roughly 1.0–1.4KB but remain comfortably under typical URL
+ * length limits, and the flow becomes stateless — no external store to
+ * provision, monitor, or pay for. The booking-kv module is preserved but
+ * unused.
+ *
  * Verify steps:
  *   1) split on `.` → header (b64url JSON) + sig (b64url HMAC)
  *   2) recompute HMAC of header bytes; constant-time compare
- *   3) assert payload.v === 1
+ *   3) assert payload.v === 2
  *   4) assert payload.exp > Date.now()
- *   5) caller validates `fp` against the KV-stored intent
+ *   5) caller uses payload.intent to write to ARC
  *
  * No dependency on `node:crypto` so this works on the Edge runtime too.
  */
 
-export interface BookingTokenPayload {
-  v: 1;
+/**
+ * The booking intent carried inside a v:2 token. Mirrors the public
+ * BookingRequest contract but trimmed to the fields a confirm-click
+ * actually needs to materialize an ARC booking. Field names stay aligned
+ * with `booking-types.ts` so the confirm route can re-use the same
+ * validator.
+ */
+export interface TokenIntent {
+  serviceId: number;
+  serviceName: string;
+  timeStartMs: number;
+  durationH: number;
+  firstName: string;
+  lastName: string;
+  /** Normalized UAE digits, no '+'. */
+  phone: string;
+  email: string;
+  vehicleYear: number;
+  vehicleMake: string;
+  vehicleModel: string;
+  plate?: string;
+  notes?: string;
+}
+
+export interface TokenPayload {
+  v: 2;
   id: string;
   exp: number;
   iat: number;
+  /** sha256(phone+email).slice(0,8) — kept for redundancy alongside intent. */
   fp: string;
+  intent: TokenIntent;
 }
 
+/**
+ * Back-compat alias. Old code (and other PRs in flight) referenced
+ * `BookingTokenPayload`; keep the symbol exported but pointing at the new
+ * shape.
+ */
+export type BookingTokenPayload = TokenPayload;
+
 export type VerifyResult =
-  | { ok: true; payload: BookingTokenPayload }
+  | { ok: true; payload: TokenPayload }
   | {
       ok: false;
       reason: "malformed" | "bad-signature" | "expired" | "bad-version";
@@ -130,9 +177,9 @@ export function generateTokenId(): string {
 
 /**
  * Stable 8-char SHA-256 hex fingerprint of `phone+email` (raw concatenation,
- * lowercased email — phone is already digits-only at this layer). Used to
- * bind a token to the intent it was issued for: a leaked token can't be
- * replayed if the intent's phone/email were swapped.
+ * lowercased email — phone is already digits-only at this layer). Useful as
+ * a redundant cross-check alongside the embedded intent so a leaked token
+ * can't trivially be replayed with a swapped phone/email.
  */
 export async function fingerprint(phone: string, email: string): Promise<string> {
   const data = utf8Encode(`${phone}${email.toLowerCase()}`);
@@ -142,16 +189,36 @@ export async function fingerprint(phone: string, email: string): Promise<string>
 
 /** Sign a payload and emit the wire-format token. */
 export async function signToken(
-  payload: BookingTokenPayload,
+  payload: TokenPayload,
   secretHex: string,
 ): Promise<string> {
-  if (payload.v !== 1) {
-    throw new Error("booking-token: only v:1 payloads are supported");
+  if (payload.v !== 2) {
+    throw new Error("booking-token: only v:2 payloads are supported");
   }
   const headerJson = JSON.stringify(payload);
   const headerBytes = utf8Encode(headerJson);
   const sigBytes = await hmacSha256(headerBytes, secretHex);
   return `${bytesToBase64Url(headerBytes)}.${bytesToBase64Url(sigBytes)}`;
+}
+
+function isIntentShape(x: unknown): x is TokenIntent {
+  if (typeof x !== "object" || x === null) return false;
+  const o = x as Record<string, unknown>;
+  return (
+    typeof o.serviceId === "number" &&
+    typeof o.serviceName === "string" &&
+    typeof o.timeStartMs === "number" &&
+    typeof o.durationH === "number" &&
+    typeof o.firstName === "string" &&
+    typeof o.lastName === "string" &&
+    typeof o.phone === "string" &&
+    typeof o.email === "string" &&
+    typeof o.vehicleYear === "number" &&
+    typeof o.vehicleMake === "string" &&
+    typeof o.vehicleModel === "string" &&
+    (o.plate === undefined || typeof o.plate === "string") &&
+    (o.notes === undefined || typeof o.notes === "string")
+  );
 }
 
 /** Verify a token. See module header for reason-code semantics. */
@@ -196,6 +263,7 @@ export async function verifyToken(
   if (
     typeof parsed !== "object" ||
     parsed === null ||
+    typeof (parsed as Record<string, unknown>).v !== "number" ||
     typeof (parsed as Record<string, unknown>).id !== "string" ||
     typeof (parsed as Record<string, unknown>).exp !== "number" ||
     typeof (parsed as Record<string, unknown>).iat !== "number" ||
@@ -203,8 +271,15 @@ export async function verifyToken(
   ) {
     return { ok: false, reason: "malformed" };
   }
-  const p = parsed as BookingTokenPayload;
-  if (p.v !== 1) return { ok: false, reason: "bad-version" };
+  const versioned = parsed as { v: number };
+  if (versioned.v !== 2) return { ok: false, reason: "bad-version" };
+
+  // v:2 must carry a valid intent object.
+  if (!isIntentShape((parsed as Record<string, unknown>).intent)) {
+    return { ok: false, reason: "malformed" };
+  }
+
+  const p = parsed as TokenPayload;
   if (p.exp <= now) return { ok: false, reason: "expired" };
 
   return { ok: true, payload: p };
