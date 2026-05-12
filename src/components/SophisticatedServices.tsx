@@ -126,7 +126,10 @@ function ServiceSlabRow({
             src={service.image}
             alt={`${service.title} — ${service.subtitle} | MBR Auto Services Dubai`}
             fill
-            sizes="(min-width: 1024px) 60vw, 100vw"
+            sizes="(min-width: 1024px) 54vw, (min-width: 768px) 90vw, 100vw"
+            // Phase C perf: first slab is above-the-fold on desktop;
+            // prioritise its decode. Subsequent slabs lazy-load.
+            priority={index === 0}
             className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
           {/* Bottom gradient for caption legibility + subtle red wash from

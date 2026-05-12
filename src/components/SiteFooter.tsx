@@ -113,13 +113,18 @@ export default function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/#reviews" className="text-[var(--text-body)] hover:text-white transition-colors">
-                  Reviews
+                <Link href="/#workshop" className="text-[var(--text-body)] hover:text-white transition-colors">
+                  Workshop
                 </Link>
               </li>
               <li>
-                <Link href="/#about" className="text-[var(--text-body)] hover:text-white transition-colors">
-                  About
+                <Link href="/#why-mbr" className="text-[var(--text-body)] hover:text-white transition-colors">
+                  Why MBR
+                </Link>
+              </li>
+              <li>
+                <Link href="/#reviews" className="text-[var(--text-body)] hover:text-white transition-colors">
+                  Reviews
                 </Link>
               </li>
               <li>

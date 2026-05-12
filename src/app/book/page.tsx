@@ -18,7 +18,7 @@ export default function BookPage() {
       <section className="section-padding">
         <div className="container-luxury max-w-4xl">
           {/* Eyebrow */}
-          <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-accent-bronze mb-5">
+          <p className="text-eyebrow mb-5">
             Book Your Service
           </p>
 

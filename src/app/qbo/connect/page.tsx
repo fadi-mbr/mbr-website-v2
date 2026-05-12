@@ -13,7 +13,7 @@ export default function QboConnectPage() {
       <div className="container-luxury max-w-4xl mx-auto px-4">
         <Link
           href="/qbo"
-          className="inline-flex items-center text-red-400 hover:text-red-300 mb-8 transition-colors"
+          className="inline-flex items-center text-link mb-8 transition-colors"
         >
           ← Back to QuickBooks Integration
         </Link>
@@ -74,7 +74,7 @@ export default function QboConnectPage() {
               You can disconnect the integration at any time directly from QuickBooks
               Online: <strong>Settings (gear) → Apps → My Apps → Disconnect</strong>. See
               the{' '}
-              <Link href="/qbo" className="text-red-400 hover:text-red-300 underline">
+              <Link href="/qbo" className="text-link">
                 QuickBooks Integration overview
               </Link>{' '}
               for details on what disconnection does on our side.
@@ -85,11 +85,11 @@ export default function QboConnectPage() {
             <h2 className="text-heading font-light text-white mb-4">Terms</h2>
             <p>
               Connecting accepts our{' '}
-              <Link href="/integrations-terms" className="text-red-400 hover:text-red-300 underline">
+              <Link href="/integrations-terms" className="text-link">
                 Integrations Terms
               </Link>{' '}
               and{' '}
-              <Link href="/privacy" className="text-red-400 hover:text-red-300 underline">
+              <Link href="/privacy" className="text-link">
                 Privacy Policy
               </Link>
               .
@@ -100,8 +100,8 @@ export default function QboConnectPage() {
             <h2 className="text-heading font-light text-white mb-4">Support</h2>
             <p>
               For help connecting, troubleshooting an authorization failure, or
-              requesting a fresh consent URL: <a href="mailto:info@mbrme.com" className="text-red-400 hover:text-red-300">info@mbrme.com</a> ·{' '}
-              <a href="tel:+971565015800" className="text-red-400 hover:text-red-300">+971 56 501 5800</a>.
+              requesting a fresh consent URL: <a href="mailto:info@mbrme.com" className="text-link">info@mbrme.com</a> ·{' '}
+              <a href="tel:+971565015800" className="text-link">+971 56 501 5800</a>.
             </p>
           </section>
         </div>

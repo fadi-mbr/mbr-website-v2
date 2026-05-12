@@ -126,14 +126,36 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Phase C: preload the hero poster — likely LCP candidate. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/images/hero-poster.jpg"
+          fetchPriority="high"
+        />
+        {/* Phase C: preload the 911Porsche brand font used above-the-fold. */}
+        <link
+          rel="preload"
+          as="font"
+          href="/fonts/911porschav3.ttf"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Structured Data for SEO */}
+        {/* Phase C: skip-to-content link for keyboard users. */}
+        <a href="#main-content" className="skip-link">Skip to content</a>
+
+        {/* Structured Data — Phase C: moved from beforeInteractive
+            (render-blocking) to afterInteractive so the parser doesn't
+            stall on JSON parsing before painting the hero. */}
         <Script
           id="auto-repair-schema"
           type="application/ld+json"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(autoRepairSchema)
           }}
@@ -141,7 +163,7 @@ export default function RootLayout({
         <Script
           id="organization-schema"
           type="application/ld+json"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationSchema)
           }}
@@ -149,7 +171,7 @@ export default function RootLayout({
         <Script
           id="aggregate-rating-schema"
           type="application/ld+json"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(aggregateRatingSchema)
           }}

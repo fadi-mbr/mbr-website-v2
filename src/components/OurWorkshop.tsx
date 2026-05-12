@@ -107,7 +107,10 @@ export default function OurWorkshop() {
                       : '(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw'
                   }
                   className="object-cover transition-transform duration-[1200ms] group-hover:scale-[1.05]"
-                  loading={i === 0 ? 'eager' : 'lazy'}
+                  // Phase C perf: `priority` (not just `loading="eager"`)
+                  // tells next/image to preload the first tile; the rest
+                  // lazy-load on intersection.
+                  priority={i === 0}
                 />
               </div>
 

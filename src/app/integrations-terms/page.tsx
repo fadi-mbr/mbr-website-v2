@@ -13,7 +13,7 @@ export default function IntegrationsTermsPage() {
       <div className="container-luxury max-w-4xl mx-auto px-4">
         <Link
           href="/"
-          className="inline-flex items-center text-red-400 hover:text-red-300 mb-8 transition-colors"
+          className="inline-flex items-center text-link mb-8 transition-colors"
         >
           ← Back to Home
         </Link>
@@ -31,7 +31,7 @@ export default function IntegrationsTermsPage() {
               These terms govern the connection between MBR Making Better Rides (&quot;MBR&quot;)
               internal operational systems and third-party platforms used to support
               accounting, reporting, and customer-experience functions. They apply
-              alongside our <Link href="/privacy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link> and our <Link href="/cookie-policy" className="text-red-400 hover:text-red-300 underline">Cookie Policy</Link>.
+              alongside our <Link href="/privacy" className="text-link">Privacy Policy</Link> and our <Link href="/cookie-policy" className="text-link">Cookie Policy</Link>.
             </p>
           </section>
 
@@ -164,7 +164,7 @@ export default function IntegrationsTermsPage() {
               <strong>Settings (gear) → Apps → My Apps → Disconnect</strong>). On
               receipt of the platform&apos;s disconnect notification, our OAuth refresh
               token and realm identifier for that integration are purged from our secret
-              store within 24 hours, in line with our <Link href="/privacy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link>.
+              store within 24 hours, in line with our <Link href="/privacy" className="text-link">Privacy Policy</Link>.
               MBR may also terminate or suspend an integration unilaterally if a security
               incident, compliance requirement, or operational need warrants it.
             </p>
@@ -189,8 +189,8 @@ export default function IntegrationsTermsPage() {
             <div className="mt-4 space-y-2">
               <p><strong>MBR Making Better Rides</strong></p>
               <p>16 8 St Al Qouz Ind. Fourth — Al Quoz, Dubai, UAE</p>
-              <p>Phone: <a href="tel:+971565015800" className="text-red-400 hover:text-red-300">+971 56 501 5800</a></p>
-              <p>Email: <a href="mailto:info@mbrme.com" className="text-red-400 hover:text-red-300">info@mbrme.com</a></p>
+              <p>Phone: <a href="tel:+971565015800" className="text-link">+971 56 501 5800</a></p>
+              <p>Email: <a href="mailto:info@mbrme.com" className="text-link">info@mbrme.com</a></p>
             </div>
           </section>
 

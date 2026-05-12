@@ -13,7 +13,7 @@ export default function CookiePolicyPage() {
       <div className="container-luxury max-w-4xl mx-auto px-4">
         <Link
           href="/"
-          className="inline-flex items-center text-red-400 hover:text-red-300 mb-8 transition-colors"
+          className="inline-flex items-center text-link mb-8 transition-colors"
         >
           ← Back to Home
         </Link>
@@ -75,7 +75,7 @@ export default function CookiePolicyPage() {
                     href="https://tools.google.com/dlpage/gaoptout" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-red-400 hover:text-red-300 underline"
+                    className="text-link"
                   >
                     Google Analytics Opt-out Browser Add-on
                   </a>
@@ -169,8 +169,8 @@ export default function CookiePolicyPage() {
             <div className="mt-4 space-y-2">
               <p><strong>MBR Making Better Rides</strong></p>
               <p>16 8 St Al Qouz Ind.fourth - Al Quoz - Dubai</p>
-              <p>Phone: <a href="tel:+971565015800" className="text-red-400 hover:text-red-300">+971 56 501 5800</a></p>
-              <p>Email: <a href="mailto:info@mbrme.com" className="text-red-400 hover:text-red-300">info@mbrme.com</a></p>
+              <p>Phone: <a href="tel:+971565015800" className="text-link">+971 56 501 5800</a></p>
+              <p>Email: <a href="mailto:info@mbrme.com" className="text-link">info@mbrme.com</a></p>
             </div>
           </section>
         </div>
