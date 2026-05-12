@@ -11,11 +11,12 @@ import {
 } from 'react-icons/fa';
 import SectionMarker from './SectionMarker';
 
+/* Three editorial stats. Tabular Fraunces numerals render as a clean
+ * 3-up row — better than a stretched 4-up with a hollow fourth slot. */
 const STATS = [
-  { value: '15+', label: 'Years' },
-  { value: '5,000+', label: 'Owners' },
-  { value: '10,000+', label: 'Services' },
-  { value: '100%', label: 'Guarantee' },
+  { value: '4.9★', label: 'Google rating' },
+  { value: '5,000+', label: 'Owners trust us' },
+  { value: '100%', label: 'Workmanship guarantee' },
 ];
 
 const CERTIFICATIONS = [
@@ -84,14 +85,14 @@ export default function WhyMbr() {
         <SectionMarker
           number="04"
           eyebrow="Why MBR"
-          headline="Fifteen years on the cars Dubai cares about."
+          headline="Independent expertise on the cars Dubai cares about."
           body="An independent workshop chosen by the owners who could go anywhere. Bosch tooling, exotic-car diagnostics, and the discipline of doing things to factory spec."
         />
 
         {/* Stat strip — 911Porsche numerals, no card wrapping. Tabular
             figures keep the column edges aligned. */}
         <motion.div
-          className="mt-20 md:mt-24 grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-6 md:gap-x-10"
+          className="mt-20 md:mt-24 grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-8 md:gap-x-12 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

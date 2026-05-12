@@ -101,7 +101,7 @@ export default function SophisticatedReviews() {
           setReviewsData(result.data);
         } else {
           setReviewsData({
-            overallRating: 4.8,
+            overallRating: 4.9,
             totalReviews: 883,
             reviews: FALLBACK_REVIEWS,
           });
@@ -109,7 +109,7 @@ export default function SophisticatedReviews() {
       } catch (error) {
         console.error('Failed to fetch reviews:', error);
         setReviewsData({
-          overallRating: 4.8,
+          overallRating: 4.9,
           totalReviews: 883,
           reviews: FALLBACK_REVIEWS,
         });
@@ -152,10 +152,10 @@ export default function SophisticatedReviews() {
 
       <div className="relative container-luxury">
         <SectionMarker
-          number="05"
+          number="06"
           eyebrow="Voices"
           headline="What owners actually say after we hand the keys back."
-          body={`4.8★ across ${(reviewsData?.totalReviews || 883).toLocaleString()} Google reviews — these six are a random snapshot.`}
+          body={`4.9★ across ${(reviewsData?.totalReviews || 883).toLocaleString()} Google reviews — these six are a random snapshot.`}
         />
 
         {/* Google rating summary — slimmer, no shimmer. */}
@@ -174,7 +174,7 @@ export default function SophisticatedReviews() {
             <div className="text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start gap-3 mb-1">
                 <span className="text-4xl md:text-5xl font-light text-white tracking-tight">
-                  {reviewsData?.overallRating || 4.8}
+                  {reviewsData?.overallRating || 4.9}
                 </span>
                 <div className="flex">
                   {[...Array(5)].map((_, i) => (

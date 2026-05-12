@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trackNavigation } from '@/lib/analytics';
-import { triggerChat } from '@/lib/chat-cta';
 
 interface NavigationProps {
   currentSection?: string;
@@ -24,6 +23,7 @@ const navigationItems = [
   { id: 'services', label: 'Services' },
   { id: 'workshop', label: 'Workshop' },
   { id: 'why-mbr', label: 'Why MBR' },
+  { id: 'team', label: 'Team' },
   { id: 'reviews', label: 'Reviews' },
   { id: 'contact', label: 'Contact' },
 ];
@@ -125,26 +125,25 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
             ))}
           </div>
 
-          {/* Persistent Enquire CTA — Phase A.
-              Always-visible primary conversion. Device-detects via
-              triggerChat() so desktop opens Chatwoot, mobile (when this
-              button renders inside the mobile menu) deep-links WhatsApp.
-              Carries the new has-shimmer modifier — one of only two
-              shimmer-eligible surfaces on the site. */}
+          {/* Persistent Enquire CTA.
+              Anchors to the Contact section so the visitor picks their
+              channel (WhatsApp, live chat, call, email, visit). The
+              floating Chatwoot launcher remains available at all times
+              for one-click chat on desktop. */}
           <motion.div
             className="hidden md:block"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5, duration: 0.4 }}
           >
-            <button
-              type="button"
-              onClick={() => triggerChat('navigation_desktop')}
-              className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small has-shimmer uppercase"
+            <Link
+              href="/#contact"
+              onClick={() => trackNavigation('contact', 'desktop_enquire')}
+              className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small has-shimmer uppercase inline-block"
               style={{ letterSpacing: '0.18em', fontSize: '0.78rem' }}
             >
               Enquire
-            </button>
+            </Link>
           </motion.div>
 
           {/* Mobile Menu Button */}
@@ -222,17 +221,17 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                   transition={{ delay: 0.3, duration: 0.2 }}
                   className="pt-4"
                 >
-              <button
-                type="button"
+              <Link
+                href="/#contact"
                 className="block w-full liquid-glass-btn liquid-glass-btn-primary text-center has-shimmer uppercase"
                 style={{ letterSpacing: '0.18em', fontSize: '0.85rem' }}
                 onClick={() => {
                   setIsOpen(false);
-                  triggerChat('navigation_mobile');
+                  trackNavigation('contact', 'mobile_enquire');
                 }}
               >
                 Enquire
-              </button>
+              </Link>
                 </motion.div>
             </div>
           </motion.div>
