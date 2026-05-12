@@ -21,6 +21,21 @@ interface Props {
   service: BookingService;
   slot: BookingSlot;
   initial: PartialDetails;
+  /**
+   * Magic-link / Chatwoot context. When set, these pre-fill the matching
+   * fields on first render. The user can still edit them — we don't lock
+   * the inputs.
+   */
+  contextPrefill?: {
+    phone?: string;
+    email?: string;
+    firstName?: string;
+  };
+  /**
+   * Chatwoot conversation ID — threaded into the POST /api/booking body so
+   * the server can notify Chatwoot after the booking lands. Not displayed.
+   */
+  conversationId?: number;
   onPersist: (partial: PartialDetails) => void;
   onSubmitStart: (req: BookingRequest) => void;
   onSuccess: (resp: BookingSuccess, req: BookingRequest) => void;
@@ -61,6 +76,8 @@ export default function StepDetails({
   service,
   slot,
   initial,
+  contextPrefill,
+  conversationId,
   onPersist,
   onSubmitStart,
   onSuccess,
@@ -68,10 +85,20 @@ export default function StepDetails({
   onSlotTaken,
   onBack,
 }: Props) {
-  const [firstName, setFirstName] = useState(initial.ownerNameFirst);
+  // Pre-fill order: persisted session value first, then magic-link context
+  // (we don't want context to clobber what the user already typed and
+  // sessionStorage'd). Empty string + context fallback covers fresh visits.
+  const [firstName, setFirstName] = useState(
+    initial.ownerNameFirst || contextPrefill?.firstName || ''
+  );
   const [lastName, setLastName] = useState(initial.ownerNameLast);
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+  // Phone is intentionally never session-persisted (see BookingWizard) so
+  // the context-prefill is the only source. Mask it through the same
+  // formatter the user sees as they type.
+  const [phone, setPhone] = useState(
+    contextPrefill?.phone ? maskUaePhoneInput(contextPrefill.phone) : ''
+  );
+  const [email, setEmail] = useState(contextPrefill?.email || '');
   const [make, setMake] = useState(initial.vehicleMake);
   const [model, setModel] = useState(initial.vehicleModel);
   const [year, setYear] = useState(initial.vehicleYear);
@@ -143,6 +170,7 @@ export default function StepDetails({
       mileage: mileage.trim() ? Number(mileage) : undefined,
       concern: concern.trim() || undefined,
       preferredLanguage: lang,
+      ...(conversationId ? { conversationId } : {}),
     };
     setSubmitting(true);
     onSubmitStart(req);

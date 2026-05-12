@@ -37,6 +37,13 @@ export interface BookingRequest {
   mileage?: number;
   concern?: string;
   preferredLanguage: Lang;
+  /**
+   * Optional Chatwoot conversation ID. Present when the booking originated
+   * from the embedded Dashboard App, or when an after-hours auto-reply
+   * link carried the conversation context through. Server uses it to post
+   * a confirmation back into the conversation thread.
+   */
+  conversationId?: number;
 }
 
 export interface BookingSuccess {
@@ -44,6 +51,8 @@ export interface BookingSuccess {
   confirmAt: number;
   serviceName: string;
   estimatedDuration: number;   // hours
+  /** True iff the booking included a conversationId AND Chatwoot was notified. */
+  chatwootNotified?: boolean;
 }
 
 export type BookingErrorCode =
