@@ -67,3 +67,27 @@ export interface BookingError {
   field?: string;
   message?: string;
 }
+
+/**
+ * Server-side booking intent — the canonical shape passed into
+ * `submitConfirmedBooking`. Originally lived in `booking-kv.ts` when we
+ * planned to persist intents via Vercel KV; the KV layer was removed in
+ * v2.0 (stateless HMAC tokens replace it), but the type stays here as the
+ * shared contract between the agent route, the confirm helper, and the
+ * ARC submission helper.
+ */
+export interface BookingIntent {
+  serviceId: number;
+  serviceName: string;
+  timeStartMs: number;
+  durationH: number;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  vehicleYear: number;
+  vehicleMake: string;
+  vehicleModel: string;
+  plate: string;
+  notes?: string;
+}

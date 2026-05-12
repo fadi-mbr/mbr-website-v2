@@ -15,7 +15,7 @@ import {
   _resetLoggerForTests,
 } from "@/lib/booking-arc-submit";
 import { ArcError } from "@/app/api/booking/_lib/arc-client";
-import type { BookingIntent } from "@/lib/booking-kv";
+import type { BookingIntent } from "@/lib/booking-types";
 import { assert, assertEqual, runSuite } from "./_harness";
 
 const INTENT: BookingIntent = {

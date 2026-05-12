@@ -12,9 +12,9 @@
  *      endpoint as a low-friction abuse cap. Hits the same IP across
  *      distinct phones (or distinct attempts before the email click).
  *
- * Good enough for v1; the KV-backed limiter (`booking-rate-limit-kv.ts`)
- * is NOT wired here. If booking abuse becomes a real problem we'd switch
- * the IP bucket to Redis so the cap survives cold-starts.
+ * Good enough for v1 — process-local, so the cap effectively resets on
+ * every cold start. If booking abuse becomes a real problem we'd back
+ * the IP bucket with Redis/KV so the cap survives cold-starts.
  */
 
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour

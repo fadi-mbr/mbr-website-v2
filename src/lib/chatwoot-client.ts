@@ -156,8 +156,8 @@ export interface ChatwootContact {
 
 /**
  * Fetch a contact by ID. Server-side only — the `api_access_token` admin
- * token must never reach the browser. Used by the embed-context route to
- * prefill the booking wizard when an advisor opens it from a Chatwoot
+ * token must never reach the browser. Used by the agent booking route to
+ * prefill the booking form when an advisor opens it from a Chatwoot
  * conversation.
  *
  * Tolerates the two response envelopes Chatwoot ships across versions:
