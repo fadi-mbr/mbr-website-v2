@@ -17,6 +17,7 @@ import kvSuite from "./kv.test";
 import emailSuite from "./email.test";
 import rateLimitKvSuite from "./rate-limit-kv.test";
 import arcSubmitSuite from "./arc-submit.test";
+import agentRouteSuite from "./agent-route.test";
 
 async function main(): Promise<void> {
   await phoneSuite();
@@ -30,6 +31,7 @@ async function main(): Promise<void> {
   await emailSuite();
   await rateLimitKvSuite();
   await arcSubmitSuite();
+  await agentRouteSuite();
   console.log("\nAll booking unit tests passed.");
 }
 
