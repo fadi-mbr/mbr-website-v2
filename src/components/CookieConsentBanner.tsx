@@ -107,7 +107,7 @@ export default function CookieConsentBanner() {
                       </p>
                       <p className="text-sm text-muted-enhanced mb-4">
                         <a
-                          href="/privacy-policy"
+                          href="/privacy"
                           className="text-red-400 hover:text-red-300 underline transition-colors"
                           target="_blank"
                           rel="noopener noreferrer"

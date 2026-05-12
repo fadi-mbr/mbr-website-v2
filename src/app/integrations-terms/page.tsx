@@ -31,7 +31,7 @@ export default function IntegrationsTermsPage() {
               These terms govern the connection between MBR Making Better Rides (&quot;MBR&quot;)
               internal operational systems and third-party platforms used to support
               accounting, reporting, and customer-experience functions. They apply
-              alongside our <Link href="/privacy-policy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link> and our <Link href="/cookie-policy" className="text-red-400 hover:text-red-300 underline">Cookie Policy</Link>.
+              alongside our <Link href="/privacy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link> and our <Link href="/cookie-policy" className="text-red-400 hover:text-red-300 underline">Cookie Policy</Link>.
             </p>
           </section>
 
@@ -164,7 +164,7 @@ export default function IntegrationsTermsPage() {
               <strong>Settings (gear) → Apps → My Apps → Disconnect</strong>). On
               receipt of the platform&apos;s disconnect notification, our OAuth refresh
               token and realm identifier for that integration are purged from our secret
-              store within 24 hours, in line with our <Link href="/privacy-policy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link>.
+              store within 24 hours, in line with our <Link href="/privacy" className="text-red-400 hover:text-red-300 underline">Privacy Policy</Link>.
               MBR may also terminate or suspend an integration unilaterally if a security
               incident, compliance requirement, or operational need warrants it.
             </p>
