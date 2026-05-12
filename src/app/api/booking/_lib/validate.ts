@@ -20,6 +20,8 @@ export interface BookingRequest {
   mileage?: number;
   concern?: string;
   preferredLanguage: "en" | "ar";
+  /** Optional Chatwoot conversation ID (positive integer). */
+  conversationId?: number;
 }
 
 export interface ValidationError {
@@ -163,6 +165,15 @@ export function validateBookingRequest(
     return err("preferredLanguage", "preferredLanguage must be 'en' or 'ar'");
   }
 
+  // Optional conversationId — Chatwoot conversation this booking is linked to.
+  // Accept positive integer; silently ignore anything else (we'd rather not
+  // hard-fail a booking because a wonky embed pushed garbage in here).
+  let conversationId: number | undefined;
+  const cid = raw["conversationId"];
+  if (typeof cid === "number" && Number.isFinite(cid) && Number.isInteger(cid) && cid > 0) {
+    conversationId = cid;
+  }
+
   return {
     ownerEmail,
     ownerNameFirst,
@@ -178,5 +189,6 @@ export function validateBookingRequest(
     mileage: mileage as number | undefined,
     concern: concern as string | undefined,
     preferredLanguage: lang,
+    conversationId,
   };
 }

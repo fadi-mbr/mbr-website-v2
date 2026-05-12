@@ -29,6 +29,7 @@ import {
 import { validateBookingRequest } from "./_lib/validate";
 import { checkRateLimit, recordBooking } from "./_lib/rate-limit";
 import { logBooking } from "./_lib/log";
+import { notifyChatwoot } from "./notify-chatwoot/route";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -229,6 +230,31 @@ export async function POST(req: Request): Promise<NextResponse> {
     status: 200,
   });
 
+  // ----- 7a. Best-effort Chatwoot notification
+  // When the request carried a conversationId (booking originated from the
+  // embedded Dashboard App, or from a magic-link auto-reply that passed it
+  // through), post a confirmation message back into the conversation. NEVER
+  // let this affect the response — booking already succeeded.
+  let chatwootNotified = false;
+  if (parsed.conversationId) {
+    try {
+      const res = await notifyChatwoot({
+        conversationId: parsed.conversationId,
+        serviceName: service.title,
+        slotStartIso: confirmAt,
+        durationH: service.duration_h,
+        customerFirstName: parsed.ownerNameFirst,
+      });
+      chatwootNotified = res.chatwoot_notified;
+    } catch (e) {
+      logBooking({
+        event: "chatwoot.notify_threw",
+        status: 200,
+        reason: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
+
   return jsonResponse(
     {
       ok: true,
@@ -239,6 +265,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         parsed.preferredLanguage === "ar"
           ? "تم استلام طلب الحجز. سنتواصل معك لتأكيد الموعد."
           : "Booking received. We'll contact you to confirm the appointment.",
+      chatwootNotified,
     },
     200
   );
