@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:booking": "npx --yes tsx src/app/api/booking/__tests__/run-all.ts"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.7",
