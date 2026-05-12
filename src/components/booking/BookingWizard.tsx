@@ -9,6 +9,7 @@ import type {
   BookingSlot,
   BookingSuccess,
 } from '@/lib/booking-types';
+import { notifyParentBooked, type EmbedContext } from '@/lib/embed-mode';
 import Stepper from './Stepper';
 import StepService from './StepService';
 import StepDate from './StepDate';
@@ -129,7 +130,22 @@ function clearSession(): void {
   } catch { /* noop */ }
 }
 
-export default function BookingWizard() {
+interface BookingWizardProps {
+  /** True when rendered inside the Chatwoot Dashboard App iframe. */
+  embedMode?: boolean;
+  /**
+   * Pre-fill context — phone/name/email come from URL params or the parent
+   * frame's `chatwoot:context` postMessage. `conversationId` is threaded into
+   * the booking request so the server can post a confirmation back into the
+   * conversation thread.
+   */
+  initialContext?: EmbedContext;
+}
+
+export default function BookingWizard({
+  embedMode = false,
+  initialContext,
+}: BookingWizardProps = {}) {
   const [lang, setLang] = useState<Lang>('en');
   const [state, dispatch] = useReducer(reducer, initial, (i) => {
     const persisted = loadSession();
@@ -198,6 +214,16 @@ export default function BookingWizard() {
       duration_h: response.estimatedDuration,
     });
     clearSession();
+    // Notify parent frame (Chatwoot Dashboard App). No-op when not embedded.
+    notifyParentBooked({
+      serviceName: response.serviceName,
+      confirmAt: new Date(request.timeStartMs).toISOString(),
+      durationH: typeof response.estimatedDuration === 'number'
+        ? response.estimatedDuration
+        : Number(response.estimatedDuration) || 0,
+      customerFirstName: request.ownerNameFirst,
+      conversationId: initialContext?.conversationId,
+    });
   };
 
   const handleSlotTaken = () => {
@@ -221,6 +247,7 @@ export default function BookingWizard() {
       lang={containerLang}
       dir={containerDir}
       data-lang={containerLang}
+      data-embed={embedMode ? '1' : undefined}
     >
       <div className="booking-wizard__head">
         <Stepper current={state.step} lang={lang} />
@@ -265,6 +292,12 @@ export default function BookingWizard() {
           service={state.service}
           slot={state.slot}
           initial={state.details}
+          contextPrefill={{
+            phone: initialContext?.phone,
+            email: initialContext?.email,
+            firstName: initialContext?.name,
+          }}
+          conversationId={initialContext?.conversationId}
           onPersist={(d) => dispatch({ type: 'set_details', details: d })}
           onSubmitStart={(req) =>
             trackEvent('booking_submitted', { service_id: req.serviceId })

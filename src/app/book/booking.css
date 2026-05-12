@@ -618,3 +618,55 @@
 .booking-wizard [role='radio'] {
   min-height: 44px;
 }
+
+/* ============================================================
+ * Embed mode — wizard rendered inside a Chatwoot Dashboard App
+ * iframe (registered at connect.mbrme.com → "MBR Booking").
+ *
+ * Goals:
+ *  - Hide all page chrome (handled at the page level — this is just
+ *    the layout strip).
+ *  - Transparent body so the iframe host's bg shows through.
+ *  - Compact padding, single column at every breakpoint.
+ *  - Wizard becomes the entire viewport.
+ * ============================================================ */
+.booking-embed-root {
+  min-height: 100vh;
+  background: transparent;
+  color: var(--text-body, #d8d8d8);
+  padding: 1rem 0.875rem;
+  /* The wizard itself draws its own backdrop via .glass-card — but in
+     embed mode the parent iframe sets the visual frame, so we keep this
+     wrapper structural-only. */
+}
+
+@media (min-width: 640px) {
+  .booking-embed-root {
+    padding: 1.25rem 1rem;
+  }
+}
+
+.booking-embed-root .booking-wizard {
+  gap: 1.25rem;
+}
+
+.booking-embed-root .booking-wizard__head {
+  gap: 0.5rem;
+}
+
+/* Knock back the radio/option grids to single-column in embed — the
+   iframe is typically narrower than the full /book page. */
+@media (max-width: 640px) {
+  .booking-embed-root .booking-form__row,
+  .booking-embed-root .booking-form__row--triplet {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Embed mode runs inside an iframe — the global floating WhatsApp button
+ * provided by the root layout is redundant (the customer is already in a
+ * chat thread with us in Chatwoot) and steals tap targets. Hide it.
+ * Selector relies on the WA button's aria-label, which is stable. */
+body:has(main.booking-embed-root) a[aria-label="Chat with us on WhatsApp"] {
+  display: none !important;
+}

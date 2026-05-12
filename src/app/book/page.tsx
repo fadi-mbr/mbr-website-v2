@@ -8,13 +8,19 @@ import './booking.css';
 /**
  * /book — multi-step booking wizard.
  *
- * The page itself is server-rendered (good for LCP + SEO chrome). The
- * wizard is a client component, lazy-loaded from BookingWizardClient —
- * the wizard bundle is fetched only when this page is visited.
+ * Modes:
+ *   - Default (no `?embed`): full page with eyebrow, headline, WhatsApp/Call
+ *     fallback CTAs, and a working-hours footnote.
+ *   - Embed (`?embed=1`):    just the wizard, transparent body bg, no chrome.
+ *     This is what loads inside the Chatwoot Dashboard App iframe at
+ *     connect.mbrme.com → "MBR Booking".
  *
- * The WhatsApp + Call CTAs at the top are intentional fallback paths —
- * keep them visible so users who don't want to fill the form can reach
- * us instantly.
+ * Magic-link entry: `/book?phone=971501234567&name=Faisal&conversation_id=42`
+ * pre-fills the Details step (read client-side by the wizard). Validation
+ * still runs server-side, so the worst a tampered link can do is fill out
+ * a booking on the named customer's behalf — which the rate-limiter caps
+ * at 1/hour and the customer sees confirmation of anyway. See
+ * src/lib/embed-mode.ts for the rationale.
  */
 
 export const metadata: Metadata = {
@@ -24,9 +30,38 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://mbrme.com/book',
   },
+  robots: {
+    // Embed-mode views shouldn't be indexed, but the canonical page should be.
+    // Keep `index, follow` on the metadata level; the embed view is reached
+    // via query string so search engines won't surface it directly.
+    index: true,
+    follow: true,
+  },
 };
 
-export default function BookPage() {
+interface PageProps {
+  // Next.js 15: searchParams is a Promise. We resolve it before checking flags.
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+function readEmbedFlag(sp: Record<string, string | string[] | undefined>): boolean {
+  const v = sp.embed;
+  const s = Array.isArray(v) ? v[0] : v;
+  return s === '1' || s === 'true';
+}
+
+export default async function BookPage({ searchParams }: PageProps) {
+  const sp = await searchParams;
+  const embed = readEmbedFlag(sp);
+
+  if (embed) {
+    return (
+      <main className="booking-embed-root">
+        <BookingWizardClient />
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-black text-white">
       <section className="section-padding">
