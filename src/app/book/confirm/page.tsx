@@ -183,6 +183,9 @@ export default async function ConfirmPage({ searchParams }: PageProps) {
     if (result.code === 'SLOT_TAKEN') {
       heading = 'That slot was just booked';
       body = 'Another booking landed on that time before yours. Please pick a new slot.';
+    } else if (result.code === 'SLOT_UNAVAILABLE') {
+      heading = "That time isn't actually open";
+      body = result.message;
     } else if (result.code === 'EXISTING_CUSTOMER') {
       heading = "We need to attach this to your existing record";
       body = result.message;
