@@ -54,16 +54,34 @@ export default function FloatingChatwootButton() {
     window.addEventListener('chatwoot:ready', onReady);
     window.addEventListener('chatwoot:on-unread-message-count-changed', onUnread);
 
+    // Race fallback: on a warm cache the SDK can finish booting and fire
+    // `chatwoot:ready` before the listener above is attached. Poll briefly
+    // for $chatwoot.hasLoaded so the button still appears.
+    let attempts = 0;
+    const poll = window.setInterval(() => {
+      attempts += 1;
+      if (window.$chatwoot?.hasLoaded || window.$chatwoot?.toggle) {
+        setReady(true);
+        window.clearInterval(poll);
+        return;
+      }
+      if (attempts >= 40) {
+        // ~10s — give up; widget genuinely failed to load (CSP, ad-block).
+        window.clearInterval(poll);
+      }
+    }, 250);
+
     return () => {
       window.removeEventListener('chatwoot:ready', onReady);
       window.removeEventListener('chatwoot:on-unread-message-count-changed', onUnread);
+      window.clearInterval(poll);
     };
   }, []);
 
   const handleClick = () => {
-    if (window.$chatwoot && ready) {
-      window.$chatwoot.toggle('open');
-    }
+    // SDK queues calls internally — safe to toggle as soon as $chatwoot
+    // is present, even before `chatwoot:ready` has fully fired.
+    window.$chatwoot?.toggle?.('open');
   };
 
   return (

@@ -88,7 +88,7 @@ export default function PremiumBrandsCarousel() {
                 transition={{ duration: 0.4, delay: (index % luxuryBrands.length) * 0.03 }}
                 viewport={{ once: true }}
               >
-                <div className="w-32 h-20 md:w-36 md:h-24 flex items-center justify-center p-4 rounded-xl bg-white border border-white/10 shadow-sm transition-all duration-300 group-hover:shadow-[0_0_0_1px_var(--accent-bronze)] group-hover:-translate-y-0.5">
+                <div className="w-32 h-20 md:w-36 md:h-24 flex items-center justify-center p-4 rounded-xl bg-white border border-white/10 shadow-sm transition-all duration-300 group-hover:shadow-[0_0_0_2px_var(--primary),0_8px_24px_rgba(227,6,19,0.25)] group-hover:-translate-y-0.5">
                   <BrandLogo brand={brand} />
                 </div>
               </motion.div>

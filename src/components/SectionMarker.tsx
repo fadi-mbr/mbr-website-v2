@@ -70,13 +70,14 @@ export default function SectionMarker({
       {/* Eyebrow */}
       <div className="text-eyebrow mb-5">{eyebrow}</div>
 
-      {/* Optional bronze hairline */}
+      {/* Optional bronze→red→bronze hairline. The red centre is the
+          brand-anchor moment in every section header. */}
       {!noDivider && (
         <div
-          className={`h-px mb-8 ${align === 'center' ? 'w-12' : 'w-16'}`}
+          className={`h-px mb-8 ${align === 'center' ? 'w-16' : 'w-20'}`}
           style={{
             background:
-              'linear-gradient(90deg, transparent, var(--accent-bronze), transparent)',
+              'linear-gradient(90deg, transparent 0%, var(--accent-bronze) 30%, var(--primary) 50%, var(--accent-bronze) 70%, transparent 100%)',
           }}
           aria-hidden="true"
         />

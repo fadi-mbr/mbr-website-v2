@@ -114,10 +114,10 @@ export default function WhyMbr() {
             <div key={stat.label} className="text-center motion-calm">
               <div className="text-numeric mb-3">{stat.value}</div>
               <div
-                className="block h-px w-10 mx-auto mb-3"
+                className="block h-px w-12 mx-auto mb-3"
                 style={{
                   background:
-                    'linear-gradient(90deg, transparent, var(--accent-bronze), transparent)',
+                    'linear-gradient(90deg, transparent, var(--accent-bronze) 35%, var(--primary) 50%, var(--accent-bronze) 65%, transparent)',
                 }}
                 aria-hidden="true"
               />
