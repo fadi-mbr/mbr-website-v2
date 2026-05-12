@@ -16,9 +16,8 @@
  *   4. Token expiry — 30 min, signed with HMAC-SHA256. A booking intent
  *      that doesn't get confirmed within 30 minutes simply dies.
  *
- * No KV. The intent is embedded inside the token (booking-token.ts v:2).
- * The `booking-rate-limit-kv.ts` module exists but is NOT used here —
- * if abuse becomes real we'd graduate the IP bucket to KV.
+ * No KV. The intent is embedded inside the token (booking-token.ts v:2);
+ * if abuse becomes real we'd graduate the IP bucket to Redis/KV.
  *
  * The response is deliberately generic — we never reveal whether the
  * email exists, whether the phone is throttled, whether validation

@@ -9,13 +9,9 @@
 import phoneSuite from "./phone.test";
 import validateSuite from "./validate.test";
 import rateLimitSuite from "./rate-limit.test";
-import embedModeSuite from "./embed-mode.test";
 import chatwootSuite from "./chatwoot.test";
-import embedContextSuite from "./embed-context.test";
 import tokenSuite from "./token.test";
-import kvSuite from "./kv.test";
 import emailSuite from "./email.test";
-import rateLimitKvSuite from "./rate-limit-kv.test";
 import arcSubmitSuite from "./arc-submit.test";
 import agentRouteSuite from "./agent-route.test";
 import requestRouteSuite from "./request-route.test";
@@ -25,13 +21,9 @@ async function main(): Promise<void> {
   await phoneSuite();
   await validateSuite();
   await rateLimitSuite();
-  await embedModeSuite();
   await chatwootSuite();
-  await embedContextSuite();
   await tokenSuite();
-  await kvSuite();
   await emailSuite();
-  await rateLimitKvSuite();
   await arcSubmitSuite();
   await agentRouteSuite();
   await requestRouteSuite();

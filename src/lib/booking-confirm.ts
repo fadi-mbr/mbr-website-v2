@@ -19,7 +19,7 @@
  */
 
 import { verifyToken, type TokenIntent } from "./booking-token";
-import type { BookingIntent } from "./booking-kv";
+import type { BookingIntent } from "./booking-types";
 import { submitConfirmedBooking, type SubmitResult } from "./booking-arc-submit";
 
 export type ConfirmResult =

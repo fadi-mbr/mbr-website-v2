@@ -22,8 +22,7 @@
  * token itself rather than being stashed in Vercel KV / Upstash. Tokens
  * grow to roughly 1.0–1.4KB but remain comfortably under typical URL
  * length limits, and the flow becomes stateless — no external store to
- * provision, monitor, or pay for. The booking-kv module is preserved but
- * unused.
+ * provision, monitor, or pay for.
  *
  * Verify steps:
  *   1) split on `.` → header (b64url JSON) + sig (b64url HMAC)

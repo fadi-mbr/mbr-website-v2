@@ -7,7 +7,7 @@
  * emails the customer; the form's success state tells them to check their
  * inbox.
  *
- * Robots: noindex until PR E cuts over (decision: launch-day flip).
+ * Robots: indexable (flipped to public in PR E, 2026-05-12).
  */
 
 import type { Metadata } from 'next';
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://mbrme.com/book',
   },
-  robots: { index: false, follow: false },
+  robots: { index: true, follow: true },
 };
 
 export const dynamic = 'force-dynamic';

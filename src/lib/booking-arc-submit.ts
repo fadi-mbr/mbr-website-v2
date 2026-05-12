@@ -1,11 +1,10 @@
 /**
  * Shared "build BookingBody + submit to ARC + (optionally) notify Chatwoot"
- * helper, extracted from the old `/api/booking/route.ts` and
- * `/api/booking/notify-chatwoot/route.ts`.
+ * helper.
  *
  * Used by:
- *   - `/api/booking/agent`  (PR C, future) — direct agent-initiated submit
- *   - `/api/booking/confirm` (PR D, future) — magic-link landing
+ *   - `/api/booking/agent`  — direct agent-initiated submit (PR C)
+ *   - `/api/booking/confirm` — magic-link landing (PR D)
  *
  * Failure modes return discriminated `{ ok: false, code, message }` so the
  * route can map straight to JSON without a try/catch ladder.
@@ -17,7 +16,7 @@
  * helpers below.
  */
 
-import type { BookingIntent } from "./booking-kv";
+import type { BookingIntent } from "./booking-types";
 import {
   ArcError,
   fetchServices as defaultFetchServices,

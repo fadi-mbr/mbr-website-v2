@@ -38,7 +38,7 @@ import {
 } from '../_lib/rate-limit';
 import { logBooking } from '../_lib/log';
 import { submitConfirmedBooking } from '@/lib/booking-arc-submit';
-import type { BookingIntent } from '@/lib/booking-kv';
+import type { BookingIntent } from '@/lib/booking-types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
