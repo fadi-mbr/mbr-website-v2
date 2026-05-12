@@ -140,8 +140,8 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
             <button
               type="button"
               onClick={() => triggerChat('navigation_desktop')}
-              className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small has-shimmer font-marque"
-              style={{ letterSpacing: '0.2em' }}
+              className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small has-shimmer uppercase"
+              style={{ letterSpacing: '0.18em', fontSize: '0.78rem' }}
             >
               Enquire
             </button>
@@ -224,8 +224,8 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                 >
               <button
                 type="button"
-                className="block w-full liquid-glass-btn liquid-glass-btn-primary text-center has-shimmer font-marque"
-                style={{ letterSpacing: '0.2em' }}
+                className="block w-full liquid-glass-btn liquid-glass-btn-primary text-center has-shimmer uppercase"
+                style={{ letterSpacing: '0.18em', fontSize: '0.85rem' }}
                 onClick={() => {
                   setIsOpen(false);
                   triggerChat('navigation_mobile');

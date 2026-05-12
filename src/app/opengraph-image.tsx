@@ -1,6 +1,4 @@
 import { ImageResponse } from 'next/og';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 
 export const alt =
   'MBR Auto Services. Independent luxury and exotic-car workshop in Dubai.';
@@ -8,26 +6,72 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 /**
- * Dynamic 1200×630 social preview. The MBR wordmark and credential
- * strip render in the 911Porsche brand-voice font (embedded from
- * /public/fonts at request time). Tagline stays default sans for
- * legibility at thumbnail sizes.
+ * Dynamic 1200×630 social preview.
+ *
+ * Wordmark, tagline and credentials render in Fraunces serif (editorial
+ * brand voice). The previous 911Porsche stencil face was retired — it
+ * read as racing-game HUD when projected to a social preview thumbnail.
+ *
+ * Fraunces is fetched live from Google Fonts at request time and
+ * embedded into the ImageResponse, so the page itself doesn't have to
+ * ship the font for the OG endpoint to render correctly.
  */
 export default async function OpenGraphImage() {
-  let porscheFont: ArrayBuffer | null = null;
+  // Fetch Fraunces (light + regular weights, latin subset) from Google
+  // Fonts and embed into the response. Fail-soft to the system serif
+  // fallback if the fetch fails for any reason.
+  let fraunces300: ArrayBuffer | null = null;
+  let fraunces400: ArrayBuffer | null = null;
   try {
-    const buf = await readFile(
-      join(process.cwd(), 'public', 'fonts', '911porschav3.ttf'),
+    const cssRes = await fetch(
+      'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&display=swap',
+      {
+        headers: {
+          // Trick Google into serving WOFF/TTF instead of WOFF2 so the
+          // raw ttf URL is in the CSS response.
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/600 Safari/600',
+        },
+      },
     );
-    porscheFont = buf.buffer.slice(
-      buf.byteOffset,
-      buf.byteOffset + buf.byteLength,
-    ) as ArrayBuffer;
+    const css = await cssRes.text();
+    const ttfUrls = [...css.matchAll(/url\((https:\/\/[^)]+\.ttf)\)/g)].map(
+      (m) => m[1],
+    );
+    if (ttfUrls.length >= 1) {
+      fraunces300 = await (await fetch(ttfUrls[0])).arrayBuffer();
+    }
+    if (ttfUrls.length >= 2) {
+      fraunces400 = await (await fetch(ttfUrls[1])).arrayBuffer();
+    }
   } catch {
-    porscheFont = null;
+    /* fall through to system fallback */
   }
 
-  const brandFont = porscheFont ? '911Porsche' : 'sans-serif';
+  const brandFont = fraunces400 || fraunces300 ? 'Fraunces' : 'Georgia, serif';
+
+  const customFonts = [
+    ...(fraunces300
+      ? [
+          {
+            name: 'Fraunces' as const,
+            data: fraunces300,
+            style: 'normal' as const,
+            weight: 300 as const,
+          },
+        ]
+      : []),
+    ...(fraunces400
+      ? [
+          {
+            name: 'Fraunces' as const,
+            data: fraunces400,
+            style: 'normal' as const,
+            weight: 400 as const,
+          },
+        ]
+      : []),
+  ];
 
   return new ImageResponse(
     (
@@ -60,13 +104,14 @@ export default async function OpenGraphImage() {
           }}
         />
 
-        {/* Wordmark — 911Porsche */}
+        {/* Wordmark — Fraunces serif */}
         <div
           style={{
             fontFamily: brandFont,
-            fontSize: 200,
-            letterSpacing: 8,
-            lineHeight: 1,
+            fontSize: 216,
+            fontWeight: 300,
+            letterSpacing: -6,
+            lineHeight: 0.95,
             display: 'flex',
             color: 'white',
           }}
@@ -74,15 +119,16 @@ export default async function OpenGraphImage() {
           MBR
         </div>
 
-        {/* Sub-wordmark — bronze accent in 911Porsche */}
+        {/* Sub-wordmark — small caps Geist/sans bronze */}
         <div
           style={{
-            fontFamily: brandFont,
-            fontSize: 28,
-            letterSpacing: 14,
+            fontFamily: 'sans-serif',
+            fontSize: 22,
+            letterSpacing: 12,
             textTransform: 'uppercase',
             color: '#A57842',
-            marginTop: 16,
+            marginTop: 18,
+            fontWeight: 500,
           }}
         >
           Making Better Rides
@@ -99,28 +145,30 @@ export default async function OpenGraphImage() {
           }}
         />
 
-        {/* Tagline */}
+        {/* Tagline — Fraunces serif, lowercase for editorial pull */}
         <div
           style={{
-            fontSize: 40,
+            fontFamily: brandFont,
+            fontSize: 44,
             fontWeight: 300,
             color: '#e5e5e5',
             textAlign: 'center',
             maxWidth: 920,
-            lineHeight: 1.25,
-            letterSpacing: -0.5,
+            lineHeight: 1.2,
+            letterSpacing: -0.8,
           }}
         >
           Independent Luxury &amp; Exotic-Car Workshop
         </div>
 
-        {/* Location */}
+        {/* Location — small caps sans */}
         <div
           style={{
-            fontFamily: brandFont,
-            fontSize: 20,
+            fontFamily: 'sans-serif',
+            fontSize: 18,
+            fontWeight: 500,
             color: '#a1a1aa',
-            marginTop: 22,
+            marginTop: 24,
             letterSpacing: 4,
             textTransform: 'uppercase',
           }}
@@ -128,7 +176,7 @@ export default async function OpenGraphImage() {
           Al Quoz Industrial 4 · Dubai · UAE
         </div>
 
-        {/* Credentials strip — 911Porsche */}
+        {/* Credentials strip — sans uppercase tracked */}
         <div
           style={{
             position: 'absolute',
@@ -138,8 +186,9 @@ export default async function OpenGraphImage() {
             display: 'flex',
             justifyContent: 'center',
             gap: 40,
-            fontFamily: brandFont,
-            fontSize: 20,
+            fontFamily: 'sans-serif',
+            fontSize: 18,
+            fontWeight: 500,
             color: '#d4d4d8',
             letterSpacing: 4,
             textTransform: 'uppercase',
@@ -155,16 +204,11 @@ export default async function OpenGraphImage() {
     ),
     {
       ...size,
-      fonts: porscheFont
-        ? [
-            {
-              name: '911Porsche',
-              data: porscheFont,
-              style: 'normal',
-              weight: 400,
-            },
-          ]
-        : undefined,
+      // `fonts` MUST contain at least one entry, or ImageResponse refuses
+      // to lay out. Omit the key entirely when the Google Fonts fetch
+      // failed at build time — next/og then falls back to its bundled
+      // sans, which still produces a valid (less branded) preview.
+      ...(customFonts.length > 0 ? { fonts: customFonts } : {}),
     },
   );
 }

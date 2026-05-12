@@ -149,9 +149,11 @@ function ServiceSlabRow({
             </div>
           </div>
 
-          {/* Service number watermark (uses 911Porsche) */}
-          <div className="absolute bottom-6 right-7 text-marker text-white/30 select-none">
-            0{index + 1}
+          {/* Service number watermark — Fraunces serif numeral, oversized,
+              subtle. Renders like a chapter mark on a photo, not a stamped
+              chassis number. */}
+          <div className="absolute bottom-4 right-6 font-display text-white/25 select-none text-5xl md:text-6xl font-light leading-none">
+            {String(index + 1).padStart(2, '0')}
           </div>
         </div>
       </div>
@@ -167,11 +169,11 @@ function ServiceSlabRow({
           {service.tiers.join(' · ')}
         </p>
 
-        {/* Title + subtitle */}
-        <h3 className="text-3xl md:text-4xl font-light text-white leading-tight tracking-tight mb-3">
+        {/* Title (serif) + subtitle (sans, sub-deck) */}
+        <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-light text-white leading-[1.1] tracking-[-0.02em] mb-3">
           {service.title}
         </h3>
-        <p className="font-marque text-xs md:text-sm text-[var(--accent-bronze)] mb-5 tracking-[0.25em]">
+        <p className="text-xs md:text-sm uppercase text-[var(--accent-bronze)] mb-5 tracking-[0.2em] font-medium">
           {service.subtitle}
         </p>
 

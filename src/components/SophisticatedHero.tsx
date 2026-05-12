@@ -278,9 +278,10 @@ export default function SophisticatedHero({
               </Link>
             </div>
 
-            {/* Credentials ticker — slow 60s horizontal scroll, 911Porsche
-                lettering, fades at edges. Soft brand-voice signal without
-                competing with the main copy above. */}
+            {/* Credentials ticker — slow 60s horizontal scroll, uppercase
+                Geist sans (via .text-eyebrow), bronze dot separators, fades
+                at edges. Soft brand-voice signal without competing with the
+                main copy above. */}
             <div className="relative overflow-hidden mb-12 -mx-6 md:mx-0">
               <div
                 className="pointer-events-none absolute inset-y-0 left-0 w-12 md:w-24 z-10"
@@ -362,58 +363,10 @@ export default function SophisticatedHero({
             </motion.a>
           </motion.div>
 
-          {/* Key Highlights Grid */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-            viewport={{ once: true }}
-          >
-            <div className="text-center group cursor-pointer">
-              <div className="glass-card has-shimmer p-8 hover:glow-red transition-all duration-300">
-                <div className="text-4xl font-light gradient-text-vibrant mb-4">15+</div>
-                <div className="text-lg text-luxury-silver mb-2">Years</div>
-                <div className="text-sm text-muted-enhanced">Excellence in Dubai</div>
-              </div>
-            </div>
-
-            <div className="text-center group cursor-pointer">
-              <div className="glass-card has-shimmer p-8 hover:glow-red transition-all duration-300">
-                <div className="text-4xl font-light gradient-text-vibrant mb-4">5000+</div>
-                <div className="text-lg text-luxury-silver mb-2">Customers</div>
-                <div className="text-sm text-muted-enhanced">Trust Our Service</div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Bosch Partnership Highlight */}
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <div className="inline-flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 glass-card-premium p-6 md:p-8">
-              <Image
-                src="/images/Bosch_Logo24.webp"
-                alt="Bosch Authorized Service Partner - Certified Premium Car Service Dubai, UAE | MBR Auto Services"
-                width={120}
-                height={64}
-                className="h-12 md:h-16 w-auto opacity-80"
-              />
-              <div className="text-center md:text-left">
-                <h3 className="text-lg md:text-xl font-light text-white mb-2">
-                  Bosch Authorized Service Center
-                </h3>
-                <p className="text-sm md:text-base text-muted-enhanced">
-                  Certified quality and genuine parts guarantee
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
+          {/* Wave 2/B note: the old hero stat grid (15+ / 5,000+) and the
+              Bosch Partnership highlight block both moved into the dedicated
+              WhyMbr section. We don't repeat them here — keeps the hero
+              breathing and pushes the visitor into the section scroll. */}
         </div>
       </section>
     </div>

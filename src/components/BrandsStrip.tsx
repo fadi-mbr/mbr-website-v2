@@ -62,13 +62,13 @@ export default function BrandsStrip() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.55, delay: 0.05 + i * 0.06, ease: 'easeOut' }}
               >
-                <div className="relative flex h-14 md:h-16 items-center justify-center">
+                <div className="relative flex h-20 md:h-24 items-center justify-center">
                   <Image
                     src={mark.src}
                     alt={mark.name}
-                    width={140}
-                    height={64}
-                    className="h-12 md:h-14 w-auto object-contain transition-all duration-500 group-hover:scale-[1.06]"
+                    width={180}
+                    height={96}
+                    className="h-16 md:h-20 w-auto object-contain transition-all duration-500 group-hover:scale-[1.06]"
                     priority={i < 3}
                   />
                 </div>
