@@ -16,6 +16,8 @@ import arcSubmitSuite from "./arc-submit.test";
 import agentRouteSuite from "./agent-route.test";
 import requestRouteSuite from "./request-route.test";
 import confirmHelperSuite from "./confirm-helper.test";
+import availabilitySuite from "./availability.test";
+import slotsRouteSuite from "./slots-route.test";
 
 async function main(): Promise<void> {
   await phoneSuite();
@@ -28,6 +30,8 @@ async function main(): Promise<void> {
   await agentRouteSuite();
   await requestRouteSuite();
   await confirmHelperSuite();
+  await availabilitySuite();
+  await slotsRouteSuite();
   console.log("\nAll booking unit tests passed.");
 }
 
