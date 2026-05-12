@@ -180,7 +180,7 @@ body {
      Pairs with the Fraunces serif headlines for the editorial contrast. */
   font-family: var(--font-geist-sans), 'Inter', -apple-system, sans-serif;
   font-feature-settings: "tnum" 1, "kern" 1;
-  font-size: clamp(0.7rem, 0.9vw, 0.8rem);
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
   font-weight: 500;
   letter-spacing: 0.25em;
   text-transform: uppercase;
@@ -192,7 +192,7 @@ body {
      Looks like the chapter mark in a magazine, not a HUD readout. */
   font-family: var(--font-fraunces), 'Iowan Old Style', Georgia, serif;
   font-feature-settings: "tnum" 1, "lnum" 1, "kern" 1;
-  font-size: clamp(0.85rem, 1.05vw, 1rem);
+  font-size: clamp(1.15rem, 1.6vw, 1.45rem);
   font-weight: 400;
   letter-spacing: 0.05em;
   color: var(--text-muted);

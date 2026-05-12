@@ -64,7 +64,7 @@ function getStaticTeamMembers(): TeamMember[] {
       name: "Basel Kelzia",
       position: "Owner & Founder",
       image: "/images/team-photos/Basel.webp",
-      description: "Founded MBR to bring dealership-grade exotic-car service to Dubai without the dealership lock-in. On the workshop floor most days — every Ferrari, Lamborghini and Rolls-Royce that comes through passes a personal check.",
+      description: "Founded MBR to bring dealership-grade exotic-car service to Dubai without the dealership lock-in. On the workshop floor most days. Every Ferrari, Lamborghini and Rolls-Royce that comes through passes a personal check.",
       socialType: "instagram",
       socialUrl: "https://www.instagram.com/dr.abu.adam/"
     },
@@ -72,7 +72,7 @@ function getStaticTeamMembers(): TeamMember[] {
       name: "Michael Touma",
       position: "Workshop Manager",
       image: "/images/team-photos/Michael.webp",
-      description: "Runs the bays day-to-day — the schedule, the parts orders, the final QC before keys go back. The constant face every returning owner deals with from intake to handover.",
+      description: "Runs the bays day-to-day. The schedule, the parts orders, the final QC before keys go back. The constant face every returning owner deals with from intake to handover.",
       socialType: "instagram",
       socialUrl: "https://www.instagram.com/michael_touma/"
     }

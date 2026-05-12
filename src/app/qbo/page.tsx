@@ -26,7 +26,7 @@ export default function QboLandingPage() {
             <p>
               MBR Making Better Rides connects to QuickBooks Online via Intuit&apos;s
               official OAuth 2.0 API to support internal financial reporting. The
-              connection is <strong>read-only</strong> — we never write to MBR&apos;s books.
+              connection is <strong>read-only</strong>. We never write to MBR&apos;s books.
             </p>
           </section>
 
@@ -95,7 +95,7 @@ export default function QboLandingPage() {
             <div className="mt-4 space-y-2">
               <p>Email: <a href="mailto:info@mbrme.com" className="text-link">info@mbrme.com</a></p>
               <p>Phone: <a href="tel:+971565015800" className="text-link">+971 56 501 5800</a></p>
-              <p>Address: 16 8 St Al Qouz Ind. Fourth — Al Quoz, Dubai, UAE</p>
+              <p>Address: 16 8 St Al Qouz Ind. Fourth, Al Quoz, Dubai, UAE</p>
             </div>
           </section>
         </div>

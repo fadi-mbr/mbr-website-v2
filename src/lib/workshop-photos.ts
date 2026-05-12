@@ -35,7 +35,7 @@ export type WorkshopPhoto = {
 export const WORKSHOP_PHOTOS: WorkshopPhoto[] = [
   {
     src: '/images/hero-poster.jpg',
-    alt: 'Inside the MBR workshop — a luxury car being serviced',
+    alt: 'Inside the MBR workshop. A luxury car being serviced',
     caption: 'On the floor',
     metadata: 'BAY 1 · Climate-controlled · Ferrari + Lamborghini',
     story: 'Where the cars Dubai cares about spend a quiet afternoon.',
@@ -47,7 +47,7 @@ export const WORKSHOP_PHOTOS: WorkshopPhoto[] = [
     alt: 'MBR technician at work on an engine',
     caption: 'Engine bay',
     metadata: 'OEM tooling · Bosch-authorised',
-    story: 'Engine work to factory spec — torque values, intervals, traceable parts.',
+    story: 'Engine work to factory spec. Torque values, intervals, traceable parts.',
     aspect: '4/3',
   },
   {
@@ -63,7 +63,7 @@ export const WORKSHOP_PHOTOS: WorkshopPhoto[] = [
     alt: 'Suspension service on a luxury vehicle',
     caption: 'Suspension & steering',
     metadata: 'Laser alignment · Air suspension',
-    story: 'Ride-height calibration to the millimetre — the handling owners pay for.',
+    story: 'Ride-height calibration to the millimetre. The handling owners pay for.',
     aspect: '4/3',
   },
   {
@@ -71,7 +71,7 @@ export const WORKSHOP_PHOTOS: WorkshopPhoto[] = [
     alt: 'Preventive maintenance check',
     caption: 'Preventive care',
     metadata: 'Manufacturer schedule · Full history',
-    story: 'Routine inspection — itemised, transparent, photographed.',
+    story: 'Routine inspection. Itemised, transparent, photographed.',
     aspect: '4/3',
   },
 ];

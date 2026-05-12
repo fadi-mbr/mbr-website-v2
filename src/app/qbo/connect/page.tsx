@@ -26,7 +26,7 @@ export default function QboConnectPage() {
             <p>
               This page is intended for MBR administrators connecting (or reconnecting)
               MBR&apos;s QuickBooks Online company to our internal reporting integration. The
-              integration is <strong>private to MBR</strong> — it is not listed on the Intuit
+              integration is <strong>private to MBR</strong>. It is not listed on the Intuit
               App Store and not available to other QuickBooks customers.
             </p>
           </section>
@@ -42,7 +42,7 @@ export default function QboConnectPage() {
             </p>
             <p>
               The requested scope is{' '}
-              <code className="text-red-400">com.intuit.quickbooks.accounting</code> — read-only access to
+              <code className="text-red-400">com.intuit.quickbooks.accounting</code>. Read-only access to
               accounting data. No additional scopes are requested.
             </p>
           </section>

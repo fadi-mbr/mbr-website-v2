@@ -4,9 +4,9 @@ import { FaWhatsapp, FaPhone, FaCalendarAlt } from 'react-icons/fa';
 import { BUSINESS_HOURS } from '@/lib/business-hours';
 
 export const metadata: Metadata = {
-  title: 'Book Service — MBR Auto Services',
+  title: 'Book Service | MBR Auto Services',
   description:
-    'Book your luxury or exotic-car service at MBR Auto Services in Al Quoz, Dubai. Online booking opens soon — chat with us or call to confirm a slot.',
+    'Book your luxury or exotic-car service at MBR Auto Services in Al Quoz, Dubai. Online booking opens soon. Chat with us or call to confirm a slot.',
   // Keep the placeholder out of search results until the real booking
   // experience lands. Re-enable when the booking widget ships.
   robots: { index: false, follow: false },
@@ -29,7 +29,7 @@ export default function BookPage() {
 
           <p className="text-subheading text-[var(--text-body)] max-w-2xl leading-relaxed mb-12">
             We&apos;re finishing the new booking experience right now. In the
-            meantime, our team confirms appointments directly — usually within
+            meantime, our team confirms appointments directly, usually within
             minutes during working hours.
           </p>
 
@@ -62,17 +62,17 @@ export default function BookPage() {
           <section
             data-booking-mount
             className="glass-card p-10 md:p-12 text-center"
-            aria-label="Booking widget — placeholder"
+            aria-label="Booking widget placeholder"
           >
             <FaCalendarAlt className="w-10 h-10 text-accent-bronze mx-auto mb-5 opacity-90" />
             <h2 className="text-heading font-light text-white mb-3">
-              Direct online booking — coming soon
+              Direct online booking, coming soon
             </h2>
             <p className="text-body text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
               Pick a service, choose a slot, get an instant confirmation.
               We&apos;re currently building the calendar integration with our
               workshop. Until it ships, the fastest path is a quick chat or
-              call — most appointments are confirmed the same day.
+              call. Most appointments are confirmed the same day.
             </p>
           </section>
 

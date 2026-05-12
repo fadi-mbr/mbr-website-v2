@@ -135,7 +135,7 @@ export default function SophisticatedHero({
               target="_blank"
               rel="noopener noreferrer"
               className="group backdrop-blur-sm bg-black/30 border border-white/15 hover:border-[var(--primary)]/50 rounded-full px-4 py-2 flex items-center gap-3 transition-colors"
-              aria-label="Closed now — WhatsApp for after-hours assistance"
+              aria-label="Closed now. WhatsApp for after-hours assistance"
             >
               <div className="w-2 h-2 rounded-full bg-red-400" />
               <span className="text-white text-sm font-light">Closed</span>

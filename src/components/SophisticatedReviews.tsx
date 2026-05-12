@@ -155,7 +155,7 @@ export default function SophisticatedReviews() {
           number="06"
           eyebrow="Voices"
           headline="What owners actually say after we hand the keys back."
-          body={`4.9★ across ${(reviewsData?.totalReviews || 883).toLocaleString()} Google reviews — these six are a random snapshot.`}
+          body={`4.9★ across ${(reviewsData?.totalReviews || 883).toLocaleString()} Google reviews. These six are a random snapshot.`}
         />
 
         {/* Google rating summary — slimmer, no shimmer. */}

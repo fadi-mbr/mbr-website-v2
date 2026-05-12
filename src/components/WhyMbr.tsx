@@ -37,7 +37,7 @@ const PILLARS = [
     icon: FaHandshake,
     title: 'Transparent pricing',
     body:
-      'Quote first, approve before we lift a spanner. Itemised invoice covering labour, parts, consumables — no surprise lines at handover.',
+      'Quote first, approve before we lift a spanner. Itemised invoice covering labour, parts, consumables. No surprise lines at handover.',
   },
 ];
 
@@ -58,13 +58,13 @@ const CERTIFICATIONS: Certification[] = [
   {
     name: 'Bosch Authorised Service',
     description:
-      'Certified Bosch service centre — diagnostic tooling and OE-spec parts straight from the supplier network that builds the parts in your car.',
+      'Certified Bosch service centre. Diagnostic tooling and OE-spec parts straight from the supplier network that builds the parts in your car.',
     logo: '/images/Bosch_Logo24.webp',
   },
   {
     name: 'Leonardo Exotic Diagnostics',
     description:
-      'OEM-grade diagnostics on Ferrari, Lamborghini and McLaren — the same toolchain factory technicians use.',
+      'OEM-grade diagnostics on Ferrari, Lamborghini and McLaren. The same toolchain factory technicians use.',
     icon: FaMicrochip,
     href: 'https://www.leonardodiagnostictool.com/',
   },
@@ -236,7 +236,7 @@ export default function WhyMbr() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block h-full"
-                  aria-label={`${cert.name} — external link`}
+                  aria-label={`${cert.name}, external link`}
                 >
                   {Inner}
                 </Link>

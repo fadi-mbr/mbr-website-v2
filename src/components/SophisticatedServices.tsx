@@ -124,7 +124,7 @@ function ServiceSlabRow({
         <div className="relative aspect-[16/10]">
           <Image
             src={service.image}
-            alt={`${service.title} — ${service.subtitle} | MBR Auto Services Dubai`}
+            alt={`${service.title}. ${service.subtitle}. MBR Auto Services Dubai`}
             fill
             sizes="(min-width: 1024px) 54vw, (min-width: 768px) 90vw, 100vw"
             // Phase C perf: first slab is above-the-fold on desktop;
@@ -277,7 +277,7 @@ export default function SophisticatedServices() {
           number="02"
           eyebrow="Craft"
           headline="Workshop-grade work on every marque we touch."
-          body="Engine, electrical, chassis and maintenance — performed with OEM-level diagnostics, the Leonardo exotic-car platform, and genuine OEM parts."
+          body="Engine, electrical, chassis and maintenance. Performed with OEM-level diagnostics, the Leonardo exotic-car platform, and genuine OEM parts."
         />
       </div>
 
