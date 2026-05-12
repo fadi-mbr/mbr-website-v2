@@ -1,14 +1,18 @@
 /**
- * Chat CTA — device-detected.
+ * Chat CTA helpers.
  *
- * Single source of truth for every "Chat with us" button on the site:
- *   - Desktop → opens the Chatwoot widget (FloatingChatwootButton mounts the
- *     SDK at app level; the widget is `hidden md:flex` so it's only available
- *     above the md breakpoint anyway).
- *   - Mobile  → deep-links to WhatsApp. The widget is hidden on small screens
- *     and most mobile visitors already have WhatsApp installed.
+ * Two surfaces, two intents:
  *
- * Gracefully falls back to WhatsApp if Chatwoot hasn't finished loading.
+ *   - `triggerChat(source)`  — generic "chat with us" CTA used by the
+ *     hero, service cards, footer. Picks the right channel for the
+ *     device: desktop opens Chatwoot, mobile deep-links WhatsApp.
+ *
+ *   - `openLiveChat(source)` — used ONLY by the "Live Chat" card in the
+ *     contact section. The visitor explicitly asked for the web chat
+ *     widget, so we wait for Chatwoot to finish loading rather than
+ *     silently routing to WhatsApp. If the widget genuinely never
+ *     comes up (ad-block, SDK error), a tiny status callback fires so
+ *     the caller can show feedback.
  */
 
 import { trackEvent } from './analytics';
@@ -24,9 +28,6 @@ function buildWhatsAppUrl(message = WHATSAPP_DEFAULT_MESSAGE): string {
 
 function isMobileViewport(): boolean {
   if (typeof window === 'undefined') return false;
-  // Match against the same breakpoint where FloatingChatwootButton hides
-  // (Tailwind md = 768px). Use matchMedia for accuracy + responsiveness to
-  // orientation changes.
   return window.matchMedia('(max-width: 767px)').matches;
 }
 
@@ -39,34 +40,73 @@ export function trackChatTrigger(source: string, mode: 'chatwoot' | 'whatsapp'):
 }
 
 /**
- * Open the chat surface from any CTA on the site.
+ * Generic chat trigger. Picks the right channel for the device.
  *
- * @param source - Where the CTA was clicked (e.g. 'hero_primary',
- *                 'contact_cta', 'service_card_mechanical'). Used for
- *                 analytics breakdown.
- * @param message - Optional WhatsApp pre-fill. Defaults to a generic
- *                  service-inquiry line.
+ * `hasLoaded` was previously required; that meant a fresh page load
+ * routed users to WhatsApp because Chatwoot hadn't finished setting
+ * up. The SDK queues calls internally — `toggle` is safe to invoke
+ * before `hasLoaded` is true, so we only check that `toggle` exists.
  */
 export function triggerChat(source: string, message?: string): void {
   if (typeof window === 'undefined') return;
 
-  // Mobile → WhatsApp deep link
   if (isMobileViewport()) {
     trackChatTrigger(source, 'whatsapp');
     window.location.href = buildWhatsAppUrl(message);
     return;
   }
 
-  // Desktop → Chatwoot, with fall-through to WhatsApp if the widget hasn't
-  // loaded (slow connection, ad-block, etc.).
   const cw = window.$chatwoot;
-  if (cw?.toggle && cw.hasLoaded) {
+  if (cw?.toggle) {
     trackChatTrigger(source, 'chatwoot');
     cw.toggle('open');
     return;
   }
 
-  // Fallback — open WhatsApp in a new tab so the user doesn't lose the page.
+  // SDK genuinely not present (likely ad-block). New-tab WhatsApp so
+  // the user keeps the current page open.
   trackChatTrigger(source, 'whatsapp');
   window.open(buildWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
+}
+
+/**
+ * Open the Chatwoot widget specifically, regardless of device or load
+ * state. Used by the dedicated "Live Chat" card in the contact section
+ * where the visitor explicitly asked for the web chat widget.
+ *
+ * Polls for the SDK for up to ~3 seconds (12 × 250ms). If it never
+ * appears, invokes `onUnavailable` so the caller can show feedback.
+ */
+export function openLiveChat(
+  source: string,
+  onUnavailable?: () => void,
+): void {
+  if (typeof window === 'undefined') return;
+
+  const tryOpen = () => {
+    const cw = window.$chatwoot;
+    if (cw?.toggle) {
+      trackChatTrigger(source, 'chatwoot');
+      cw.toggle('open');
+      return true;
+    }
+    return false;
+  };
+
+  if (tryOpen()) return;
+
+  // Widget not ready yet — poll briefly. Chatwoot script is loaded with
+  // `defer async` so on a cold cache it can take a beat.
+  let attempts = 0;
+  const interval = window.setInterval(() => {
+    attempts += 1;
+    if (tryOpen()) {
+      window.clearInterval(interval);
+      return;
+    }
+    if (attempts >= 12) {
+      window.clearInterval(interval);
+      onUnavailable?.();
+    }
+  }, 250);
 }

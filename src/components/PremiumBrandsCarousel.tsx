@@ -133,38 +133,54 @@ export default function PremiumBrandsCarousel() {
           ))}
         </motion.div>
 
-        {/* SEO-Friendly Content Section */}
+        {/* Editorial pull-quote — closes the brand ribbon with one
+            confident line instead of a wall of SEO paragraphs. The
+            dense copy is preserved below in sr-only so crawlers still
+            see the marque keywords. */}
         <motion.div
-          className="mt-16 text-center"
-          initial={{ opacity: 0, y: 30 }}
+          className="mt-14 md:mt-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.15 }}
           viewport={{ once: true }}
         >
-          <div className="glass-card-premium p-8 max-w-4xl mx-auto">
-            <h3 className="text-heading font-light text-white mb-4">
-              Experienced with every luxury and exotic marque
-            </h3>
-            <p className="text-body-enhanced leading-relaxed mb-6">
-              MBR Auto Services counts Ferrari, Lamborghini, and Rolls-Royce owners among its
-              regular customers in Dubai, alongside Bentley, McLaren, Maserati, Porsche,
-              Mercedes-Benz, BMW, Audi, Range Rover, and Jaguar. Every service is carried out
-              with OEM-level diagnostic equipment, including the Leonardo exotic-car diagnostic
-              platform, and genuine OEM parts.
+          {/* Bronze hairline above the quote */}
+          <div
+            className="h-px w-24 mx-auto mb-7 md:mb-9"
+            style={{
+              background:
+                'linear-gradient(90deg, transparent, var(--accent-bronze), transparent)',
+            }}
+            aria-hidden="true"
+          />
+          <blockquote className="max-w-3xl mx-auto">
+            <p className="font-display text-2xl md:text-4xl lg:text-5xl text-white font-light leading-[1.1] tracking-[-0.02em] mb-5">
+              Different badges. Same standard.
             </p>
-            <p className="text-body-enhanced leading-relaxed">
-              An independent workshop in Dubai with Bosch-authorised certification, our team handles
-              engine and transmission work, electrical and ECU diagnostics, suspension and
-              brake service, and preventive maintenance. Scheduled service intervals,
-              pre-purchase inspections, and accident repairs are all delivered to the same
-              workshop standard.
-            </p>
-          </div>
+            <footer className="text-eyebrow text-[var(--text-muted)]">
+              Bosch toolchain · Leonardo exotic diagnostics · Genuine OEM parts
+            </footer>
+          </blockquote>
         </motion.div>
 
-        {/* Brand List for SEO (Hidden visually, accessible to search engines) */}
+        {/* Crawler-only marque inventory. Keeps the SEO long-tail
+            coverage we used to render visibly — now invisible to
+            visitors but still present in the rendered HTML. */}
         <div className="sr-only">
           <h3>Luxury car brands serviced in Dubai, UAE by MBR Auto Services</h3>
+          <p>
+            MBR Auto Services counts Ferrari, Lamborghini, and Rolls-Royce owners
+            among its regular customers in Dubai, alongside Bentley, McLaren,
+            Maserati, Porsche, Mercedes-Benz, BMW, Audi, Range Rover, and Jaguar.
+            Every service is carried out with OEM-level diagnostic equipment,
+            including the Leonardo exotic-car diagnostic platform, and genuine OEM
+            parts. An independent workshop in Dubai with Bosch-authorised
+            certification, our team handles engine and transmission work,
+            electrical and ECU diagnostics, suspension and brake service, and
+            preventive maintenance. Scheduled service intervals, pre-purchase
+            inspections, and accident repairs are all delivered to the same
+            workshop standard.
+          </p>
           <ul>
             {luxuryBrands.map((brand) => (
               <li key={brand.slug}>{brand.keywords}</li>
