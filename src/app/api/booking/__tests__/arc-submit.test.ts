@@ -136,6 +136,57 @@ export default () =>
       },
     },
     {
+      name: "ARC ALREADY_EXISTS_EMAIL → EXISTING_CUSTOMER",
+      fn: async () => {
+        _setLoggerForTests(() => {});
+        _setArcDepsForTests({
+          fetchServices: async () => [SERVICE_42],
+          submitBooking: async () => {
+            throw new ArcError("already exists", {
+              status: 400,
+              code: "ALREADY_EXISTS_EMAIL",
+            });
+          },
+        });
+        try {
+          const r = await submitConfirmedBooking(INTENT);
+          assert(!r.ok);
+          if (!r.ok) {
+            assertEqual(r.code, "EXISTING_CUSTOMER");
+            assert(/WhatsApp/.test(r.message));
+          }
+        } finally {
+          _resetDepsForTests();
+          _resetLoggerForTests();
+        }
+      },
+    },
+    {
+      name: "buildBookingBody — defaults empty vehicleTrim to model",
+      fn: async () => {
+        _setLoggerForTests(() => {});
+        let capturedBody: { vehicleTrim?: string } | null = null;
+        _setArcDepsForTests({
+          fetchServices: async () => [SERVICE_42],
+          submitBooking: async (body) => {
+            capturedBody = body as { vehicleTrim?: string };
+          },
+        });
+        try {
+          const r = await submitConfirmedBooking(INTENT);
+          assert(r.ok, "submit should succeed");
+          assert(capturedBody !== null, "submitBooking should have been called");
+          const trim = (capturedBody as { vehicleTrim?: string }).vehicleTrim;
+          // INTENT.vehicleModel is "M3" so trim should match. The key fact is
+          // it's NEVER an empty string (which is what ARC rejects).
+          assert(typeof trim === "string" && trim.length > 0, "vehicleTrim must be non-empty");
+        } finally {
+          _resetDepsForTests();
+          _resetLoggerForTests();
+        }
+      },
+    },
+    {
       name: "ARC PHONE_PROBLEM → PHONE_PROBLEM",
       fn: async () => {
         _setLoggerForTests(() => {});

@@ -51,6 +51,7 @@ export interface SubmitErr {
     | "UNKNOWN_SERVICE"
     | "PHONE_PROBLEM"
     | "SLOT_TAKEN"
+    | "EXISTING_CUSTOMER"
     | "ARC_DOWN";
   message: string;
 }
@@ -164,7 +165,11 @@ function buildBookingBody(
     vehicleYear: intent.vehicleYear,
     vehicleModel: intent.vehicleModel,
     vehicleMake: intent.vehicleMake,
-    vehicleTrim: "",
+    // ARC's /public/appointment rejects empty vehicleTrim with
+    // EMPTY_MODEL_TRIM. The wizard form has no trim input, so default it
+    // to the model (matches ARC's UI which uses the model as the trim
+    // when none is provided).
+    vehicleTrim: intent.vehicleModel || "Base",
     mileage: 0,
     vehicleId: null,
     concern: intent.plate ? `Plate: ${intent.plate}` : "",
@@ -277,6 +282,32 @@ export async function submitConfirmedBooking(
           ok: false,
           code: "SLOT_TAKEN",
           message: "That slot was just booked — please pick another.",
+        };
+      }
+      // ARC's /public/appointment refuses to create a duplicate owner
+      // record when the email is already on file. The endpoint has no
+      // "attach to existing owner" mode — that's a worker-token endpoint
+      // we haven't reverse-engineered yet. Until then, fall back to a
+      // WhatsApp handoff for repeat customers.
+      if (e.code === "ALREADY_EXISTS_EMAIL") {
+        return {
+          ok: false,
+          code: "EXISTING_CUSTOMER",
+          message:
+            "Looks like you've booked with us before. Please message us on WhatsApp at +971 56 501 5800 to confirm your slot — we'll attach it to your existing record.",
+        };
+      }
+      // Similar guard for phone duplicates (ARC sometimes reports both).
+      if (
+        e.status === 400 &&
+        typeof e.code === "string" &&
+        /ALREADY_EXISTS/.test(e.code)
+      ) {
+        return {
+          ok: false,
+          code: "EXISTING_CUSTOMER",
+          message:
+            "Looks like you've booked with us before. Please message us on WhatsApp at +971 56 501 5800 to confirm your slot — we'll attach it to your existing record.",
         };
       }
     }
