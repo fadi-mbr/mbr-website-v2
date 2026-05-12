@@ -37,6 +37,29 @@ export interface BookingSubmitPayload {
   notes?: string;
 }
 
+/**
+ * Discriminated result the Server Action returns back to the client form.
+ *
+ *   ok:true   → show success state with the confirmation details
+ *   ok:false  → show inline error with `message`, allow Retry
+ *
+ * Field names mirror the agent-endpoint response so the action can pass it
+ * through without remapping.
+ */
+export type ServerActionResult =
+  | {
+      ok: true;
+      arcAppointmentId?: number;
+      confirmAt: string;
+      serviceName: string;
+      estimatedDuration: number;
+    }
+  | {
+      ok: false;
+      code?: string;
+      message: string;
+    };
+
 interface Props {
   mode: 'agent' | 'public';
   services: BookingService[];
@@ -47,11 +70,19 @@ interface Props {
     email?: string;
   };
   /**
-   * Submit handler — receives the validated payload. The preview route
-   * defaults this to `console.log` + fake-success; PR C/D will replace
-   * with a Server Action that calls /api/booking/agent or /request.
+   * Optional inline submit handler — used by the preview route to log
+   * payloads without hitting any backend. Kept for backwards compatibility
+   * with the v2 preview page.
    */
   onSubmit?: (payload: BookingSubmitPayload) => Promise<void> | void;
+  /**
+   * Server Action — when supplied, takes precedence over `onSubmit` and
+   * is awaited on submit. The page-level wrapper provides this so that
+   * the agent secret / token never crosses the client boundary.
+   */
+  serverAction?: (
+    payload: BookingSubmitPayload
+  ) => Promise<ServerActionResult>;
 }
 
 type FieldErrors = Partial<
@@ -76,6 +107,7 @@ export default function BookingFormClient({
   services,
   prefill,
   onSubmit,
+  serverAction,
 }: Props) {
   // ----- state -----
   const [serviceId, setServiceId] = useState<number | null>(null);
@@ -98,7 +130,12 @@ export default function BookingFormClient({
   const [success, setSuccess] = useState<{
     serviceTitle: string;
     when: string;
+    arcAppointmentId?: number;
+    isPreview?: boolean;
   } | null>(null);
+  const [lastPayload, setLastPayload] = useState<BookingSubmitPayload | null>(
+    null
+  );
 
   const selectedService = useMemo(
     () => services.find((s) => s.id === serviceId) ?? null,
@@ -155,13 +192,60 @@ export default function BookingFormClient({
       hour12: true,
     }).format(new Date(ms));
 
+  /**
+   * Submit the prepared payload through whichever handler is wired up.
+   * Extracted from `handleSubmit` so the Retry button can call it directly
+   * with the cached `lastPayload`.
+   */
+  const runSubmit = async (payload: BookingSubmitPayload): Promise<void> => {
+    setBanner(null);
+    setSubmitting(true);
+    try {
+      if (serverAction) {
+        const result = await serverAction(payload);
+        if (result.ok) {
+          setSuccess({
+            serviceTitle: result.serviceName || selectedService?.title || 'Your booking',
+            when: formatWhen(payload.timeStartMs),
+            arcAppointmentId: result.arcAppointmentId,
+          });
+        } else {
+          setBanner(
+            result.message ||
+              'We could not complete the booking. Please try again.'
+          );
+        }
+      } else if (onSubmit) {
+        await onSubmit(payload);
+        setSuccess({
+          serviceTitle: selectedService?.title ?? 'Your booking',
+          when: formatWhen(payload.timeStartMs),
+          isPreview: true,
+        });
+      } else {
+        // Default preview behaviour: log payload + fake-success.
+        console.log('[BookingForm preview] submit payload', payload);
+        setSuccess({
+          serviceTitle: selectedService?.title ?? 'Your booking',
+          when: formatWhen(payload.timeStartMs),
+          isPreview: true,
+        });
+      }
+    } catch (err) {
+      console.error('[BookingForm] submit failed', err);
+      setBanner('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     setBanner(null);
 
     // Honeypot: silent success without doing anything.
     if (honeypot.trim()) {
-      setSuccess({ serviceTitle: '—', when: '—' });
+      setSuccess({ serviceTitle: '—', when: '—', isPreview: true });
       return;
     }
 
@@ -192,25 +276,12 @@ export default function BookingFormClient({
       vehiclePlate: vehiclePlate.trim() || undefined,
       notes: notes.trim() || undefined,
     };
+    setLastPayload(payload);
+    await runSubmit(payload);
+  };
 
-    setSubmitting(true);
-    try {
-      if (onSubmit) {
-        await onSubmit(payload);
-      } else {
-        // Default preview behaviour: log payload + fake-success.
-        console.log('[BookingForm preview] submit payload', payload);
-      }
-      setSuccess({
-        serviceTitle: selectedService?.title ?? 'Your booking',
-        when: formatWhen(payload.timeStartMs),
-      });
-    } catch (err) {
-      console.error('[BookingForm] submit failed', err);
-      setBanner('Something went wrong. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
+  const handleRetry = async () => {
+    if (lastPayload) await runSubmit(lastPayload);
   };
 
   if (success) {
@@ -220,13 +291,22 @@ export default function BookingFormClient({
         role="status"
         aria-live="polite"
       >
-        <h2 className="text-xl font-light mb-2">Booking request received</h2>
+        <h2 className="text-xl font-light mb-2">
+          {success.isPreview ? 'Booking request received' : 'Booking confirmed'}
+        </h2>
         <p className="text-sm text-neutral-300">
           {success.serviceTitle} — {success.when}
         </p>
-        <p className="text-xs text-neutral-500 mt-4">
-          This is a preview screen. No appointment was created.
-        </p>
+        {success.arcAppointmentId !== undefined && (
+          <p className="text-xs text-neutral-500 mt-2">
+            Reference #{success.arcAppointmentId}
+          </p>
+        )}
+        {success.isPreview && (
+          <p className="text-xs text-neutral-500 mt-4">
+            This is a preview screen. No appointment was created.
+          </p>
+        )}
       </div>
     );
   }
@@ -242,9 +322,18 @@ export default function BookingFormClient({
         <div
           role="alert"
           aria-live="polite"
-          className="rounded border border-red-800 bg-red-950/40 text-red-200 px-3 py-2 text-sm"
+          className="rounded border border-red-800 bg-red-950/40 text-red-200 px-3 py-2 text-sm flex items-center justify-between gap-3"
         >
-          {banner}
+          <span>{banner}</span>
+          {lastPayload && !submitting && (
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="shrink-0 rounded border border-red-700 px-2 py-1 text-xs text-red-100 hover:bg-red-900/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]"
+            >
+              Retry
+            </button>
+          )}
         </div>
       )}
 

@@ -7,7 +7,10 @@
  */
 
 import React from 'react';
-import BookingFormClient from './BookingFormClient';
+import BookingFormClient, {
+  type BookingSubmitPayload,
+  type ServerActionResult,
+} from './BookingFormClient';
 import type { BookingService } from '@/lib/booking-types';
 
 interface Props {
@@ -19,9 +22,23 @@ interface Props {
     phone?: string;
     email?: string;
   };
+  /**
+   * Optional Server Action — when present, the client form awaits this on
+   * submit instead of running its default preview-mode no-op. The action is
+   * responsible for hitting the appropriate backend (agent or public) with
+   * any secrets that must stay server-side.
+   */
+  serverAction?: (
+    payload: BookingSubmitPayload
+  ) => Promise<ServerActionResult>;
 }
 
-export default function BookingForm({ mode, services, prefill }: Props) {
+export default function BookingForm({
+  mode,
+  services,
+  prefill,
+  serverAction,
+}: Props) {
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="border-b border-neutral-900">
@@ -40,6 +57,7 @@ export default function BookingForm({ mode, services, prefill }: Props) {
           mode={mode}
           services={services}
           prefill={prefill}
+          serverAction={serverAction}
         />
       </main>
     </div>
