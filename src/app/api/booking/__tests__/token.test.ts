@@ -1,5 +1,9 @@
 /**
  * Unit tests for the HMAC magic-link token (src/lib/booking-token.ts).
+ *
+ * v:2 — payload carries the full BookingIntent inline; no KV lookup needed
+ * at confirm time. Legacy v:1 tokens are no longer honored and must fail
+ * verification with reason `bad-version`.
  */
 
 import {
@@ -7,7 +11,8 @@ import {
   verifyToken,
   fingerprint,
   generateTokenId,
-  type BookingTokenPayload,
+  type TokenPayload,
+  type TokenIntent,
 } from "@/lib/booking-token";
 import { assert, assertEqual, runSuite } from "./_harness";
 
@@ -16,13 +21,33 @@ const SECRET_A =
 const SECRET_B =
   "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
 
-function makePayload(overrides: Partial<BookingTokenPayload> = {}): BookingTokenPayload {
+function makeIntent(overrides: Partial<TokenIntent> = {}): TokenIntent {
   return {
-    v: 1,
+    serviceId: 42,
+    serviceName: "Major service",
+    timeStartMs: 1_700_086_400_000,
+    durationH: 2,
+    firstName: "Fadi",
+    lastName: "Kelzia",
+    phone: "971500000088",
+    email: "fadi@example.com",
+    vehicleYear: 2021,
+    vehicleMake: "Porsche",
+    vehicleModel: "Cayenne",
+    plate: "A12345",
+    notes: "Please check the brakes — they squeal at low speed.",
+    ...overrides,
+  };
+}
+
+function makePayload(overrides: Partial<TokenPayload> = {}): TokenPayload {
+  return {
+    v: 2,
     id: "11111111-2222-3333-4444-555555555555",
     iat: 1_700_000_000_000,
     exp: 1_700_000_000_000 + 30 * 60 * 1000,
     fp: "deadbeef",
+    intent: makeIntent(),
     ...overrides,
   };
 }
@@ -35,10 +60,34 @@ function base64UrlEncode(s: string): string {
     .replace(/=+$/, "");
 }
 
+function toBuf(u8: Uint8Array): ArrayBuffer {
+  const out = new ArrayBuffer(u8.byteLength);
+  new Uint8Array(out).set(u8);
+  return out;
+}
+
+async function rawHmacB64Url(headerBytes: Uint8Array, secretHex: string): Promise<string> {
+  const keyBytes = new Uint8Array(secretHex.length / 2);
+  for (let i = 0; i < keyBytes.length; i++) {
+    keyBytes[i] = parseInt(secretHex.substr(i * 2, 2), 16);
+  }
+  const key = await crypto.subtle.importKey(
+    "raw",
+    toBuf(keyBytes),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = new Uint8Array(await crypto.subtle.sign("HMAC", key, toBuf(headerBytes)));
+  let s = "";
+  for (let i = 0; i < sig.length; i++) s += String.fromCharCode(sig[i]);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
 export default () =>
   runSuite("booking-token", [
     {
-      name: "signToken + verifyToken — happy path",
+      name: "signToken + verifyToken — happy path (v:2 carries intent)",
       fn: async () => {
         const payload = makePayload();
         const tok = await signToken(payload, SECRET_A);
@@ -46,8 +95,13 @@ export default () =>
         assert(result.ok, "verify should succeed");
         if (result.ok) {
           assertEqual(result.payload.id, payload.id);
-          assertEqual(result.payload.v, 1);
+          assertEqual(result.payload.v, 2);
           assertEqual(result.payload.fp, "deadbeef");
+          assertEqual(result.payload.intent.serviceId, 42);
+          assertEqual(result.payload.intent.serviceName, "Major service");
+          assertEqual(result.payload.intent.phone, "971500000088");
+          assertEqual(result.payload.intent.vehicleMake, "Porsche");
+          assertEqual(result.payload.intent.plate, "A12345");
         }
       },
     },
@@ -85,36 +139,39 @@ export default () =>
       },
     },
     {
-      name: "verifyToken — bad version",
+      name: "verifyToken — v:1 legacy token is rejected (bad-version)",
       fn: async () => {
-        // Hand-craft a v:2 payload but sign correctly with secret A so the
-        // signature passes but version check fails.
-        const payload = { ...makePayload(), v: 2 } as unknown as BookingTokenPayload;
-        const headerJson = JSON.stringify(payload);
-        const headerBytes = new TextEncoder().encode(headerJson);
-        // We can re-use signToken by faking the v:1 check — instead, mint
-        // raw HMAC here.
-        const keyBytes = new Uint8Array(SECRET_A.length / 2);
-        for (let i = 0; i < keyBytes.length; i++) {
-          keyBytes[i] = parseInt(SECRET_A.substr(i * 2, 2), 16);
-        }
-        const key = await crypto.subtle.importKey(
-          "raw",
-          keyBytes,
-          { name: "HMAC", hash: "SHA-256" },
-          false,
-          ["sign"],
-        );
-        const sig = new Uint8Array(
-          await crypto.subtle.sign("HMAC", key, headerBytes),
-        );
-        const b64url = (b: Uint8Array) => {
-          let s = "";
-          for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
-          return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        // Hand-craft a legacy v:1 payload (no intent), signed correctly with
+        // SECRET_A so the signature passes but version check fails.
+        const v1payload = {
+          v: 1,
+          id: "00000000-0000-0000-0000-000000000001",
+          iat: 1_700_000_000_000,
+          exp: 1_700_000_000_000 + 30 * 60 * 1000,
+          fp: "cafebabe",
         };
-        const tok = `${b64url(headerBytes)}.${b64url(sig)}`;
-        const result = await verifyToken(tok, SECRET_A, payload.iat + 1000);
+        const headerBytes = new TextEncoder().encode(JSON.stringify(v1payload));
+        const sigB64 = await rawHmacB64Url(headerBytes, SECRET_A);
+        let s = "";
+        for (let i = 0; i < headerBytes.length; i++) s += String.fromCharCode(headerBytes[i]);
+        const headerB64 = btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        const tok = `${headerB64}.${sigB64}`;
+        const result = await verifyToken(tok, SECRET_A, v1payload.iat + 1000);
+        assert(!result.ok, "v:1 must be rejected");
+        if (!result.ok) assertEqual(result.reason, "bad-version");
+      },
+    },
+    {
+      name: "verifyToken — unknown version (v:3) is rejected (bad-version)",
+      fn: async () => {
+        const future = { ...makePayload(), v: 3 } as unknown as TokenPayload;
+        const headerBytes = new TextEncoder().encode(JSON.stringify(future));
+        const sigB64 = await rawHmacB64Url(headerBytes, SECRET_A);
+        let s = "";
+        for (let i = 0; i < headerBytes.length; i++) s += String.fromCharCode(headerBytes[i]);
+        const headerB64 = btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        const tok = `${headerB64}.${sigB64}`;
+        const result = await verifyToken(tok, SECRET_A, future.iat + 1000);
         assert(!result.ok);
         if (!result.ok) assertEqual(result.reason, "bad-version");
       },
@@ -141,12 +198,60 @@ export default () =>
         const result = await verifyToken("!!!.!!!", SECRET_A);
         assert(!result.ok);
         if (!result.ok) {
-          // either malformed or bad-signature is acceptable; we strict to malformed
           assert(
             result.reason === "malformed" || result.reason === "bad-signature",
             "expected malformed or bad-signature, got " + result.reason,
           );
         }
+      },
+    },
+    {
+      name: "verifyToken — v:2 without intent is malformed",
+      fn: async () => {
+        // Sign a v:2 header missing the intent field.
+        const broken = {
+          v: 2,
+          id: "00000000-0000-0000-0000-000000000002",
+          iat: 1_700_000_000_000,
+          exp: 1_700_000_000_000 + 30 * 60 * 1000,
+          fp: "deadbeef",
+        };
+        const headerBytes = new TextEncoder().encode(JSON.stringify(broken));
+        const sigB64 = await rawHmacB64Url(headerBytes, SECRET_A);
+        let s = "";
+        for (let i = 0; i < headerBytes.length; i++) s += String.fromCharCode(headerBytes[i]);
+        const headerB64 = btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+        const tok = `${headerB64}.${sigB64}`;
+        const result = await verifyToken(tok, SECRET_A, broken.iat + 1000);
+        assert(!result.ok);
+        if (!result.ok) assertEqual(result.reason, "malformed");
+      },
+    },
+    {
+      name: "signToken — realistic full intent encodes to < 1.5KB",
+      fn: async () => {
+        const payload = makePayload({
+          intent: makeIntent({
+            // worst-case-ish: long notes field
+            notes:
+              "Please check the brakes — they squeal at low speed, especially after rain. " +
+              "Also the AC fan rattles when set to 4 or higher. " +
+              "Tyres rotated last service; please note any uneven wear.",
+          }),
+        });
+        const tok = await signToken(payload, SECRET_A);
+        assert(
+          tok.length < 1500,
+          `token length must be < 1500, got ${tok.length}`,
+        );
+        // URL-safe characters only (base64url alphabet + the single '.' separator)
+        assert(
+          /^[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+$/.test(tok),
+          "token must contain only URL-safe characters",
+        );
+        // Roundtrip
+        const verified = await verifyToken(tok, SECRET_A, payload.iat + 1000);
+        assert(verified.ok);
       },
     },
     {
@@ -163,9 +268,6 @@ export default () =>
     {
       name: "fingerprint mismatch use case",
       fn: async () => {
-        // Caller flow: sign with fp_for(phone1,email1); later compare against
-        // fingerprint(phone2,email2). This module doesn't enforce that — the
-        // route does — but we sanity-check the building block.
         const fpA = await fingerprint("971500000088", "a@example.com");
         const fpB = await fingerprint("971500000088", "b@example.com");
         assert(fpA !== fpB, "different email → different fingerprint");

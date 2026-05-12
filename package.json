@@ -11,12 +11,12 @@
   },
   "dependencies": {
     "@next/third-parties": "^15.5.7",
-    "@sendgrid/mail": "^8.1.6",
     "@vercel/analytics": "^1.6.1",
     "@vercel/kv": "^3.0.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.16",
     "next": "^15.5.15",
+    "nodemailer": "^8.0.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0"
@@ -25,6 +25,7 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

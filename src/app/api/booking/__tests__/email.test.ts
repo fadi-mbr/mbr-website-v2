@@ -1,10 +1,10 @@
 /**
- * Unit tests for the SendGrid confirmation-email wrapper
+ * Unit tests for the nodemailer/SMTP confirmation-email wrapper
  * (src/lib/booking-email.ts).
  *
- * We inject a fake mailer via `_setMailerForTests` rather than mocking
- * `@sendgrid/mail` directly — the upstream library's `sgMail` default export
- * is a singleton that's awkward to stub through module rewrites.
+ * We inject a fake transporter via `_setMailerForTests` rather than mocking
+ * `nodemailer` directly — `nodemailer.createTransport()` returns a stateful
+ * transporter object that is awkward to stub through module rewrites.
  */
 
 import {
@@ -15,36 +15,37 @@ import {
   formatDubai,
   sendConfirmationEmail,
   renderConfirmationHtml,
-  type MailerLike,
+  type TransporterLike,
 } from "@/lib/booking-email";
 import { assert, assertEqual, runSuite } from "./_harness";
 
 interface CapturedSend {
-  apiKey?: string;
   msg?: Record<string, unknown>;
 }
 
-function makeFakeMailer(opts: { throwOnSend?: boolean } = {}): {
-  mailer: MailerLike;
+function makeFakeTransporter(opts: { throwOnSend?: boolean } = {}): {
+  transporter: TransporterLike;
   captured: CapturedSend;
 } {
   const captured: CapturedSend = {};
-  const mailer: MailerLike = {
-    setApiKey(k: string): void {
-      captured.apiKey = k;
-    },
-    async send(msg: Record<string, unknown>): Promise<unknown> {
+  const transporter: TransporterLike = {
+    async sendMail(msg: Record<string, unknown>): Promise<unknown> {
       captured.msg = msg;
-      if (opts.throwOnSend) throw new Error("sendgrid_boom");
-      return [{ statusCode: 202 }, {}];
+      if (opts.throwOnSend) throw new Error("smtp_boom");
+      return { messageId: "<test@local>", accepted: [msg.to] };
     },
   };
-  return { mailer, captured };
+  return { transporter, captured };
 }
 
 const BASE_INPUT = {
-  apiKey: "SG.test_key_xxx",
-  fromEmail: "bookings@m.mbrme.com",
+  smtp: {
+    host: "smtp.improvmx.com",
+    port: 587,
+    user: "booking@mail.mbrme.com",
+    password: "test-password",
+  },
+  fromEmail: "booking@mail.mbrme.com",
   to: "customer@example.com",
   firstName: "Fadi",
   serviceName: "Oil change",
@@ -72,18 +73,25 @@ export default () =>
       },
     },
     {
-      name: "sendConfirmationEmail — sets apiKey + builds msg with expected fields",
+      name: "formatDubai — accepts a Date object",
+      fn: () => {
+        const out = formatDubai(new Date(1_700_000_000_000));
+        assert(out.length > 0);
+        assert(!out.includes("NaN"));
+      },
+    },
+    {
+      name: "sendConfirmationEmail — builds msg with expected fields",
       fn: async () => {
-        const { mailer, captured } = makeFakeMailer();
-        _setMailerForTests(mailer);
+        const { transporter, captured } = makeFakeTransporter();
+        _setMailerForTests(transporter);
         try {
           const r = await sendConfirmationEmail(BASE_INPUT);
           assert(r.ok, "send should succeed");
-          assertEqual(captured.apiKey, "SG.test_key_xxx");
           assert(captured.msg, "msg should be captured");
           assertEqual(captured.msg!.to, "customer@example.com");
-          assertEqual(captured.msg!.from, "bookings@m.mbrme.com");
-          assertEqual(captured.msg!.replyTo, "bookings@m.mbrme.com");
+          assertEqual(captured.msg!.from, "booking@mail.mbrme.com");
+          assertEqual(captured.msg!.replyTo, "booking@mail.mbrme.com");
           assertEqual(captured.msg!.subject, CONFIRMATION_SUBJECT);
           assert(
             typeof captured.msg!.html === "string" && (captured.msg!.html as string).length > 0,
@@ -101,8 +109,8 @@ export default () =>
     {
       name: "sendConfirmationEmail — HTML escapes firstName & serviceName",
       fn: async () => {
-        const { mailer, captured } = makeFakeMailer();
-        _setMailerForTests(mailer);
+        const { transporter, captured } = makeFakeTransporter();
+        _setMailerForTests(transporter);
         try {
           await sendConfirmationEmail({
             ...BASE_INPUT,
@@ -125,16 +133,34 @@ export default () =>
       },
     },
     {
+      name: "sendConfirmationEmail — plaintext fallback URL on its own line",
+      fn: async () => {
+        const { transporter, captured } = makeFakeTransporter();
+        _setMailerForTests(transporter);
+        try {
+          await sendConfirmationEmail(BASE_INPUT);
+          const text = captured.msg!.text as string;
+          const lines = text.split("\n");
+          assert(
+            lines.includes(BASE_INPUT.confirmUrl),
+            "confirm URL must appear on its own line in plaintext",
+          );
+        } finally {
+          _resetMailerForTests();
+        }
+      },
+    },
+    {
       name: "sendConfirmationEmail — returns ok:false on send failure",
       fn: async () => {
-        const { mailer } = makeFakeMailer({ throwOnSend: true });
-        _setMailerForTests(mailer);
+        const { transporter } = makeFakeTransporter({ throwOnSend: true });
+        _setMailerForTests(transporter);
         try {
           const r = await sendConfirmationEmail(BASE_INPUT);
           assert(!r.ok);
           if (!r.ok) {
             assert(
-              (r.error || "").includes("sendgrid_boom"),
+              (r.error || "").includes("smtp_boom"),
               "error message should propagate, got: " + r.error,
             );
           }
@@ -146,12 +172,25 @@ export default () =>
     {
       name: "sendConfirmationEmail — fails fast on missing required fields",
       fn: async () => {
-        const r1 = await sendConfirmationEmail({ ...BASE_INPUT, apiKey: "" });
+        const r1 = await sendConfirmationEmail({
+          ...BASE_INPUT,
+          smtp: { ...BASE_INPUT.smtp, host: "" },
+        });
         assert(!r1.ok);
-        const r2 = await sendConfirmationEmail({ ...BASE_INPUT, fromEmail: "" });
+        const r2 = await sendConfirmationEmail({
+          ...BASE_INPUT,
+          smtp: { ...BASE_INPUT.smtp, user: "" },
+        });
         assert(!r2.ok);
-        const r3 = await sendConfirmationEmail({ ...BASE_INPUT, to: "" });
+        const r3 = await sendConfirmationEmail({
+          ...BASE_INPUT,
+          smtp: { ...BASE_INPUT.smtp, password: "" },
+        });
         assert(!r3.ok);
+        const r4 = await sendConfirmationEmail({ ...BASE_INPUT, fromEmail: "" });
+        assert(!r4.ok);
+        const r5 = await sendConfirmationEmail({ ...BASE_INPUT, to: "" });
+        assert(!r5.ok);
       },
     },
     {
