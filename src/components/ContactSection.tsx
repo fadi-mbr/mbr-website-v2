@@ -19,7 +19,7 @@ import {
   trackSocialMediaClick,
   trackEmailClick,
 } from '@/lib/analytics';
-import { triggerChat } from '@/lib/chat-cta';
+import { triggerChat, openLiveChat } from '@/lib/chat-cta';
 import { BUSINESS_HOURS, getWeeklyHours } from '@/lib/business-hours';
 import SectionMarker from './SectionMarker';
 
@@ -103,13 +103,22 @@ export default function ContactSection() {
             </p>
           </a>
 
-          {/* Live Chat — Chatwoot widget. The floating launcher lives at
-              app level (FloatingChatwootButton, desktop only). This card
-              gives the channel a discoverable surface inside the contact
-              section so visitors don't have to spot the floating button. */}
+          {/* Live Chat — Chatwoot widget. Uses openLiveChat (not the
+              generic triggerChat) so the visitor who explicitly asked
+              for web chat always gets the web chat — the helper waits
+              for the SDK to finish loading rather than silently routing
+              to WhatsApp on a slow first paint. */}
           <button
             type="button"
-            onClick={() => triggerChat('contact_section_live_chat')}
+            onClick={() =>
+              openLiveChat('contact_section_live_chat', () => {
+                // SDK never came up — fall back to a friendly nudge.
+                // (Chatwoot ad-blocked or failed to load.)
+                alert(
+                  'Live chat is taking a moment to load. WhatsApp or call us in the meantime — both reach the team instantly.',
+                );
+              })
+            }
             className="group text-left relative overflow-hidden rounded-2xl border border-white/10 hover:border-[var(--primary)]/50 transition-all duration-300 p-6 md:p-7"
             style={{
               background:

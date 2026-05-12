@@ -34,26 +34,27 @@ export default function CookieConsentBanner() {
     }
   }, []);
 
+  /*
+   * Consent state changes are picked up live by ConditionalGoogleAnalytics
+   * (it listens for the `cookieConsentUpdated` event that
+   * `lib/cookie-consent.ts` dispatches). No page reload is needed — the
+   * banner just dismisses and analytics either start tracking or stay
+   * silent, both in place.
+   */
   const handleAcceptAll = () => {
     acceptAllCookies();
     setIsVisible(false);
-    // Reload page to apply consent changes
-    window.location.reload();
   };
 
   const handleRejectAll = () => {
     rejectAllCookies();
     setIsVisible(false);
-    // Reload page to apply consent changes
-    window.location.reload();
   };
 
   const handleSavePreferences = () => {
     saveCustomConsent(consent);
     setIsVisible(false);
     setShowSettings(false);
-    // Reload page to apply consent changes
-    window.location.reload();
   };
 
   const toggleSetting = (key: keyof CookieConsent) => {
