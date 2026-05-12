@@ -129,6 +129,16 @@ export default function TeamSection() {
             );
           })}
         </div>
+
+        {/* Cross-link to the full /about page */}
+        <div className="mt-14 md:mt-16 text-center">
+          <a
+            href="/about"
+            className="inline-flex items-center gap-2 text-eyebrow text-white border-b border-[var(--accent-bronze)] pb-1 hover:text-[var(--accent-bronze)] transition-colors"
+          >
+            Read the founder&rsquo;s story →
+          </a>
+        </div>
       </div>
     </section>
   );

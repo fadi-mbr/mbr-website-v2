@@ -20,6 +20,7 @@ import {
 import { useGoogleReviews } from './GoogleReviewsHook';
 import { isShopOpen } from '@/lib/business-hours';
 import { triggerChat } from '@/lib/chat-cta';
+import CountUp from './CountUp';
 
 interface SophisticatedHeroProps {
   googleReviews?: {
@@ -102,11 +103,11 @@ export default function SophisticatedHero({
           transition={{ delay: 1, duration: 0.8 }}
         >
           <Image
-            src="/images/Logo_horizontal.svg"
-            alt="MBR Making Better Rides - Premium Car Repair Dubai, Luxury Auto Service UAE"
-            width={140}
-            height={32}
-            className="logo-sm opacity-60"
+            src="/images/MBR_Logo_shield.svg"
+            alt="MBR Auto Services. Luxury and Exotic Car Workshop, Dubai"
+            width={56}
+            height={56}
+            className="opacity-75 w-12 h-12 md:w-14 md:h-14"
           />
         </motion.div>
 
@@ -247,13 +248,49 @@ export default function SophisticatedHero({
               <p className="text-eyebrow mb-5">
                 Trusted by Ferrari · Lamborghini · Rolls-Royce owners
               </p>
-              <h1 className="text-display font-light gradient-text mb-8 leading-tight">
-                Dubai&rsquo;s Independent Luxury &amp; Exotic-Car Workshop
+              <h1 className="font-display text-white font-light mb-6 leading-[1.05] tracking-[-0.025em] text-[clamp(2.5rem,6vw,5rem)]">
+                Service that lives up <br className="hidden md:inline" />
+                to the badge.
               </h1>
-              <p className="text-subheading text-[var(--text-body)] mb-12 leading-relaxed max-w-2xl mx-auto">
-                Bosch-authorised. Leonardo exotic diagnostics. OEM-level
-                tooling and genuine OEM parts. Based in Al Quoz Industrial 4.
+              <p className="text-subheading text-[var(--text-body)] mb-10 leading-relaxed max-w-2xl mx-auto">
+                Independent luxury &amp; exotic-car workshop in Dubai.
+                Bosch-authorised, Leonardo-equipped, OEM parts only.
               </p>
+
+              {/* Tabular stat strip — Fraunces serif numerals, four beats.
+                  This is the brand-anchor moment under the headline. */}
+              <div className="mt-2 mb-12 grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-6 md:gap-x-4 max-w-3xl mx-auto motion-calm">
+                {[
+                  { to: 4.9, decimals: 1, suffix: '★', label: 'Google rating' },
+                  { to: 5000, suffix: '+', label: 'Cars serviced' },
+                  { to: 12, suffix: '+', label: 'Marques' },
+                  { to: 100, suffix: '%', label: 'OEM parts' },
+                ].map((stat) => (
+                  <div key={stat.label} className="text-center flex flex-col items-center">
+                    <div
+                      className="font-display font-light text-white leading-none tracking-tight"
+                      style={{
+                        fontSize: 'clamp(2.25rem, 4.5vw, 3.5rem)',
+                        fontFeatureSettings: '"tnum" 1, "lnum" 1',
+                      }}
+                    >
+                      <CountUp to={stat.to} decimals={stat.decimals ?? 0} />
+                      <span className="text-[var(--primary)]">{stat.suffix}</span>
+                    </div>
+                    <div
+                      className="h-px w-8 mt-3 mb-2"
+                      style={{
+                        background:
+                          'linear-gradient(90deg, transparent, var(--accent-bronze) 50%, transparent)',
+                      }}
+                      aria-hidden="true"
+                    />
+                    <div className="text-eyebrow text-[0.65rem] md:text-[0.75rem]">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Dual primary CTAs — Chat is the dominant action; Book is a

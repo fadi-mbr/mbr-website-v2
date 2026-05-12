@@ -50,6 +50,13 @@ export default async function OpenGraphImage() {
 
   const brandFont = fraunces400 || fraunces300 ? 'Fraunces' : 'Georgia, serif';
 
+  // Resolve a public origin for the shield image. In production this is
+  // mbrme.com; on Vercel preview deploys we fall back to VERCEL_URL.
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.mbrme.com');
+  const shieldUrl = `${origin}/images/MBR_Logo_shield.png`;
+
   const customFonts = [
     ...(fraunces300
       ? [
@@ -104,20 +111,15 @@ export default async function OpenGraphImage() {
           }}
         />
 
-        {/* Wordmark — Fraunces serif */}
-        <div
-          style={{
-            fontFamily: brandFont,
-            fontSize: 216,
-            fontWeight: 300,
-            letterSpacing: -6,
-            lineHeight: 0.95,
-            display: 'flex',
-            color: 'white',
-          }}
-        >
-          MBR
-        </div>
+        {/* Shield monogram — the real brand mark */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={shieldUrl}
+          alt=""
+          width={220}
+          height={220}
+          style={{ marginBottom: 24 }}
+        />
 
         {/* Sub-wordmark — small caps Geist/sans bronze */}
         <div

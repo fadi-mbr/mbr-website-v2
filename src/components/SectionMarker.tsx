@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 /**
@@ -64,6 +65,22 @@ export default function SectionMarker({
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.7, ease: 'easeOut' }}
     >
+      {/* Shield watermark — small brand anchor above every section header.
+          Bronze tint keeps it editorial, not corporate. */}
+      <div
+        className={`mb-4 ${align === 'center' ? '' : 'self-start'}`}
+        style={{ filter: 'brightness(0.85) saturate(0.6)', opacity: 0.55 }}
+        aria-hidden="true"
+      >
+        <Image
+          src="/images/MBR_Logo_shield.svg"
+          alt=""
+          width={28}
+          height={28}
+          className="w-6 h-6 md:w-7 md:h-7"
+        />
+      </div>
+
       {/* Chapter marker */}
       <div className="text-marker mb-3">{number}</div>
 

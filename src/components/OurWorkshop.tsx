@@ -151,6 +151,16 @@ export default function OurWorkshop() {
             </motion.button>
           ))}
         </div>
+
+        {/* Cross-link to the full workshop page */}
+        <div className="mt-12 md:mt-14 text-center">
+          <a
+            href="/workshop"
+            className="inline-flex items-center gap-2 text-eyebrow text-white border-b border-[var(--accent-bronze)] pb-1 hover:text-[var(--accent-bronze)] transition-colors"
+          >
+            See the full workshop →
+          </a>
+        </div>
       </div>
 
       {/* Lightbox */}
