@@ -3,11 +3,11 @@
 import React from 'react';
 import ProfessionalNavigation from '@/components/ProfessionalNavigation';
 import SophisticatedHero from '@/components/SophisticatedHero';
+import BrandsStrip from '@/components/BrandsStrip';
 import SophisticatedServices from '@/components/SophisticatedServices';
-import PremiumBrandsCarousel from '@/components/PremiumBrandsCarousel';
+import OurWorkshop from '@/components/OurWorkshop';
+import WhyMbr from '@/components/WhyMbr';
 import SophisticatedReviews from '@/components/SophisticatedReviews';
-import AboutSection from '@/components/AboutSection';
-import SophisticatedTeam from '@/components/SophisticatedTeam';
 import ContactSection from '@/components/ContactSection';
 
 export default function HomePage() {
@@ -15,11 +15,11 @@ export default function HomePage() {
     <div className="min-h-screen bg-black text-white">
       <ProfessionalNavigation />
       <SophisticatedHero />
+      <BrandsStrip />
       <SophisticatedServices />
-      <PremiumBrandsCarousel />
+      <OurWorkshop />
+      <WhyMbr />
       <SophisticatedReviews />
-      <AboutSection />
-      <SophisticatedTeam />
       <ContactSection />
     </div>
   );
