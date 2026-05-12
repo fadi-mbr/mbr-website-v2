@@ -199,7 +199,7 @@ export default function SophisticatedReviews() {
                   </span>
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <FaStar key={i} className="w-5 h-5 md:w-6 md:h-6 text-luxury-gold mx-0.5 md:mx-1" />
+                      <FaStar key={i} className="w-5 h-5 md:w-6 md:h-6 text-star-gold mx-0.5 md:mx-1" />
                     ))}
                   </div>
                 </div>
@@ -246,7 +246,7 @@ export default function SophisticatedReviews() {
                 {/* Stars */}
                 <div className="flex mb-4">
                   {[...Array(review.rating)].map((_, i) => (
-                    <FaStar key={i} className="w-4 h-4 text-luxury-gold mr-1" />
+                    <FaStar key={i} className="w-4 h-4 text-star-gold mr-1" />
                   ))}
                 </div>
 

@@ -68,6 +68,7 @@ export default function SophisticatedHero({
           loop
           muted={isMuted}
           playsInline
+          poster="/images/hero-poster.jpg"
           className="absolute top-0 left-0 w-full h-full object-cover"
         >
           <source
@@ -92,7 +93,7 @@ export default function SophisticatedHero({
             alt="MBR Making Better Rides - Premium Car Repair Dubai, Luxury Auto Service UAE"
             width={140}
             height={32}
-            className="h-8 w-auto opacity-60"
+            className="logo-sm opacity-60"
           />
         </motion.div>
 
@@ -166,7 +167,7 @@ export default function SophisticatedHero({
           <div className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-3xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg max-w-full overflow-hidden">
             <div className="flex items-center space-x-1 md:space-x-2">
               <FaGoogle className="text-red-500 text-sm md:text-base" />
-              <FaStar className="text-luxury-gold text-sm md:text-base" />
+              <FaStar className="text-star-gold text-sm md:text-base" />
               <span className="text-white font-bold text-sm md:text-lg">
                 {reviewsLoading ? '4.8' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.8)}
               </span>
@@ -219,12 +220,12 @@ export default function SophisticatedHero({
                 alt="MBR Making Better Rides - Premium Car Repair Dubai, Luxury Auto Service UAE"
                 width={400}
                 height={150}
-                className="w-auto h-24 md:h-32 lg:h-40 object-contain filter brightness-100"
+                className="logo-lg object-contain filter brightness-100"
                 priority
               />
             </div>
             <div className="max-w-4xl mx-auto">
-              <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-luxury-gold mb-3">
+              <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-accent-bronze mb-3">
                 Trusted by Ferrari · Lamborghini · Rolls-Royce owners
               </p>
               <p className="text-xl md:text-2xl font-light gradient-text mb-4">

@@ -6,6 +6,7 @@ import FloatingWhatsAppButton from "@/components/FloatingWhatsAppButton";
 import FloatingChatwootButton from "@/components/FloatingChatwootButton";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import ConditionalGoogleAnalytics from "@/components/ConditionalGoogleAnalytics";
+import SiteFooter from "@/components/SiteFooter";
 import { autoRepairSchema, organizationSchema, aggregateRatingSchema } from '@/lib/structured-data';
 import "./globals.css";
 
@@ -101,20 +102,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "MBR Auto Services",
-    images: [
-      {
-        url: 'https://mbrme.com/images/Logo_MBRauto_noWhite_small.png',
-        width: 1200,
-        height: 630,
-        alt: 'MBR Auto Services. Independent luxury and exotic-car workshop in Dubai.',
-      },
-    ],
+    // Image is generated dynamically by src/app/opengraph-image.tsx
+    // (Next.js file-based metadata convention — auto-picked up).
   },
   twitter: {
     card: "summary_large_image",
     title: "MBR Auto Services | Ferrari, Lamborghini & Rolls-Royce Service Dubai",
     description: "Independent luxury and exotic-car workshop in Dubai. Bosch-authorised, Leonardo exotic diagnostics, OEM-level tooling, 15+ years.",
-    images: ['https://mbrme.com/images/Logo_MBRauto_noWhite_small.png'],
+    // Twitter image inherits from opengraph-image.tsx when card=summary_large_image.
   },
 };
 
@@ -160,6 +155,7 @@ export default function RootLayout({
           }}
         />
         {children}
+        <SiteFooter />
         <FloatingWhatsAppButton />
         <FloatingChatwootButton />
         <CookieConsentBanner />

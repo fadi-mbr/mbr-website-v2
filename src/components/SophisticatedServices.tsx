@@ -188,7 +188,7 @@ export default function SophisticatedServices() {
                       href={service.externalLink.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-xs uppercase tracking-[0.2em] text-luxury-gold hover:text-white transition-colors duration-300 mb-6"
+                      className="inline-flex items-center text-xs uppercase tracking-[0.2em] text-accent-bronze hover:text-white transition-colors duration-300 mb-6"
                     >
                       {service.externalLink.label}
                       <span className="ml-2" aria-hidden="true">&rarr;</span>

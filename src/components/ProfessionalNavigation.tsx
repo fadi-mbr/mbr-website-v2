@@ -79,7 +79,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
               alt="MBR Making Better Rides - Premium Car Repair Dubai, Luxury Auto Service UAE"
               width={140}
               height={45}
-                className="h-8 w-auto opacity-95 transition-all duration-300 group-hover:opacity-100 group-hover:brightness-110"
+                className="logo-md opacity-95 transition-all duration-300 group-hover:opacity-100 group-hover:brightness-110"
               priority
             />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />

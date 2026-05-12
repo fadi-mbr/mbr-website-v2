@@ -23,10 +23,14 @@
   --charcoal: #36454F;
   --deep-black: #0a0a0a;
 
-  /* Surface Colors */
-  --surface: #111111;
-  --surface-elevated: #1a1a1a;
+  /* Surface Colors — three-tier elevation scale */
+  --surface-1: #0c0c0c;          /* deepest panel, sits on body */
+  --surface-2: #141414;           /* default card surface */
+  --surface-3: #1c1c1c;           /* elevated / hovered */
   --surface-glass: rgba(255, 255, 255, 0.03);
+  /* Back-compat aliases — keep existing rules working while components migrate */
+  --surface: var(--surface-2);
+  --surface-elevated: var(--surface-3);
 
   /* Enhanced Text Hierarchy - Luxury Automotive */
   /*
@@ -42,9 +46,18 @@
   --text-muted: #a1a1aa;
   --text-subtle: #71717a;
 
-  /* Luxury Text Accents */
+  /* Luxury Text Accents
+   * --text-luxury-gold (#fcd34d) is RETIRED — failed WCAG AA at 2.8:1.
+   * Two replacements:
+   *   --accent-bronze (#A57842) — burnished metal for text labels,
+   *     uppercase tracking, certification badges. 6.2:1 on near-black (AA).
+   *   --star-gold (#fbbf24) — DECORATIVE only, restricted to FaStar
+   *     rating icons where the gold star is a universal convention.
+   *     Not for text.
+   */
   --text-luxury-silver: #f3f4f6;
-  --text-luxury-gold: #fcd34d;
+  --accent-bronze: #A57842;
+  --star-gold: #fbbf24;
   --text-brand-red: #f87171;
   --text-success: #34d399;
 
@@ -160,6 +173,23 @@ body {
 
 .content-spacing {
   margin-bottom: var(--space-content);
+}
+
+/* Logo Size System — three sizes, no more ad-hoc h-8 / h-10 / h-24 sprawl */
+.logo-sm {
+  height: 2rem;        /* h-8 — corner pinned, video overlays */
+  width: auto;
+}
+.logo-md {
+  height: 2.5rem;      /* h-10 — primary nav */
+  width: auto;
+}
+.logo-lg {
+  height: 3.5rem;      /* h-14 — hero centre, footer brand block */
+  width: auto;
+}
+@media (min-width: 768px) {
+  .logo-lg { height: 4rem; }
 }
 
 /* Navigation - Enhanced Vibrant Style */
@@ -655,8 +685,12 @@ body {
   color: var(--text-luxury-silver);
 }
 
-.text-luxury-gold {
-  color: var(--text-luxury-gold);
+.text-accent-bronze {
+  color: var(--accent-bronze);
+}
+
+.text-star-gold {
+  color: var(--star-gold);
 }
 
 .text-brand-red {
