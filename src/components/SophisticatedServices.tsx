@@ -3,8 +3,11 @@
 import React from 'react';
 import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
-import { FaArrowRight, FaWhatsapp, FaCogs, FaBolt, FaWrench, FaOilCan } from 'react-icons/fa';
+import Link from 'next/link';
+import { FaCalendarAlt, FaWhatsapp, FaCogs, FaBolt, FaWrench, FaOilCan } from 'react-icons/fa';
 import { trackWhatsAppClick, trackServiceClick } from '@/lib/analytics';
+import { triggerChat } from '@/lib/chat-cta';
+import PremiumBrandsCarousel from './PremiumBrandsCarousel';
 
 const services = [
   {
@@ -90,15 +93,28 @@ export default function SophisticatedServices() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <h2 className="text-display font-light gradient-text mb-8 tracking-tight">
+          <h2 className="text-display font-light gradient-text mb-6 tracking-tight">
             Luxury, Exotic &amp; Supercar Services
           </h2>
-          <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
+          <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed mb-10">
             Engine, transmission, electrical and chassis work, performed with OEM-level
             diagnostics, the Leonardo exotic-car platform, and genuine OEM parts. Trusted by
             Ferrari, Lamborghini, and Rolls-Royce owners; experienced with Bentley, Porsche,
             and the German luxury lineup.
           </p>
+
+          {/* Tier pill row — anchors services to the brand hierarchy */}
+          <div className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[0.7rem] md:text-xs uppercase tracking-[0.25em] text-accent-bronze">
+            <span>Supercar</span>
+            <span className="text-white/20" aria-hidden="true">·</span>
+            <span>Ultra-Luxury</span>
+            <span className="text-white/20" aria-hidden="true">·</span>
+            <span>Luxury &amp; Sport</span>
+            <span className="text-white/20" aria-hidden="true">·</span>
+            <span className="text-[var(--text-muted)] normal-case tracking-normal italic">
+              same workshop, same craft
+            </span>
+          </div>
         </motion.div>
 
         {/* Services Grid */}
@@ -195,25 +211,31 @@ export default function SophisticatedServices() {
                     </a>
                   )}
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons — Chat with us / Book Directly */}
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <a
-                      href={`https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20${encodeURIComponent(service.title.toLowerCase())}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 liquid-glass-btn liquid-glass-btn-primary"
+                    <button
+                      type="button"
+                      className="flex-1 liquid-glass-btn liquid-glass-btn-primary inline-flex items-center justify-center gap-2"
                       onClick={() => {
-                        trackWhatsAppClick('services_sophisticated', 'Book Service', service.title);
-                        trackServiceClick(service.title, service.title, 'whatsapp');
+                        trackServiceClick(service.title, service.title, 'chat');
+                        triggerChat(
+                          `service_card_${service.title.toLowerCase().replace(/\s+/g, '_')}`,
+                          `Hello MBR, I need ${service.title.toLowerCase()}`,
+                        );
                       }}
                     >
-                      Book Service
-                    </a>
-
-                    <button className="flex-1 liquid-glass-btn liquid-glass-btn-secondary flex items-center justify-center space-x-2">
-                      <span>Learn More</span>
-                      <FaArrowRight className="w-4 h-4" />
+                      <FaWhatsapp className="w-4 h-4" />
+                      <span>Chat with us</span>
                     </button>
+
+                    <Link
+                      href="/book"
+                      className="flex-1 liquid-glass-btn liquid-glass-btn-secondary inline-flex items-center justify-center gap-2"
+                      onClick={() => trackServiceClick(service.title, service.title, 'book_link')}
+                    >
+                      <FaCalendarAlt className="w-4 h-4" />
+                      <span>Book Directly</span>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -221,39 +243,12 @@ export default function SophisticatedServices() {
           ))}
         </motion.div>
 
-        {/* Bosch Partnership - Enhanced */}
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-          viewport={{ once: true }}
-        >
-          <div className="inline-flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8 glass-card-premium p-6 md:p-8">
-            <Image
-              src="/images/Bosch_Logo24.webp"
-              alt="Bosch Authorized Service Partner - Certified Premium Car Service Dubai, UAE | MBR Auto Services"
-              width={120}
-              height={60}
-              className="opacity-80"
-            />
-            <div className="text-center md:text-left">
-              <h3 className="text-2xl font-light text-white mb-3">
-                Bosch Authorized Service Partner
-              </h3>
-              <p className="text-muted-enhanced mb-4">
-                Certified quality, genuine parts, and manufacturer-level diagnostics
-              </p>
-              <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-6 text-sm text-subtle-enhanced">
-                <span>• Genuine Parts</span>
-                <span>• Certified Technicians</span>
-                <span>• Warranty Coverage</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
       </div>
+
+      {/* Brands we service — full 12-mark carousel, anchored to the services
+          they map to. The short BrandsStrip above the fold introduces the
+          marques; this is the full breadth for visitors who want to scan. */}
+      <PremiumBrandsCarousel />
     </section>
   );
 }
