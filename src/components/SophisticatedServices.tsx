@@ -133,7 +133,7 @@ export default function SophisticatedServices() {
               whileHover={{ y: -10 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="relative overflow-hidden glass-card glass-shimmer hover:glow-red transition-all duration-500">
+              <div className="relative overflow-hidden glass-card hover:glow-red transition-all duration-500">
 
                 {/* Service Image */}
                 <div className="relative h-64 overflow-hidden">

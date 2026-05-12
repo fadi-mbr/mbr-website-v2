@@ -165,7 +165,7 @@ export default function ContactSection() {
                     }
                   }}
                 >
-                  <div className="glass-card glass-shimmer p-6 h-full text-center group hover:bg-surface hover:glow-red transition-all duration-300">
+                  <div className="glass-card p-6 h-full text-center group hover:bg-surface hover:glow-red transition-all duration-300">
                     <info.icon className={`w-8 h-8 mx-auto mb-4 ${info.color} group-hover:scale-110 transition-transform`} />
                     <h3 className="text-subheading text-white mb-2">
                       {info.title}
@@ -182,7 +182,7 @@ export default function ContactSection() {
                   </div>
                 </a>
               ) : (
-                <div className="glass-card glass-shimmer p-6 h-full text-center hover:glow-red transition-all duration-300">
+                <div className="glass-card p-6 h-full text-center hover:glow-red transition-all duration-300">
                   <info.icon className={`w-8 h-8 mx-auto mb-4 ${info.color}`} />
                   <h3 className="text-subheading text-white mb-2">
                     {info.title}

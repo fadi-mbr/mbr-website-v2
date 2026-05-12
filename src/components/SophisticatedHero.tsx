@@ -341,7 +341,7 @@ export default function SophisticatedHero({
             viewport={{ once: true }}
           >
             <div className="text-center group cursor-pointer">
-              <div className="glass-card glass-shimmer p-8 hover:glow-red transition-all duration-300">
+              <div className="glass-card has-shimmer p-8 hover:glow-red transition-all duration-300">
                 <div className="text-4xl font-light gradient-text-vibrant mb-4">15+</div>
                 <div className="text-lg text-luxury-silver mb-2">Years</div>
                 <div className="text-sm text-muted-enhanced">Excellence in Dubai</div>
@@ -349,7 +349,7 @@ export default function SophisticatedHero({
             </div>
 
             <div className="text-center group cursor-pointer">
-              <div className="glass-card glass-shimmer p-8 hover:glow-red transition-all duration-300">
+              <div className="glass-card has-shimmer p-8 hover:glow-red transition-all duration-300">
                 <div className="text-4xl font-light gradient-text-vibrant mb-4">5000+</div>
                 <div className="text-lg text-luxury-silver mb-2">Customers</div>
                 <div className="text-sm text-muted-enhanced">Trust Our Service</div>

@@ -4,17 +4,27 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { trackWhatsAppClick, trackNavigation } from '@/lib/analytics';
+import { trackNavigation } from '@/lib/analytics';
+import { triggerChat } from '@/lib/chat-cta';
 
 interface NavigationProps {
   currentSection?: string;
 }
 
+/* Post-Wave-2 section ids:
+ *   - trusted-brands (BrandsStrip)
+ *   - services       (SophisticatedServices)
+ *   - workshop       (OurWorkshop)
+ *   - why-mbr        (WhyMbr)
+ *   - reviews        (SophisticatedReviews)
+ *   - contact        (ContactSection)
+ * The pre-revamp "about" and "team" anchors are gone — they were folded
+ * into Why MBR. The nav reflects the current information architecture. */
 const navigationItems = [
   { id: 'services', label: 'Services' },
+  { id: 'workshop', label: 'Workshop' },
+  { id: 'why-mbr', label: 'Why MBR' },
   { id: 'reviews', label: 'Reviews' },
-  { id: 'about', label: 'About' },
-  { id: 'team', label: 'Team' },
   { id: 'contact', label: 'Contact' },
 ];
 
@@ -115,22 +125,26 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
             ))}
           </div>
 
-          {/* CTA Button */}
+          {/* Persistent Enquire CTA — Phase A.
+              Always-visible primary conversion. Device-detects via
+              triggerChat() so desktop opens Chatwoot, mobile (when this
+              button renders inside the mobile menu) deep-links WhatsApp.
+              Carries the new has-shimmer modifier — one of only two
+              shimmer-eligible surfaces on the site. */}
           <motion.div
             className="hidden md:block"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5, duration: 0.4 }}
           >
-            <a
-              href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small"
-              onClick={() => trackWhatsAppClick('navigation_desktop', 'Book Service')}
+            <button
+              type="button"
+              onClick={() => triggerChat('navigation_desktop')}
+              className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small has-shimmer font-marque"
+              style={{ letterSpacing: '0.2em' }}
             >
-              Book Service
-            </a>
+              Enquire
+            </button>
           </motion.div>
 
           {/* Mobile Menu Button */}
@@ -208,18 +222,17 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                   transition={{ delay: 0.3, duration: 0.2 }}
                   className="pt-4"
                 >
-              <a
-                href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
-                target="_blank"
-                rel="noopener noreferrer"
-                    className="block liquid-glass-btn liquid-glass-btn-primary text-center"
+              <button
+                type="button"
+                className="block w-full liquid-glass-btn liquid-glass-btn-primary text-center has-shimmer font-marque"
+                style={{ letterSpacing: '0.2em' }}
                 onClick={() => {
                   setIsOpen(false);
-                  trackWhatsAppClick('navigation_mobile', 'Book Service');
+                  triggerChat('navigation_mobile');
                 }}
               >
-                Book Service
-              </a>
+                Enquire
+              </button>
                 </motion.div>
             </div>
           </motion.div>
