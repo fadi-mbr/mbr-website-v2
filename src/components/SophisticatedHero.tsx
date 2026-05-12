@@ -296,17 +296,17 @@ export default function SophisticatedHero({
                 {[0, 1].map((dupKey) => (
                   <div key={dupKey} className="flex shrink-0 items-center gap-14 md:gap-20 pr-14 md:pr-20 text-eyebrow text-[var(--text-subtle)] opacity-70" style={{ fontSize: '0.6rem', letterSpacing: '0.32em' }}>
                     <span>Bosch Authorised</span>
-                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span className="text-[var(--primary)]">·</span>
                     <span>Leonardo Diagnostics</span>
-                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span className="text-[var(--primary)]">·</span>
                     <span>OEM-Level Tooling</span>
-                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span className="text-[var(--primary)]">·</span>
                     <span>Genuine OEM Parts</span>
-                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span className="text-[var(--primary)]">·</span>
                     <span>Independent Workshop</span>
-                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span className="text-[var(--primary)]">·</span>
                     <span>Al Quoz Industrial 4</span>
-                    <span className="text-[var(--accent-bronze)]">·</span>
+                    <span className="text-[var(--primary)]">·</span>
                   </div>
                 ))}
               </div>

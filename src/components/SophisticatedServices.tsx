@@ -191,7 +191,8 @@ function ServiceSlabRow({
           {service.features.map((f) => (
             <li key={f} className="flex items-center gap-3">
               <span
-                className="block w-1 h-1 rounded-full bg-[var(--accent-bronze)] flex-shrink-0"
+                className="block w-1.5 h-1.5 rounded-full bg-[var(--primary)] flex-shrink-0"
+                style={{ boxShadow: '0 0 8px rgba(227,6,19,0.55)' }}
                 aria-hidden="true"
               />
               <span>{f}</span>

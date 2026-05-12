@@ -7,13 +7,13 @@ import type { NextConfig } from "next";
  * <script> blobs; revisit when we move to a nonce-based CSP. */
 const CSP = [
   "default-src 'self'",
-  "img-src 'self' data: blob: https://*.googleusercontent.com https://*.gstatic.com https://*.google.com https://maps.googleapis.com",
+  "img-src 'self' data: blob: https://*.googleusercontent.com https://*.gstatic.com https://*.google.com https://maps.googleapis.com https://connect.mbrme.com",
   "media-src 'self' https://cdn.mbrme.com",
   "script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://*.google-analytics.com https://connect.mbrme.com https://*.vercel-scripts.com",
-  "connect-src 'self' https://*.google-analytics.com https://*.googleapis.com https://connect.mbrme.com",
-  "frame-src 'self' https://www.google.com",
-  "font-src 'self' data:",
-  "style-src 'self' 'unsafe-inline'",
+  "connect-src 'self' https://*.google-analytics.com https://*.googleapis.com https://connect.mbrme.com wss://connect.mbrme.com",
+  "frame-src 'self' https://www.google.com https://connect.mbrme.com",
+  "font-src 'self' data: https://connect.mbrme.com",
+  "style-src 'self' 'unsafe-inline' https://connect.mbrme.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
