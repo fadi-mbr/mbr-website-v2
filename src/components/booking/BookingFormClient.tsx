@@ -23,8 +23,8 @@ import {
   normalizeIntlPhone,
 } from '@/lib/booking-phone';
 import type { BookingService } from '@/lib/booking-types';
-import { OTHER_SENTINEL } from '@/lib/car-catalog';
-import { FOREIGN_SENTINEL, formatPlate } from '@/lib/uae-plates';
+import { ALL_MAKES_PLUS_OTHER, getModelsForMake, OTHER_SENTINEL } from '@/lib/car-catalog';
+import { FOREIGN_SENTINEL, formatPlate, parsePlate } from '@/lib/uae-plates';
 
 export interface BookingSubmitPayload {
   mode: 'agent' | 'public';
@@ -83,6 +83,15 @@ interface Props {
     lastName?: string;
     phone?: string;
     email?: string;
+    vehicleYear?: number;
+    vehicleMake?: string;
+    vehicleModel?: string;
+    /**
+     * Formatted plate string (e.g. `Dubai M 12345`). Decomposed by
+     * `parsePlate` into emirate/category/number or foreign/foreignText
+     * for the picker.
+     */
+    vehiclePlate?: string;
   };
   /**
    * Optional inline submit handler — used by the preview route to log
@@ -118,6 +127,47 @@ type FieldErrors = Partial<
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+/**
+ * Resolve a free-text vehicle make from Chatwoot to a (make, customMake)
+ * pair. If the input matches a catalog entry exactly (case-insensitive),
+ * snap to that canonical name; otherwise fall back to the OTHER sentinel
+ * with the typed text preserved in `customMake`.
+ */
+function resolveMakePrefill(raw: string | undefined): {
+  make: string;
+  customMake: string;
+} {
+  if (!raw) return { make: '', customMake: '' };
+  const q = raw.trim();
+  if (!q) return { make: '', customMake: '' };
+  const canonical = ALL_MAKES_PLUS_OTHER.find(
+    (m) => m !== OTHER_SENTINEL && m.toLowerCase() === q.toLowerCase(),
+  );
+  if (canonical) return { make: canonical, customMake: '' };
+  return { make: OTHER_SENTINEL, customMake: q };
+}
+
+/**
+ * Resolve a free-text model against the catalog entries for `make`. Exact
+ * (case-insensitive) match → snap to canonical, otherwise OTHER + customModel.
+ * If `make` is empty / OTHER, treat the model itself as custom.
+ */
+function resolveModelPrefill(
+  make: string,
+  raw: string | undefined,
+): { model: string; customModel: string } {
+  if (!raw) return { model: '', customModel: '' };
+  const q = raw.trim();
+  if (!q) return { model: '', customModel: '' };
+  if (!make || make === OTHER_SENTINEL) {
+    return { model: OTHER_SENTINEL, customModel: q };
+  }
+  const models = getModelsForMake(make);
+  const canonical = models.find((m) => m.toLowerCase() === q.toLowerCase());
+  if (canonical) return { model: canonical, customModel: '' };
+  return { model: OTHER_SENTINEL, customModel: q };
+}
+
 export default function BookingFormClient({
   mode,
   services,
@@ -134,20 +184,39 @@ export default function BookingFormClient({
     prefill?.phone ? maskIntlPhoneInput(prefill.phone) : ''
   );
   const [email, setEmail] = useState(prefill?.email ?? '');
-  const [vehicleYear, setVehicleYear] = useState('');
+  const [vehicleYear, setVehicleYear] = useState(
+    prefill?.vehicleYear ? String(prefill.vehicleYear) : ''
+  );
   // Make/Model: when the picker selects "Other", the sentinel `__OTHER__`
   // is stored here and the actual user-typed name goes into customMake /
   // customModel. At submit time we resolve to the real string.
-  const [vehicleMake, setVehicleMake] = useState('');
-  const [customMake, setCustomMake] = useState('');
-  const [vehicleModel, setVehicleModel] = useState('');
-  const [customModel, setCustomModel] = useState('');
+  //
+  // Prefill (from Chatwoot custom_attributes): if the supplied make/model
+  // matches a catalog entry exactly, hydrate the combobox with the canonical
+  // name; otherwise fall back to OTHER + customMake/customModel.
+  const _initMake = useMemo(
+    () => resolveMakePrefill(prefill?.vehicleMake),
+    [prefill?.vehicleMake]
+  );
+  const _initModel = useMemo(
+    () => resolveModelPrefill(_initMake.make, prefill?.vehicleModel),
+    [_initMake.make, prefill?.vehicleModel]
+  );
+  const [vehicleMake, setVehicleMake] = useState(_initMake.make);
+  const [customMake, setCustomMake] = useState(_initMake.customMake);
+  const [vehicleModel, setVehicleModel] = useState(_initModel.model);
+  const [customModel, setCustomModel] = useState(_initModel.customModel);
   // Plate: composed from emirate + category + number, or from foreignText
-  // when emirate === FOREIGN_SENTINEL.
-  const [plateEmirate, setPlateEmirate] = useState('');
-  const [plateCategory, setPlateCategory] = useState('');
-  const [plateNumber, setPlateNumber] = useState('');
-  const [plateForeign, setPlateForeign] = useState('');
+  // when emirate === FOREIGN_SENTINEL. Prefill via `parsePlate` if a stored
+  // plate string is supplied; unrecognised formats fall back to empty.
+  const _initPlate = useMemo(
+    () => parsePlate(prefill?.vehiclePlate),
+    [prefill?.vehiclePlate]
+  );
+  const [plateEmirate, setPlateEmirate] = useState(_initPlate.emirate);
+  const [plateCategory, setPlateCategory] = useState(_initPlate.category);
+  const [plateNumber, setPlateNumber] = useState(_initPlate.number);
+  const [plateForeign, setPlateForeign] = useState(_initPlate.foreignText);
   const [notes, setNotes] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -376,11 +445,19 @@ export default function BookingFormClient({
   };
 
   if (success) {
-    const heading = success.pendingMessage
+    // Heading + body branch on three states:
+    //   - public pending     → "Check your email" + magic-link instructions
+    //   - agent confirmed    → "Booking submitted ✓" + ARC awaiting-approval
+    //   - preview/legacy     → "Booking request received" / "Booking confirmed"
+    const isPublicPending = !!success.pendingMessage;
+    const isAgent = !isPublicPending && mode === 'agent' && !success.isPreview;
+    const heading = isPublicPending
       ? 'Check your email'
-      : success.isPreview
-        ? 'Booking request received'
-        : 'Booking confirmed';
+      : isAgent
+        ? 'Booking submitted ✓'
+        : success.isPreview
+          ? 'Booking request received'
+          : 'Booking confirmed';
     return (
       <div
         className="rounded-lg border border-[#b08d57]/40 bg-neutral-900 p-6 text-white"
@@ -388,8 +465,19 @@ export default function BookingFormClient({
         aria-live="polite"
       >
         <h2 className="text-xl font-light mb-2">{heading}</h2>
-        {success.pendingMessage ? (
+        {isPublicPending ? (
           <p className="text-sm text-neutral-300">{success.pendingMessage}</p>
+        ) : isAgent ? (
+          <>
+            <p className="text-sm text-neutral-300">
+              The booking is now in ARC awaiting team approval. The customer
+              doesn&apos;t need to do anything — once a teammate approves it in
+              ARC (Notifications inbox), it lands in the calendar.
+            </p>
+            <p className="text-xs text-neutral-400 mt-3">
+              {success.serviceTitle} — {success.when}
+            </p>
+          </>
         ) : (
           <p className="text-sm text-neutral-300">
             {success.serviceTitle} — {success.when}
@@ -397,7 +485,7 @@ export default function BookingFormClient({
         )}
         {success.arcAppointmentId !== undefined && (
           <p className="text-xs text-neutral-500 mt-2">
-            Reference #{success.arcAppointmentId}
+            Reference: apt #{success.arcAppointmentId}
           </p>
         )}
         {success.isPreview && (
@@ -405,10 +493,11 @@ export default function BookingFormClient({
             This is a preview screen. No appointment was created.
           </p>
         )}
-        {success.pendingMessage && (
+        {isPublicPending && (
           <p className="text-xs text-neutral-500 mt-4">
             The link in the email expires in 30 minutes. If you don&apos;t see
-            it, check your spam folder.
+            it, check your spam folder. The booking will only appear in ARC
+            after you click the link.
           </p>
         )}
       </div>
@@ -423,6 +512,21 @@ export default function BookingFormClient({
       aria-label="MBR Booking"
       className="space-y-8 text-white"
     >
+      {/* Mode banner: makes the agent vs public flow obvious before submit. */}
+      <div
+        className={[
+          'rounded-md border px-3 py-2 text-xs',
+          mode === 'agent'
+            ? 'border-[#b08d57]/40 bg-[#b08d57]/10 text-[#d8b27e]'
+            : 'border-neutral-700 bg-neutral-900 text-neutral-300',
+        ].join(' ')}
+        role="note"
+      >
+        {mode === 'agent'
+          ? 'This booking will be sent to ARC immediately for team approval — no email step.'
+          : "We'll email you a confirmation link to finalize this booking."}
+      </div>
+
       {banner && (
         <div
           role="alert"
@@ -783,7 +887,11 @@ export default function BookingFormClient({
               : 'bg-[#b08d57] text-black hover:bg-[#c79c63]',
           ].join(' ')}
         >
-          {submitting ? 'Submitting…' : mode === 'agent' ? 'Book appointment' : 'Request booking'}
+          {submitting
+            ? 'Submitting…'
+            : mode === 'agent'
+              ? 'Book appointment now'
+              : 'Email me the confirmation link'}
         </button>
       </div>
     </form>

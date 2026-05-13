@@ -83,11 +83,31 @@ async function loadServices(baseUrl: string): Promise<BookingService[]> {
   }
 }
 
-function projectPrefill(contact: ChatwootContact | null): {
+/**
+ * Project Chatwoot contact → form prefill.
+ *
+ * Surfaces:
+ *   - name → firstName + lastName (via `splitName`)
+ *   - phone_number → phone (digits only, 6-15)
+ *   - email → email
+ *   - custom_attributes.vehicle_year   → vehicleYear  (number or 4-digit string)
+ *   - custom_attributes.vehicle_make   → vehicleMake
+ *   - custom_attributes.vehicle_model  → vehicleModel
+ *   - custom_attributes.vehicle_plate  → vehiclePlate (formatted plate string;
+ *     the form decomposes it via `parsePlate` from src/lib/uae-plates.ts)
+ *
+ * Each attribute is read defensively — Chatwoot allows any user-set type
+ * for custom_attributes, and we silently skip values of the wrong shape.
+ */
+export function projectPrefill(contact: ChatwootContact | null): {
   firstName?: string;
   lastName?: string;
   phone?: string;
   email?: string;
+  vehicleYear?: number;
+  vehicleMake?: string;
+  vehicleModel?: string;
+  vehiclePlate?: string;
 } {
   if (!contact) return {};
   const { firstName, lastName } = splitName(contact.name);
@@ -100,11 +120,42 @@ function projectPrefill(contact: ChatwootContact | null): {
     typeof contact.email === 'string' && contact.email.trim()
       ? contact.email.trim()
       : undefined;
-  const out: { firstName?: string; lastName?: string; phone?: string; email?: string } = {};
+  const out: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    email?: string;
+    vehicleYear?: number;
+    vehicleMake?: string;
+    vehicleModel?: string;
+    vehiclePlate?: string;
+  } = {};
   if (firstName) out.firstName = firstName;
   if (lastName) out.lastName = lastName;
   if (phone) out.phone = phone;
   if (email) out.email = email;
+
+  if (contact.custom_attributes && typeof contact.custom_attributes === 'object') {
+    const ca = contact.custom_attributes as Record<string, unknown>;
+    if (typeof ca.vehicle_year === 'number' && Number.isFinite(ca.vehicle_year)) {
+      out.vehicleYear = ca.vehicle_year;
+    } else if (
+      typeof ca.vehicle_year === 'string' &&
+      /^\d{4}$/.test(ca.vehicle_year)
+    ) {
+      out.vehicleYear = Number(ca.vehicle_year);
+    }
+    if (typeof ca.vehicle_make === 'string' && ca.vehicle_make.trim()) {
+      out.vehicleMake = ca.vehicle_make.trim();
+    }
+    if (typeof ca.vehicle_model === 'string' && ca.vehicle_model.trim()) {
+      out.vehicleModel = ca.vehicle_model.trim();
+    }
+    if (typeof ca.vehicle_plate === 'string' && ca.vehicle_plate.trim()) {
+      out.vehiclePlate = ca.vehicle_plate.trim();
+    }
+  }
+
   return out;
 }
 

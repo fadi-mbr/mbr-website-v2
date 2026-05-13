@@ -21,6 +21,15 @@ interface Props {
     lastName?: string;
     phone?: string;
     email?: string;
+    vehicleYear?: number;
+    vehicleMake?: string;
+    vehicleModel?: string;
+    /**
+     * Formatted plate string as stored on the Chatwoot contact (e.g.
+     * `Dubai M 12345` or `Foreign: KSA 9999 ABC`). Decomposed by the form
+     * client via `parsePlate`.
+     */
+    vehiclePlate?: string;
   };
   /**
    * Optional Server Action — when present, the client form awaits this on

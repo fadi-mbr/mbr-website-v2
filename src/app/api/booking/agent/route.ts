@@ -29,7 +29,7 @@
  */
 
 import crypto from 'node:crypto';
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { normalisePhone } from '../_lib/arc-client';
 import { validateBookingRequest } from '../_lib/validate';
 import {
@@ -39,6 +39,10 @@ import {
 import { logBooking } from '../_lib/log';
 import { submitConfirmedBooking } from '@/lib/booking-arc-submit';
 import type { BookingIntent } from '@/lib/booking-types';
+import {
+  loadChatwootConfig,
+  updateContactCustomAttributes,
+} from '@/lib/chatwoot-client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -89,6 +93,77 @@ function readBaseUrl(reqUrl: string): URL {
     return new URL(reqUrl);
   } catch {
     return new URL('http://localhost');
+  }
+}
+
+/* -------------------- Chatwoot contact write-back deps -------------------- */
+/**
+ * Indirection so unit tests can capture / no-op the contact-attribute
+ * write-back without mocking `next/server.after()` or the global fetch.
+ *
+ * Production wiring uses the real `loadChatwootConfig` +
+ * `updateContactCustomAttributes`. `_setContactAttrsDepsForTests` lets
+ * tests substitute fakes; `_resetContactAttrsDepsForTests` restores
+ * production.
+ */
+interface ContactAttrsDeps {
+  loadConfig: typeof loadChatwootConfig;
+  updateAttrs: typeof updateContactCustomAttributes;
+}
+
+const PROD_CONTACT_ATTRS_DEPS: ContactAttrsDeps = {
+  loadConfig: loadChatwootConfig,
+  updateAttrs: updateContactCustomAttributes,
+};
+
+let contactAttrsDeps: ContactAttrsDeps = PROD_CONTACT_ATTRS_DEPS;
+
+export function _setContactAttrsDepsForTests(deps: ContactAttrsDeps): void {
+  contactAttrsDeps = deps;
+}
+
+export function _resetContactAttrsDepsForTests(): void {
+  contactAttrsDeps = PROD_CONTACT_ATTRS_DEPS;
+}
+
+/**
+ * Schedule a best-effort write-back of the vehicle fields onto the Chatwoot
+ * contact's `custom_attributes`, so the next /book/agent submission for the
+ * same customer pre-fills the vehicle. Non-blocking; failures are logged but
+ * never affect the user-facing response.
+ *
+ * Extracted so tests can call it directly (the `after()` wrapper itself is
+ * a thin scheduler that's hard to assert against).
+ */
+export async function writeBackVehicleAttrs(args: {
+  contactId: number;
+  vehicleYear: number;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehiclePlate?: string;
+}): Promise<void> {
+  try {
+    const cfg = contactAttrsDeps.loadConfig();
+    if (!cfg) return;
+    const attrs: Record<string, string | number | boolean | null> = {
+      vehicle_year: args.vehicleYear,
+      vehicle_make: args.vehicleMake,
+      vehicle_model: args.vehicleModel,
+    };
+    if (args.vehiclePlate) attrs.vehicle_plate = args.vehiclePlate;
+    const res = await contactAttrsDeps.updateAttrs(cfg, args.contactId, attrs);
+    if (!res.ok) {
+      logBooking({
+        event: 'booking.agent.contact_attrs_failed',
+        reason: `contact=${args.contactId} ${res.reason}`,
+        status: res.status,
+      });
+    }
+  } catch (e) {
+    logBooking({
+      event: 'booking.agent.contact_attrs_error',
+      reason: e instanceof Error ? e.message : String(e),
+    });
   }
 }
 
@@ -304,6 +379,36 @@ export async function POST(req: Request): Promise<NextResponse> {
     status: 200,
     reason: `conv=${conversationId} contact=${contactId}`,
   });
+
+  // 9. Schedule a non-blocking write-back of the vehicle fields to the
+  //    Chatwoot contact's custom_attributes. This makes future /book/agent
+  //    submissions for the same customer pre-fill vehicle year/make/model
+  //    and plate. Best-effort: a failure here is logged but doesn't affect
+  //    the booking response.
+  //
+  //    `after()` throws when invoked outside a Next request scope (e.g.
+  //    inside our hand-rolled unit-test harness). Catch + fall back to a
+  //    fire-and-forget Promise — production gets the deferred behaviour,
+  //    tests get observable side effects.
+  const writeBackArgs = {
+    contactId,
+    vehicleYear: parsed.vehicleYear,
+    vehicleMake: parsed.vehicleMake,
+    vehicleModel: parsed.vehicleModel,
+    vehiclePlate:
+      typeof body.vehiclePlate === 'string' && body.vehiclePlate.trim()
+        ? body.vehiclePlate.trim()
+        : undefined,
+  };
+  try {
+    after(async () => {
+      await writeBackVehicleAttrs(writeBackArgs);
+    });
+  } catch {
+    // Not in a request scope (unit tests). Run directly — the helper
+    // already swallows its own errors.
+    void writeBackVehicleAttrs(writeBackArgs);
+  }
 
   return jsonResponse(
     {
