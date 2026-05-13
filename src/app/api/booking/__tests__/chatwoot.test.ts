@@ -11,6 +11,7 @@ import {
   buildContactUrl,
   renderConfirmationMessage,
   loadChatwootConfig,
+  updateContactCustomAttributes,
 } from '../../../../lib/chatwoot-client';
 import { runSuite, assertEqual, assert } from './_harness';
 
@@ -151,6 +152,77 @@ export default function suite() {
         // exact locale-format strings vary by Node version, so don't pin.
         assert(/\d{2}:\d{2}/.test(msg) || /\d{1,2}\s?[ap]m/i.test(msg),
           `expected time-like substring, got: ${msg}`);
+      },
+    },
+
+    /* --------- updateContactCustomAttributes (PATCH body shape) --------- */
+    {
+      name: 'updateContactCustomAttributes PATCHes the contact URL with custom_attributes body',
+      fn: async () => {
+        const origFetch = globalThis.fetch;
+        let capturedUrl = '';
+        let capturedInit: RequestInit | undefined;
+        globalThis.fetch = (async (
+          input: RequestInfo | URL,
+          init?: RequestInit,
+        ) => {
+          capturedUrl =
+            typeof input === 'string'
+              ? input
+              : input instanceof URL
+                ? input.toString()
+                : (input as Request).url;
+          capturedInit = init;
+          return new Response(JSON.stringify({ id: 5 }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        }) as typeof fetch;
+        try {
+          const res = await updateContactCustomAttributes(
+            { baseUrl: 'https://connect.mbrme.com', accountId: '1', token: 'tok' },
+            5,
+            { vehicle_year: 2023, vehicle_make: 'Ferrari' },
+          );
+          assert(res.ok, `expected ok result, got ${JSON.stringify(res)}`);
+          assertEqual(
+            capturedUrl,
+            'https://connect.mbrme.com/api/v1/accounts/1/contacts/5',
+          );
+          assertEqual(capturedInit?.method, 'PATCH');
+          assertEqual(
+            (capturedInit?.headers as Record<string, string> | undefined)?.api_access_token,
+            'tok',
+          );
+          const parsed = JSON.parse(String(capturedInit?.body ?? '{}'));
+          assertEqual(parsed, {
+            custom_attributes: { vehicle_year: 2023, vehicle_make: 'Ferrari' },
+          });
+        } finally {
+          globalThis.fetch = origFetch;
+        }
+      },
+    },
+    {
+      name: 'updateContactCustomAttributes surfaces non-2xx as ok:false with status',
+      fn: async () => {
+        const origFetch = globalThis.fetch;
+        globalThis.fetch = (async () =>
+          new Response('nope', { status: 403 })) as typeof fetch;
+        try {
+          const res = await updateContactCustomAttributes(
+            { baseUrl: 'https://chat', accountId: '1', token: 't' },
+            7,
+            { x: 1 },
+          );
+          assertEqual(res.ok, false);
+          if (!res.ok) {
+            assertEqual(res.status, 403);
+            assert(res.reason.includes('chatwoot 403'));
+          }
+        } finally {
+          globalThis.fetch = origFetch;
+        }
       },
     },
   ]);

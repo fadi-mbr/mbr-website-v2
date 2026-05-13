@@ -128,3 +128,103 @@ export function formatPlate(args: {
 export function isValidPlateNumber(n: string): boolean {
   return /^\d{1,5}$/.test(n.trim());
 }
+
+/**
+ * Shape returned by `parsePlate` — the inverse of `formatPlate`.
+ *
+ * If the input string is not parseable as either a UAE or a foreign plate,
+ * every field is the empty string and the caller can fall back to leaving
+ * the picker empty.
+ */
+export interface ParsedPlate {
+  emirate: string;
+  category: string;
+  number: string;
+  foreignText: string;
+}
+
+const EMPTY_PARSED: ParsedPlate = {
+  emirate: '',
+  category: '',
+  number: '',
+  foreignText: '',
+};
+
+/**
+ * Decompose a stored plate string back into the picker's four fields.
+ *
+ * Accepts:
+ *   - `Dubai M 12345`                          → UAE
+ *   - `Abu Dhabi 12 9999`                      → UAE (multi-word emirate)
+ *   - `Foreign: KSA 9999 ABC`                  → foreign with `Foreign:` prefix
+ *   - `Foreign plate KSA 9999 ABC`             → foreign without colon
+ *   - unrecognised input                       → all-empty (caller falls back)
+ *
+ * Notes:
+ *   - UAE matching is greedy on the emirate name (longest match wins). The
+ *     last whitespace-separated token must be 1–5 digits.
+ *   - Whitespace between tokens is collapsed; surrounding whitespace ignored.
+ *   - We do NOT validate that the category exists in
+ *     `getCategoriesForEmirate` — if the catalog is updated or the stored
+ *     plate is from an old entry, we still let the picker show what we have
+ *     instead of silently dropping it.
+ */
+export function parsePlate(raw: string | undefined | null): ParsedPlate {
+  if (!raw) return { ...EMPTY_PARSED };
+  const s = raw.replace(/\s+/g, ' ').trim();
+  if (!s) return { ...EMPTY_PARSED };
+
+  // ---- Foreign path (two recognised shapes) -------------------------------
+  // `Foreign: <text>` (matches `formatPlate` output)
+  const foreignColon = /^foreign\s*:\s*(.+)$/i.exec(s);
+  if (foreignColon) {
+    const t = foreignColon[1].trim();
+    return t
+      ? { emirate: FOREIGN_SENTINEL, category: '', number: '', foreignText: t }
+      : { ...EMPTY_PARSED };
+  }
+  // `Foreign plate <text>` (matches the picker emirate label)
+  const foreignPrefix = /^foreign\s+plate\s+(.+)$/i.exec(s);
+  if (foreignPrefix) {
+    const t = foreignPrefix[1].trim();
+    return t
+      ? { emirate: FOREIGN_SENTINEL, category: '', number: '', foreignText: t }
+      : { ...EMPTY_PARSED };
+  }
+  // Bare `Foreign plate` with no body — treat as foreign with empty text.
+  if (/^foreign(\s+plate)?$/i.test(s)) {
+    return { emirate: FOREIGN_SENTINEL, category: '', number: '', foreignText: '' };
+  }
+
+  // ---- UAE path -----------------------------------------------------------
+  // Greedy emirate match: try the longest known emirate prefix first so
+  // "Abu Dhabi 12 9999" parses as ("Abu Dhabi", "12", "9999").
+  const lower = s.toLowerCase();
+  const sortedEmirates = [...EMIRATE_NAMES].sort(
+    (a, b) => b.length - a.length,
+  );
+  let matchedEmirate: string | null = null;
+  let rest = '';
+  for (const e of sortedEmirates) {
+    const ePrefix = e.toLowerCase() + ' ';
+    if (lower.startsWith(ePrefix)) {
+      matchedEmirate = e;
+      rest = s.slice(e.length).trim();
+      break;
+    }
+  }
+  if (!matchedEmirate || !rest) return { ...EMPTY_PARSED };
+
+  const parts = rest.split(/\s+/).filter((x) => x.length > 0);
+  if (parts.length < 2) return { ...EMPTY_PARSED };
+
+  const num = parts[parts.length - 1];
+  if (!/^\d{1,5}$/.test(num)) return { ...EMPTY_PARSED };
+  // Everything between emirate and number is the category code. We keep
+  // multi-token categories joined by a space (defensive — none of the
+  // current catalog has them, but it's harmless if they appear).
+  const cat = parts.slice(0, parts.length - 1).join(' ');
+  if (!cat) return { ...EMPTY_PARSED };
+
+  return { emirate: matchedEmirate, category: cat, number: num, foreignText: '' };
+}

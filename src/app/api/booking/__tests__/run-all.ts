@@ -15,6 +15,7 @@ import tokenSuite from "./token.test";
 import emailSuite from "./email.test";
 import arcSubmitSuite from "./arc-submit.test";
 import agentRouteSuite from "./agent-route.test";
+import agentPrefillSuite from "./agent-prefill.test";
 import requestRouteSuite from "./request-route.test";
 import confirmHelperSuite from "./confirm-helper.test";
 import confirmRouteSuite from "./confirm-route.test";
@@ -34,6 +35,7 @@ async function main(): Promise<void> {
   await emailSuite();
   await arcSubmitSuite();
   await agentRouteSuite();
+  await agentPrefillSuite();
   await requestRouteSuite();
   await confirmHelperSuite();
   await confirmRouteSuite();

@@ -11,6 +11,7 @@ import {
   getCategoriesForEmirate,
   getHintForEmirate,
   isValidPlateNumber,
+  parsePlate,
 } from "../../../../lib/uae-plates";
 import { assert, assertEqual, runSuite } from "./_harness";
 
@@ -142,5 +143,138 @@ export default () => runSuite("uae-plates", [
       assert(!isValidPlateNumber('123456'));
       assert(!isValidPlateNumber('12A4'));
     },
+  },
+
+  /* ------------------------ parsePlate (inverse) ------------------------ */
+  {
+    name: "parsePlate: 'Dubai M 12345' → { Dubai, M, 12345 }",
+    fn: () =>
+      assertEqual(parsePlate('Dubai M 12345'), {
+        emirate: 'Dubai',
+        category: 'M',
+        number: '12345',
+        foreignText: '',
+      }),
+  },
+  {
+    name: "parsePlate: 'Abu Dhabi 12 9999' → multi-word emirate",
+    fn: () =>
+      assertEqual(parsePlate('Abu Dhabi 12 9999'), {
+        emirate: 'Abu Dhabi',
+        category: '12',
+        number: '9999',
+        foreignText: '',
+      }),
+  },
+  {
+    name: "parsePlate: 'Foreign plate KSA 9999 ABC' → foreign sentinel",
+    fn: () =>
+      assertEqual(parsePlate('Foreign plate KSA 9999 ABC'), {
+        emirate: FOREIGN_SENTINEL,
+        category: '',
+        number: '',
+        foreignText: 'KSA 9999 ABC',
+      }),
+  },
+  {
+    name: "parsePlate: 'Foreign: KSA 1234 XYZ' → foreign sentinel (matches formatPlate output)",
+    fn: () =>
+      assertEqual(parsePlate('Foreign: KSA 1234 XYZ'), {
+        emirate: FOREIGN_SENTINEL,
+        category: '',
+        number: '',
+        foreignText: 'KSA 1234 XYZ',
+      }),
+  },
+  {
+    name: "parsePlate round-trips formatPlate (UAE)",
+    fn: () => {
+      const formatted = formatPlate({
+        emirate: 'Dubai',
+        category: 'M',
+        number: '12345',
+        foreignText: '',
+      });
+      assertEqual(parsePlate(formatted), {
+        emirate: 'Dubai',
+        category: 'M',
+        number: '12345',
+        foreignText: '',
+      });
+    },
+  },
+  {
+    name: "parsePlate round-trips formatPlate (foreign)",
+    fn: () => {
+      const formatted = formatPlate({
+        emirate: FOREIGN_SENTINEL,
+        category: '',
+        number: '',
+        foreignText: 'KSA 1234 XYZ',
+      });
+      assertEqual(parsePlate(formatted), {
+        emirate: FOREIGN_SENTINEL,
+        category: '',
+        number: '',
+        foreignText: 'KSA 1234 XYZ',
+      });
+    },
+  },
+  {
+    name: "parsePlate: collapses extra whitespace",
+    fn: () =>
+      assertEqual(parsePlate('  Dubai   M   12345  '), {
+        emirate: 'Dubai',
+        category: 'M',
+        number: '12345',
+        foreignText: '',
+      }),
+  },
+  {
+    name: "parsePlate: unrecognised input → all empty",
+    fn: () =>
+      assertEqual(parsePlate('Atlantis QQ 99999'), {
+        emirate: '',
+        category: '',
+        number: '',
+        foreignText: '',
+      }),
+  },
+  {
+    name: "parsePlate: bare emirate with no number → all empty",
+    fn: () =>
+      assertEqual(parsePlate('Dubai M'), {
+        emirate: '',
+        category: '',
+        number: '',
+        foreignText: '',
+      }),
+  },
+  {
+    name: "parsePlate: undefined / empty → all empty",
+    fn: () => {
+      assertEqual(parsePlate(''), {
+        emirate: '',
+        category: '',
+        number: '',
+        foreignText: '',
+      });
+      assertEqual(parsePlate(undefined), {
+        emirate: '',
+        category: '',
+        number: '',
+        foreignText: '',
+      });
+    },
+  },
+  {
+    name: "parsePlate: 6+ digit number rejected (not a valid plate number)",
+    fn: () =>
+      assertEqual(parsePlate('Dubai M 123456'), {
+        emirate: '',
+        category: '',
+        number: '',
+        foreignText: '',
+      }),
   },
 ]);

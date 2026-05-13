@@ -15,7 +15,13 @@
  *   - ARC failure → 503
  */
 
-import { POST, timingSafeStringEqual } from '../agent/route';
+import {
+  POST,
+  timingSafeStringEqual,
+  writeBackVehicleAttrs,
+  _setContactAttrsDepsForTests,
+  _resetContactAttrsDepsForTests,
+} from '../agent/route';
 import {
   _setArcDepsForTests,
   _setChatwootDepsForTests,
@@ -501,6 +507,190 @@ export default function suite() {
         }
       },
     },
+    // -------- write-back to Chatwoot contact custom_attributes --------
+    {
+      name: 'writeBackVehicleAttrs no-ops when Chatwoot config missing',
+      fn: async () => {
+        let updateCalls = 0;
+        _setContactAttrsDepsForTests({
+          loadConfig: () => null,
+          updateAttrs: async () => {
+            updateCalls++;
+            return { ok: true, data: { id: 1 } };
+          },
+        });
+        try {
+          await writeBackVehicleAttrs({
+            contactId: 5,
+            vehicleYear: 2023,
+            vehicleMake: 'Ferrari',
+            vehicleModel: '296 GTB',
+            vehiclePlate: 'Dubai M 12345',
+          });
+          assertEqual(updateCalls, 0);
+        } finally {
+          _resetContactAttrsDepsForTests();
+        }
+      },
+    },
+    {
+      name: 'writeBackVehicleAttrs PATCHes the four vehicle attrs when plate present',
+      fn: async () => {
+        let captured: {
+          contactId: number;
+          attrs: Record<string, unknown>;
+        } | null = null;
+        _setContactAttrsDepsForTests({
+          loadConfig: () => ({
+            baseUrl: 'https://chat',
+            accountId: '1',
+            token: 't',
+          }),
+          updateAttrs: async (_cfg, contactId, attrs) => {
+            captured = { contactId, attrs };
+            return { ok: true, data: { id: contactId } };
+          },
+        });
+        try {
+          await writeBackVehicleAttrs({
+            contactId: 5,
+            vehicleYear: 2023,
+            vehicleMake: 'Ferrari',
+            vehicleModel: '296 GTB',
+            vehiclePlate: 'Dubai M 12345',
+          });
+          assert(captured !== null, 'updateAttrs should have been called');
+          const cap = captured as unknown as {
+            contactId: number;
+            attrs: Record<string, unknown>;
+          };
+          assertEqual(cap.contactId, 5);
+          assertEqual(cap.attrs, {
+            vehicle_year: 2023,
+            vehicle_make: 'Ferrari',
+            vehicle_model: '296 GTB',
+            vehicle_plate: 'Dubai M 12345',
+          });
+        } finally {
+          _resetContactAttrsDepsForTests();
+        }
+      },
+    },
+    {
+      name: 'writeBackVehicleAttrs omits plate key when plate empty',
+      fn: async () => {
+        let captured: Record<string, unknown> | null = null;
+        _setContactAttrsDepsForTests({
+          loadConfig: () => ({
+            baseUrl: 'https://chat',
+            accountId: '1',
+            token: 't',
+          }),
+          updateAttrs: async (_cfg, _contactId, attrs) => {
+            captured = attrs;
+            return { ok: true, data: { id: 1 } };
+          },
+        });
+        try {
+          await writeBackVehicleAttrs({
+            contactId: 5,
+            vehicleYear: 2023,
+            vehicleMake: 'Ferrari',
+            vehicleModel: '296 GTB',
+          });
+          assert(captured !== null);
+          const c = captured as unknown as Record<string, unknown>;
+          assertEqual('vehicle_plate' in c, false);
+          assertEqual(c.vehicle_year, 2023);
+          assertEqual(c.vehicle_make, 'Ferrari');
+          assertEqual(c.vehicle_model, '296 GTB');
+        } finally {
+          _resetContactAttrsDepsForTests();
+        }
+      },
+    },
+    {
+      name: 'writeBackVehicleAttrs swallows network errors',
+      fn: async () => {
+        silenceLogger();
+        _setContactAttrsDepsForTests({
+          loadConfig: () => ({
+            baseUrl: 'https://chat',
+            accountId: '1',
+            token: 't',
+          }),
+          updateAttrs: async () => {
+            throw new Error('boom');
+          },
+        });
+        try {
+          // Must not throw.
+          await writeBackVehicleAttrs({
+            contactId: 5,
+            vehicleYear: 2023,
+            vehicleMake: 'Ferrari',
+            vehicleModel: '296 GTB',
+          });
+        } finally {
+          _resetContactAttrsDepsForTests();
+          _resetLoggerForTests();
+        }
+      },
+    },
+    {
+      name: 'happy-path POST schedules contact attrs write-back via after()',
+      fn: async () => {
+        silenceLogger();
+        _resetRateLimitForTests();
+        installOkArc();
+        installFakeChatwoot();
+        let captured: {
+          contactId: number;
+          attrs: Record<string, unknown>;
+        } | null = null;
+        _setContactAttrsDepsForTests({
+          loadConfig: () => ({
+            baseUrl: 'https://chat',
+            accountId: '1',
+            token: 't',
+          }),
+          updateAttrs: async (_cfg, contactId, attrs) => {
+            captured = { contactId, attrs };
+            return { ok: true, data: { id: contactId } };
+          },
+        });
+        try {
+          await withEnv({ BOOKING_AGENT_SECRET: SECRET }, async () => {
+            const res = await POST(
+              makeRequest(makeBody({ contactId: 5 }), { secret: SECRET }),
+            );
+            assertEqual(res.status, 200);
+            // `after()` runs the callback after the response is sent. In the
+            // test harness (no real Next runtime) `after()` may run sync, but
+            // it's not guaranteed — give it a microtask tick to drain.
+            await new Promise((r) => setTimeout(r, 0));
+            assert(
+              captured !== null,
+              'expected the after() callback to write back vehicle attrs',
+            );
+            const cap = captured as unknown as {
+              contactId: number;
+              attrs: Record<string, unknown>;
+            };
+            assertEqual(cap.contactId, 5);
+            assertEqual(cap.attrs.vehicle_make, 'Toyota');
+            assertEqual(cap.attrs.vehicle_model, 'Land Cruiser');
+            assertEqual(cap.attrs.vehicle_year, 2022);
+            assertEqual(cap.attrs.vehicle_plate, 'A 12345');
+          });
+        } finally {
+          _resetDepsForTests();
+          _resetContactAttrsDepsForTests();
+          _resetLoggerForTests();
+        }
+      },
+    },
+
     {
       name: 'unknown service id → 400 UNKNOWN_SERVICE',
       fn: async () => {

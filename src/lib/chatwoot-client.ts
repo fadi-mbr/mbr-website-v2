@@ -152,6 +152,19 @@ export interface ChatwootContact {
   name?: string;
   email?: string;
   phone_number?: string;
+  /**
+   * Per-contact custom attributes (Chatwoot-managed). Booking uses these
+   * to round-trip vehicle info across bookings so the next /book/agent
+   * submission for the same customer pre-fills the vehicle fields.
+   *
+   * Known keys (set by `updateContactCustomAttributes` from the agent
+   * route after a successful confirmed booking):
+   *   vehicle_year   number | numeric string
+   *   vehicle_make   string
+   *   vehicle_model  string
+   *   vehicle_plate  string  (formatted plate, e.g. "Dubai M 12345")
+   */
+  custom_attributes?: Record<string, unknown>;
 }
 
 /**
@@ -191,7 +204,43 @@ export async function fetchContact(
   if (typeof obj.phone_number === 'string' && obj.phone_number.trim()) {
     contact.phone_number = obj.phone_number;
   }
+  if (
+    obj.custom_attributes &&
+    typeof obj.custom_attributes === 'object' &&
+    !Array.isArray(obj.custom_attributes)
+  ) {
+    contact.custom_attributes = obj.custom_attributes as Record<string, unknown>;
+  }
   return { ok: true, data: contact };
+}
+
+/**
+ * Partial-update a contact's `custom_attributes`. Chatwoot's PATCH on
+ * `/api/v1/accounts/:id/contacts/:contact_id` merges the supplied
+ * `custom_attributes` map server-side, so we only need to send the keys
+ * we want to change.
+ *
+ * Used by the agent booking route in an `after()` callback so a successful
+ * booking writes vehicle info back to the contact for next-time prefill.
+ * Failures are non-fatal — callers should not block the user response on
+ * the result.
+ */
+export async function updateContactCustomAttributes(
+  cfg: ChatwootConfig,
+  contactId: number,
+  attrs: Record<string, string | number | boolean | null>,
+  timeoutMs?: number,
+): Promise<ChatwootResult<{ id: number }>> {
+  const url = buildContactUrl(cfg, contactId);
+  return chatwootFetch<{ id: number }>(
+    cfg,
+    url,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ custom_attributes: attrs }),
+    },
+    timeoutMs,
+  );
 }
 
 export async function setConversationCustomAttributes(
