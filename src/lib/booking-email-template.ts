@@ -24,7 +24,7 @@
  *   - Bronze (#b08d57) primary button with black text — 4.5+ WCAG AA
  *     contrast ratio.
  *
- * The MBR logo asset lives at https://mbrme.com/images/MBR_Logo_horizontal.svg
+ * The MBR logo asset lives at https://mbrme.com/images/Logo_horizontal.svg
  * (Vercel deploy serves from the website's /public/images directory).
  */
 
@@ -66,7 +66,7 @@ const COLORS = {
   buttonText: '#000000',
 } as const;
 
-const LOGO_URL = 'https://mbrme.com/images/MBR_Logo_horizontal.svg';
+const LOGO_URL = 'https://mbrme.com/images/Logo_horizontal.svg';
 const ADDRESS = '16 8 St, Al Quoz Industrial 4, Dubai, UAE';
 const PHONE_DISPLAY = '+971 56 501 5800';
 const PHONE_TEL = '+971565015800';

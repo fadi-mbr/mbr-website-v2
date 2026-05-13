@@ -208,7 +208,7 @@ export default () =>
         assert(html.includes("max-width:560px"));
         // Brand: horizontal logo lives at mbrme.com/images/...
         assert(
-          html.includes("https://mbrme.com/images/MBR_Logo_horizontal.svg"),
+          html.includes("https://mbrme.com/images/Logo_horizontal.svg"),
           "header must reference the MBR horizontal logo",
         );
         // Bronze accent on the CTA button.
