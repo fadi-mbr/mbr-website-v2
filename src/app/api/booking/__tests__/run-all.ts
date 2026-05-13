@@ -16,8 +16,10 @@ import arcSubmitSuite from "./arc-submit.test";
 import agentRouteSuite from "./agent-route.test";
 import requestRouteSuite from "./request-route.test";
 import confirmHelperSuite from "./confirm-helper.test";
+import confirmRouteSuite from "./confirm-route.test";
 import availabilitySuite from "./availability.test";
 import slotsRouteSuite from "./slots-route.test";
+import icsSuite from "./ics.test";
 import carCatalogSuite from "./car-catalog.test";
 import uaePlatesSuite from "./uae-plates.test";
 
@@ -32,8 +34,10 @@ async function main(): Promise<void> {
   await agentRouteSuite();
   await requestRouteSuite();
   await confirmHelperSuite();
+  await confirmRouteSuite();
   await availabilitySuite();
   await slotsRouteSuite();
+  await icsSuite();
   await carCatalogSuite();
   await uaePlatesSuite();
   console.log("\nAll booking unit tests passed.");
