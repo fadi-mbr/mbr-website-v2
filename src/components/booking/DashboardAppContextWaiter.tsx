@@ -89,7 +89,8 @@ export function DashboardAppContextWaiter(): React.ReactElement {
     const onMessage = (event: MessageEvent) => {
       // Origin allow-list — only our Chatwoot host can hand us context.
       if (event.origin !== 'https://connect.mbrme.com') return;
-      // Some Chatwoot versions wrap the data as a JSON string in event.data.
+      // Chatwoot sends the response as a JSON string in event.data.
+      // The string shape is: '{"event":"appContext","data":{...}}'
       let raw: unknown = event.data;
       if (typeof raw === 'string') {
         try {
@@ -111,20 +112,36 @@ export function DashboardAppContextWaiter(): React.ReactElement {
 
     window.addEventListener('message', onMessage);
 
-    // Best-effort handshake. Chatwoot listens for app-ready events from
-    // some Dashboard App integrations.
-    try {
-      window.parent?.postMessage(
-        { event: 'chatwoot-dashboard-app:ready' },
-        'https://connect.mbrme.com',
-      );
-      window.parent?.postMessage(
-        { type: 'chatwoot:dashboard:ready' },
-        'https://connect.mbrme.com',
-      );
-    } catch {
-      // Cross-origin block — that's fine, Chatwoot may broadcast unprompted.
-    }
+    // Chatwoot Dashboard App handshake: post a JSON-stringified message to
+    // the parent frame requesting the conversation context. Chatwoot
+    // replies with `{event:'appContext', data:{contact, conversation, currentAgent}}`
+    // which our `onMessage` listener picks up.
+    //
+    // The event name is the official one (chatwoot-dashboard-app:fetch-info).
+    // We also retry a few times since some Chatwoot v4 builds drop the first
+    // request if it arrives before the parent has wired its message listener.
+    const requestContext = () => {
+      try {
+        window.parent?.postMessage(
+          JSON.stringify({ event: 'chatwoot-dashboard-app:fetch-info' }),
+          'https://connect.mbrme.com',
+        );
+        // Some Chatwoot helper packages also accept '*' targetOrigin;
+        // re-send with wildcard as a safety net.
+        window.parent?.postMessage(
+          JSON.stringify({ event: 'chatwoot-dashboard-app:fetch-info' }),
+          '*',
+        );
+      } catch {
+        // Cross-origin block — that's fine, the listener may still receive.
+      }
+    };
+    requestContext();
+    // Retry at 250ms, 1s, 3s. Chatwoot v4 has been observed to occasionally
+    // miss the first ping; subsequent ones usually succeed.
+    const retry1 = setTimeout(requestContext, 250);
+    const retry2 = setTimeout(requestContext, 1000);
+    const retry3 = setTimeout(requestContext, 3000);
 
     timer = setTimeout(() => {
       if (!cancelled) setStatus({ kind: 'timeout' });
@@ -133,6 +150,9 @@ export function DashboardAppContextWaiter(): React.ReactElement {
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
+      clearTimeout(retry1);
+      clearTimeout(retry2);
+      clearTimeout(retry3);
       window.removeEventListener('message', onMessage);
     };
   }, []);
