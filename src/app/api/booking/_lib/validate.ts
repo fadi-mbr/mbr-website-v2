@@ -5,6 +5,11 @@
  * as `{ code:"VALIDATION", field, message }` to match the contract.
  */
 
+import {
+  isValidPhoneE164Digits,
+  normalizeIntlPhone,
+} from "@/lib/booking-phone";
+
 export interface BookingRequest {
   ownerEmail: string;
   ownerNameFirst: string;
@@ -122,10 +127,14 @@ export function validateBookingRequest(
   if (typeof ownerNameLast !== "string") return ownerNameLast;
 
   const ownerPhoneRaw = raw["ownerPhone"];
-  if (typeof ownerPhoneRaw !== "string" || !/^971\d{9}$/.test(ownerPhoneRaw)) {
+  if (typeof ownerPhoneRaw !== "string") {
+    return err("ownerPhone", "ownerPhone must be a string");
+  }
+  const normalisedPhone = normalizeIntlPhone(ownerPhoneRaw);
+  if (!normalisedPhone || !isValidPhoneE164Digits(normalisedPhone)) {
     return err(
       "ownerPhone",
-      "ownerPhone must be a UAE E.164 digits-only string matching ^971\\d{9}$ (caller normalises first)"
+      "ownerPhone must be a valid phone number (UAE +971 by default; type +<country-code> for other numbers)"
     );
   }
 
@@ -178,7 +187,7 @@ export function validateBookingRequest(
     ownerEmail,
     ownerNameFirst,
     ownerNameLast,
-    ownerPhone: ownerPhoneRaw,
+    ownerPhone: normalisedPhone,
     serviceId,
     description,
     timeStartMs,

@@ -19,8 +19,8 @@ import CarMakeModelPicker from './CarMakeModelPicker';
 import UaePlatePicker from './UaePlatePicker';
 import {
   EMAIL_RE,
-  maskUaePhoneInput,
-  normalizeUaePhone,
+  maskIntlPhoneInput,
+  normalizeIntlPhone,
 } from '@/lib/booking-phone';
 import type { BookingService } from '@/lib/booking-types';
 import { OTHER_SENTINEL } from '@/lib/car-catalog';
@@ -131,7 +131,7 @@ export default function BookingFormClient({
   const [firstName, setFirstName] = useState(prefill?.firstName ?? '');
   const [lastName, setLastName] = useState(prefill?.lastName ?? '');
   const [phone, setPhone] = useState(
-    prefill?.phone ? maskUaePhoneInput(prefill.phone) : ''
+    prefill?.phone ? maskIntlPhoneInput(prefill.phone) : ''
   );
   const [email, setEmail] = useState(prefill?.email ?? '');
   const [vehicleYear, setVehicleYear] = useState('');
@@ -176,7 +176,7 @@ export default function BookingFormClient({
   const checkLastName = (v: string) =>
     v.trim() ? undefined : 'Please enter your last name.';
   const checkPhone = (v: string) =>
-    normalizeUaePhone(v) ? undefined : 'Enter a valid UAE mobile (e.g. 050 123 4567).';
+    normalizeIntlPhone(v) ? undefined : 'Enter a valid phone number.';
   const checkEmail = (v: string) =>
     EMAIL_RE.test(v.trim()) ? undefined : 'Enter a valid email address.';
   const checkVehicleMake = (make: string, custom: string) => {
@@ -340,7 +340,7 @@ export default function BookingFormClient({
       return;
     }
 
-    const normPhone = normalizeUaePhone(phone)!;
+    const normPhone = normalizeIntlPhone(phone)!;
     const resolvedMake =
       vehicleMake === OTHER_SENTINEL ? customMake.trim() : vehicleMake;
     const resolvedModel =
@@ -418,6 +418,7 @@ export default function BookingFormClient({
   return (
     <form
       onSubmit={handleSubmit}
+      method="post"
       noValidate
       aria-label="MBR Booking"
       className="space-y-8 text-white"
@@ -556,6 +557,7 @@ export default function BookingFormClient({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Field
             id="firstName"
+            name="given-name"
             label="First name"
             value={firstName}
             onChange={setFirstName}
@@ -564,11 +566,12 @@ export default function BookingFormClient({
             }
             error={errors.firstName}
             required
-            autoComplete="given-name"
+            autoComplete="section-contact given-name"
             enterKeyHint="next"
           />
           <Field
             id="lastName"
+            name="family-name"
             label="Last name"
             value={lastName}
             onChange={setLastName}
@@ -577,28 +580,43 @@ export default function BookingFormClient({
             }
             error={errors.lastName}
             required
-            autoComplete="family-name"
+            autoComplete="section-contact family-name"
             enterKeyHint="next"
           />
         </div>
         <Field
           id="phone"
+          name="tel"
           label="Phone"
           value={phone}
-          onChange={(v) => setPhone(maskUaePhoneInput(v))}
-          onBlur={() =>
-            setErrors((p) => ({ ...p, phone: checkPhone(phone) }))
-          }
+          onChange={(v) => setPhone(maskIntlPhoneInput(v))}
+          onFocus={() => {
+            if (!phone.trim()) setPhone('+971 ');
+          }}
+          onBlur={() => {
+            // If the user focused, didn't type anything beyond the default
+            // prefix, and tabbed away — clear back to empty so the field
+            // doesn't look pre-filled. Otherwise validate.
+            const stripped = phone.replace(/\s+/g, '');
+            if (stripped === '+971' || stripped === '+') {
+              setPhone('');
+              setErrors((p) => ({ ...p, phone: undefined }));
+              return;
+            }
+            setErrors((p) => ({ ...p, phone: checkPhone(phone) }));
+          }}
           error={errors.phone}
           required
+          type="tel"
           inputMode="tel"
-          autoComplete="tel"
+          autoComplete="section-contact tel"
           enterKeyHint="next"
           placeholder="+971 50 123 4567"
-          hint="UAE mobile only — we’ll text the appointment confirmation."
+          hint="We'll text you the confirmation. UAE +971 by default — type +country code for other numbers."
         />
         <Field
           id="email"
+          name="email"
           label="Email"
           value={email}
           onChange={setEmail}
@@ -609,7 +627,7 @@ export default function BookingFormClient({
           required
           type="email"
           inputMode="email"
-          autoComplete="email"
+          autoComplete="section-contact email"
           enterKeyHint="next"
         />
       </section>
@@ -776,9 +794,17 @@ export default function BookingFormClient({
 
 interface FieldProps {
   id: string;
+  /**
+   * Browser autofill name. Defaults to `id` when not provided. We override
+   * this for contact fields so the `name` matches the browser autofill
+   * conventions (`given-name`, `family-name`, `tel`, `email`) — Safari and
+   * Chrome use the name attribute as a hint when scoring autofill matches.
+   */
+  name?: string;
   label: string;
   value: string;
   onChange: (v: string) => void;
+  onFocus?: () => void;
   onBlur?: () => void;
   error?: string;
   required?: boolean;
@@ -792,9 +818,11 @@ interface FieldProps {
 
 function Field({
   id,
+  name,
   label,
   value,
   onChange,
+  onFocus,
   onBlur,
   error,
   required,
@@ -824,11 +852,12 @@ function Field({
       </label>
       <input
         id={fieldId}
-        name={id}
+        name={name ?? id}
         type={type}
         inputMode={inputMode}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onFocus={onFocus}
         onBlur={onBlur}
         placeholder={placeholder}
         required={required}
