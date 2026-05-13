@@ -225,6 +225,61 @@ export async function fetchContact(
  * Failures are non-fatal — callers should not block the user response on
  * the result.
  */
+/**
+ * Minimal conversation shape used to derive the contact (sender) id when the
+ * iframe only has the `conversation_id`. Chatwoot's conversation envelope
+ * contains `meta.sender.id` — the contact that initiated/owns the
+ * conversation. We accept a few alternate shapes Chatwoot ships across
+ * versions and unwrap defensively.
+ */
+export interface ChatwootConversationSummary {
+  id: number;
+  contactId?: number;
+}
+
+/**
+ * Fetch a conversation and surface the sender contact id. Used by the
+ * `/book/agent` page as a fallback when the iframe is loaded with
+ * `conversation_id` only (derived from `document.referrer`).
+ */
+export async function fetchConversation(
+  cfg: ChatwootConfig,
+  conversationId: number,
+  timeoutMs?: number,
+): Promise<ChatwootResult<ChatwootConversationSummary>> {
+  const url = buildConversationUrl(cfg, conversationId);
+  const res = await chatwootFetch<unknown>(cfg, url, { method: 'GET' }, timeoutMs);
+  if (!res.ok) return res;
+  const raw = res.data as Record<string, unknown> | undefined;
+  if (!raw || typeof raw !== 'object') {
+    return { ok: false, status: 0, reason: 'empty_response' };
+  }
+  // Chatwoot v3/v4 nest the conversation in different ways. Probe likely shapes.
+  const root = raw as Record<string, unknown>;
+  const payload =
+    'payload' in root && root.payload && typeof root.payload === 'object'
+      ? (root.payload as Record<string, unknown>)
+      : root;
+  const meta = (payload.meta && typeof payload.meta === 'object'
+    ? (payload.meta as Record<string, unknown>)
+    : undefined);
+  const sender = (meta?.sender && typeof meta.sender === 'object'
+    ? (meta.sender as Record<string, unknown>)
+    : undefined);
+  const id =
+    typeof payload.id === 'number'
+      ? payload.id
+      : Number(payload.id);
+  if (!Number.isFinite(id)) {
+    return { ok: false, status: 0, reason: 'no_conversation_id_in_response' };
+  }
+  const contactId =
+    typeof sender?.id === 'number' ? sender.id : Number(sender?.id);
+  const out: ChatwootConversationSummary = { id };
+  if (Number.isFinite(contactId) && contactId > 0) out.contactId = contactId;
+  return { ok: true, data: out };
+}
+
 export async function updateContactCustomAttributes(
   cfg: ChatwootConfig,
   contactId: number,

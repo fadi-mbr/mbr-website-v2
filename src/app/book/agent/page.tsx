@@ -35,6 +35,7 @@ import type {
 } from '@/components/booking/BookingFormClient';
 import {
   fetchContact,
+  fetchConversation,
   loadChatwootConfig,
   type ChatwootContact,
 } from '@/lib/chatwoot-client';
@@ -173,24 +174,24 @@ export default async function AgentBookingPage({ searchParams }: PageProps) {
     ? params.conversation_id[0]
     : params.conversation_id;
 
-  const contactId = rawContactId ? Number(rawContactId) : NaN;
+  let contactId = rawContactId ? Number(rawContactId) : NaN;
   const conversationId = rawConversationId ? Number(rawConversationId) : NaN;
 
-  const validIds =
-    Number.isFinite(contactId) &&
+  const validConversationId =
     Number.isFinite(conversationId) &&
-    Number.isInteger(contactId) &&
     Number.isInteger(conversationId) &&
-    contactId > 0 &&
     conversationId > 0;
+  const validContactId =
+    Number.isFinite(contactId) &&
+    Number.isInteger(contactId) &&
+    contactId > 0;
 
-  if (!validIds) {
-    // Chatwoot Dashboard Apps in some configurations don't substitute
-    // {{contact.id}} / {{conversation.id}} in the iframe URL. Fall back
-    // to listening for the conversation context via postMessage from
-    // the connect.mbrme.com parent frame; once received, the waiter
-    // redirects with the IDs in the URL and this Server Component
-    // re-renders normally.
+  // The iframe URL only needs `conversation_id`; the contact is derivable
+  // server-side from Chatwoot's conversation envelope (meta.sender.id).
+  // The waiter falls back to `document.referrer` to extract that single id
+  // when Chatwoot's URL template substitution and postMessage handshake
+  // both fail.
+  if (!validConversationId) {
     return <DashboardAppContextWaiter />;
   }
 
@@ -198,9 +199,27 @@ export default async function AgentBookingPage({ searchParams }: PageProps) {
   let contact: ChatwootContact | null = null;
   const cfg = loadChatwootConfig();
   if (cfg) {
-    const r = await fetchContact(cfg, contactId, 5_000);
-    if (r.ok) contact = r.data;
+    // If contact_id wasn't in the URL, derive it from the conversation.
+    if (!validContactId) {
+      const conv = await fetchConversation(cfg, conversationId, 5_000);
+      if (conv.ok && typeof conv.data.contactId === 'number') {
+        contactId = conv.data.contactId;
+      }
+    }
+    if (Number.isFinite(contactId) && contactId > 0) {
+      const r = await fetchContact(cfg, contactId, 5_000);
+      if (r.ok) contact = r.data;
+    }
   }
+
+  // The agent API requires a positive integer contactId for the Chatwoot
+  // confirmation message + custom-attribute write-back. If we couldn't
+  // derive one (Chatwoot down, conversation missing sender, etc.), fall
+  // back to the waiter so the agent isn't trapped on an unsubmittable form.
+  if (!Number.isFinite(contactId) || contactId <= 0) {
+    return <DashboardAppContextWaiter />;
+  }
+
   const prefill = projectPrefill(contact);
 
   // ----- Service catalogue.
