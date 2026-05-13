@@ -13,7 +13,7 @@
  * `src/lib/booking-confirm.ts` 1:1, so we can just dispatch on `kind`.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ConfirmErrorCard,
   invalidTokenCopy,
@@ -62,9 +62,19 @@ interface State {
 
 export function ConfirmInProgress({ token }: { token: string }) {
   const [state, setState] = useState<State>({ status: 'loading' });
+  // React 18+ StrictMode (and accidental re-fires) can run this effect twice.
+  // The first run kicks off the POST, then cleanup runs and a SECOND run
+  // fires another POST before the first network call has returned. The
+  // server creates the ARC record on call 1, then call 2 sees NO_TIME (slot
+  // now taken by call 1) and the UI shows an error even though the booking
+  // succeeded. Use a ref so the network call only ever fires once per
+  // component instance. (Page reload still hits the server again, which is
+  // why the server is ALSO idempotent on tokenId — see /api/booking/confirm.)
+  const triggered = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
+    if (triggered.current) return;
+    triggered.current = true;
     (async () => {
       try {
         const res = await fetch('/api/booking/confirm', {
@@ -73,19 +83,14 @@ export function ConfirmInProgress({ token }: { token: string }) {
           body: JSON.stringify({ token }),
         });
         const json = (await res.json()) as ConfirmResponse;
-        if (cancelled) return;
         setState({ status: 'done', result: json });
       } catch (e) {
-        if (cancelled) return;
         setState({
           status: 'done',
           networkError: e instanceof Error ? e.message : 'Network error',
         });
       }
     })();
-    return () => {
-      cancelled = true;
-    };
   }, [token]);
 
   if (state.status === 'loading') {

@@ -18,6 +18,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { verifyToken } from '@/lib/booking-token';
 import { confirmFromToken } from '@/lib/booking-confirm';
 import { logBooking } from '../_lib/log';
 
@@ -34,6 +35,59 @@ function jsonResponse(body: unknown, status: number): NextResponse {
     status,
     headers: PRIVATE_NO_STORE,
   });
+}
+
+/**
+ * In-memory idempotency cache keyed by tokenId.
+ *
+ * React Strict Mode (and any browser retry) can fire the confirm POST
+ * twice in rapid succession. Without this cache, call 1 creates the
+ * appointment in ARC and call 2 then sees the slot taken and returns
+ * SLOT_UNAVAILABLE — a confusing UX where the user thinks the booking
+ * failed but a real record exists.
+ *
+ * We remember the OUTCOME of the first call per tokenId and return it
+ * verbatim for any subsequent call within TTL. Token expiry is 30 min,
+ * so we cache for 35 min to cover stale browser tabs that re-mount.
+ *
+ * Caveat: this cache is per serverless instance. Different cold-start
+ * instances would see independent caches. For React StrictMode protection
+ * (same request, same instance) this is sufficient. The ROOT fix for
+ * cross-instance races is to make `submitConfirmedBooking` itself
+ * idempotent — out of scope for this hotfix.
+ */
+interface CachedOutcome {
+  body: unknown;
+  status: number;
+  cachedAt: number;
+}
+const CACHE_TTL_MS = 35 * 60 * 1000;
+const idempotencyCache = new Map<string, CachedOutcome>();
+
+function getCached(tokenId: string): CachedOutcome | null {
+  const hit = idempotencyCache.get(tokenId);
+  if (!hit) return null;
+  if (Date.now() - hit.cachedAt > CACHE_TTL_MS) {
+    idempotencyCache.delete(tokenId);
+    return null;
+  }
+  return hit;
+}
+
+function setCached(tokenId: string, body: unknown, status: number): void {
+  idempotencyCache.set(tokenId, { body, status, cachedAt: Date.now() });
+  // Periodic GC — best effort.
+  if (idempotencyCache.size > 200) {
+    const cutoff = Date.now() - CACHE_TTL_MS;
+    for (const [k, v] of idempotencyCache) {
+      if (v.cachedAt < cutoff) idempotencyCache.delete(k);
+    }
+  }
+}
+
+/** Exposed for tests so a clean slate is achievable per spec. */
+export function _resetIdempotencyCacheForTests(): void {
+  idempotencyCache.clear();
 }
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -80,6 +134,25 @@ export async function POST(req: Request): Promise<NextResponse> {
     );
   }
 
+  // Idempotency: if we've already processed this token, return the cached
+  // outcome instead of re-submitting to ARC. Verify the signature first to
+  // get the tokenId — we don't want callers to abuse the cache by sending
+  // a random string and getting whatever happened to be stored there.
+  const verified = await verifyToken(token, secret);
+  if (verified.ok) {
+    const tokenId = verified.payload.id;
+    const cached = getCached(tokenId);
+    if (cached) {
+      logBooking({
+        event: 'booking.confirm.idempotent_replay',
+        latencyMs: Date.now() - t0,
+        status: cached.status,
+        reason: `tokenId=${tokenId}`,
+      });
+      return jsonResponse(cached.body, cached.status);
+    }
+  }
+
   const result = await confirmFromToken(token, secret);
 
   if (result.kind === 'invalid-token') {
@@ -89,6 +162,7 @@ export async function POST(req: Request): Promise<NextResponse> {
       status: 400,
       reason: result.reason,
     });
+    // Don't cache invalid tokens — they have no tokenId we can trust.
     return jsonResponse({ kind: 'invalid-token', reason: result.reason }, 400);
   }
 
@@ -109,16 +183,17 @@ export async function POST(req: Request): Promise<NextResponse> {
       code: result.code,
       reason: result.message,
     });
-    return jsonResponse(
-      {
-        kind: 'submit-failed',
-        code: result.code,
-        message: result.message,
-        intent: result.intent,
-        tokenId: result.tokenId,
-      },
-      status,
-    );
+    const body = {
+      kind: 'submit-failed',
+      code: result.code,
+      message: result.message,
+      intent: result.intent,
+      tokenId: result.tokenId,
+    };
+    // Cache the failure outcome so a retry returns the same answer
+    // (avoids double-creating an ARC record on the retry path).
+    setCached(result.tokenId, body, status);
+    return jsonResponse(body, status);
   }
 
   logBooking({
@@ -127,16 +202,15 @@ export async function POST(req: Request): Promise<NextResponse> {
     status: 200,
     serviceId: result.intent.serviceId,
   });
-  return jsonResponse(
-    {
-      kind: 'ok',
-      intent: result.intent,
-      tokenId: result.tokenId,
-      arcAppointmentId: result.arcAppointmentId,
-      confirmAt: result.confirmAt,
-      serviceName: result.serviceName,
-      estimatedDuration: result.estimatedDuration,
-    },
-    200,
-  );
+  const body = {
+    kind: 'ok',
+    intent: result.intent,
+    tokenId: result.tokenId,
+    arcAppointmentId: result.arcAppointmentId,
+    confirmAt: result.confirmAt,
+    serviceName: result.serviceName,
+    estimatedDuration: result.estimatedDuration,
+  };
+  setCached(result.tokenId, body, 200);
+  return jsonResponse(body, 200);
 }
