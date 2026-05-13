@@ -17,7 +17,11 @@
  * payload without touching the real ARC endpoint.
  */
 
-import { POST } from '../request/route';
+import {
+  POST,
+  _setAfterRunnerForTests,
+  _resetAfterRunnerForTests,
+} from '../request/route';
 import {
   _setMailerForTests,
   _resetMailerForTests,
@@ -26,6 +30,42 @@ import {
 import { _resetForTests as _resetRateLimitForTests } from '../_lib/rate-limit';
 import { verifyToken } from '@/lib/booking-token';
 import { runSuite, assert, assertEqual } from './_harness';
+
+// ---------------------------------------------------------------------------
+// after-runner harness — captures every `after(cb)` call so the test can
+// invoke the deferred work explicitly (and await its completion). Real
+// Next 15 `after()` only runs inside the request pipeline; in unit tests
+// we substitute this recorder via `_setAfterRunnerForTests`.
+// ---------------------------------------------------------------------------
+
+interface AfterCapture {
+  /** Number of callbacks scheduled via `after()` during the request. */
+  count: number;
+  /** Last callback scheduled — invoking it runs the deferred email send. */
+  lastCb: (() => Promise<void> | void) | null;
+}
+
+function installAfterRecorder(): AfterCapture {
+  const cap: AfterCapture = { count: 0, lastCb: null };
+  _setAfterRunnerForTests((cb) => {
+    cap.count++;
+    cap.lastCb = cb;
+  });
+  return cap;
+}
+
+/**
+ * Drain any callback the route scheduled. Mirrors Vercel's behaviour of
+ * running `after()` callbacks after the response is sent — except we run
+ * them synchronously so the test can assert on side effects.
+ */
+async function drainAfter(cap: AfterCapture): Promise<void> {
+  if (cap.lastCb) {
+    const cb = cap.lastCb;
+    cap.lastCb = null;
+    await cb();
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Test-only seam: stub the global `fetch` so arc-client.fetchServices()
@@ -180,6 +220,7 @@ function withEnv<T>(
 function resetAll(): void {
   _resetRateLimitForTests();
   _resetMailerForTests();
+  _resetAfterRunnerForTests();
   restoreFetch();
 }
 
@@ -207,11 +248,12 @@ export default function suite() {
 
     // ----- honeypot -------------------------------------------------------
     {
-      name: 'honeypot tripped → 200 generic, no email sent',
+      name: 'honeypot tripped → 200 generic, no email sent, no deferred work',
       fn: async () => {
         resetAll();
         const { transporter, captured } = makeFakeMailer();
         _setMailerForTests(transporter);
+        const cap = installAfterRecorder();
         // Fetch should never be called when the honeypot trips, but install
         // a stub anyway so an unexpected call would still produce a sane
         // response rather than hanging on the real network.
@@ -225,6 +267,7 @@ export default function suite() {
             const j = (await res.json()) as { ok: boolean; pending: boolean };
             assertEqual(j.ok, true);
             assertEqual(j.pending, true);
+            assertEqual(cap.count, 0, 'no after() should be scheduled');
             assertEqual(captured.msg, undefined);
           });
         } finally {
@@ -235,16 +278,18 @@ export default function suite() {
 
     // ----- IP rate-limit --------------------------------------------------
     {
-      name: '11th hit from the same IP → 200 generic, no email',
+      name: '11th hit from the same IP → 200 generic, no email scheduled',
       fn: async () => {
         resetAll();
-        const { transporter, captured } = makeFakeMailer();
+        const { transporter } = makeFakeMailer();
         _setMailerForTests(transporter);
+        const cap = installAfterRecorder();
         // Different phone per request so the phone limiter doesn't fire first.
         stubFetchOk();
         try {
           await withEnv(FULL_ENV, async () => {
-            // 10 successful submissions from the same IP.
+            // 10 successful submissions from the same IP — each schedules
+            // exactly one `after()` callback (the email send).
             for (let i = 0; i < 10; i++) {
               const phone = `9715012345${String(i).padStart(2, '0')}`;
               const res = await POST(
@@ -254,27 +299,16 @@ export default function suite() {
               );
               assertEqual(res.status, 200);
             }
-            // The 11th is silently dropped.
-            const before = Object.keys(captured).length;
-            captured.msg = undefined;
+            assertEqual(cap.count, 10, '10 successful sends should defer 10 callbacks');
+            // The 11th is silently dropped — no new deferred work.
+            const before = cap.count;
             const res = await POST(
               makeRequest(makeBody({ ownerPhone: '971501239999' }), {
                 ip: '203.0.113.7',
               }),
             );
             assertEqual(res.status, 200);
-            // No new email captured on the dropped call (mailer is shared so
-            // `captured.msg` would be overwritten only if sendMail was hit).
-            // The 10th call DID set captured.msg, so just assert >= 10 happened.
-            assert(before >= 0);
-            // After the cap, captured.msg is still the last *allowed* message
-            // (10th), not the dropped 11th — confirm by looking at the to-field.
-            const lastTo =
-              captured.msg && (captured.msg as Record<string, unknown>).to;
-            assert(
-              lastTo === undefined || typeof lastTo === 'string',
-              'captured.msg shape',
-            );
+            assertEqual(cap.count, before, '11th call must not schedule any deferred work');
           });
         } finally {
           resetAll();
@@ -287,16 +321,20 @@ export default function suite() {
       name: 'second submit for the same phone within the hour → 200 generic, no second email',
       fn: async () => {
         resetAll();
-        const { transporter, captured } = makeFakeMailer();
-        _setMailerForTests(transporter);
+        const first = makeFakeMailer();
+        _setMailerForTests(first.transporter);
+        const cap = installAfterRecorder();
         stubFetchOk();
         try {
           await withEnv(FULL_ENV, async () => {
             const r1 = await POST(makeRequest(makeBody(), { ip: '1.2.3.4' }));
             assertEqual(r1.status, 200);
-            assert(captured.msg !== undefined, 'first call should have emailed');
+            assertEqual(cap.count, 1, 'first call should schedule one deferred email');
+            await drainAfter(cap);
+            assert(first.captured.msg !== undefined, 'first call should have emailed');
 
-            // Reset the captured msg holder by re-installing a fresh mailer.
+            // Swap to a fresh mailer so we can verify the second call NEVER
+            // hits sendMail.
             const second = makeFakeMailer();
             _setMailerForTests(second.transporter);
 
@@ -305,6 +343,7 @@ export default function suite() {
             const j = (await r2.json()) as { ok: boolean; pending: boolean };
             assertEqual(j.ok, true);
             assertEqual(j.pending, true);
+            assertEqual(cap.count, 1, 'phone-throttled call must not schedule deferred work');
             assertEqual(
               second.captured.msg,
               undefined,
@@ -324,6 +363,7 @@ export default function suite() {
         resetAll();
         const { transporter, captured } = makeFakeMailer();
         _setMailerForTests(transporter);
+        const cap = installAfterRecorder();
         stubFetchOk();
         try {
           await withEnv(FULL_ENV, async () => {
@@ -334,6 +374,7 @@ export default function suite() {
             const j = (await res.json()) as { ok: boolean; pending: boolean };
             assertEqual(j.ok, true);
             assertEqual(j.pending, true);
+            assertEqual(cap.count, 0, 'invalid input must not schedule deferred work');
             assertEqual(captured.msg, undefined);
           });
         } finally {
@@ -344,11 +385,12 @@ export default function suite() {
 
     // ----- happy path -----------------------------------------------------
     {
-      name: 'happy path → 200, email sent, token in URL verifies and carries intent',
+      name: 'happy path → 200 ships before email; deferred send carries intent',
       fn: async () => {
         resetAll();
         const { transporter, captured } = makeFakeMailer();
         _setMailerForTests(transporter);
+        const cap = installAfterRecorder();
         stubFetchOk();
         try {
           await withEnv(FULL_ENV, async () => {
@@ -361,8 +403,16 @@ export default function suite() {
             const j = (await res.json()) as { ok: boolean; pending: boolean };
             assertEqual(j.ok, true);
             assertEqual(j.pending, true);
+            // The email send was deferred — the response shipped without
+            // touching the SMTP transport yet.
+            assertEqual(captured.msg, undefined, 'email must be deferred, not synchronous');
+            assertEqual(cap.count, 1, 'exactly one after() callback scheduled');
 
-            assert(captured.msg !== undefined, 'email should have been sent');
+            // Now run the deferred work (simulates Vercel running after()
+            // after the response was flushed).
+            await drainAfter(cap);
+
+            assert(captured.msg !== undefined, 'email should have been sent in deferred phase');
             const msg = captured.msg as Record<string, unknown>;
             assertEqual(msg.to, body.ownerEmail);
             assertEqual(msg.from, FULL_ENV.BOOKING_FROM_EMAIL);
@@ -386,6 +436,41 @@ export default function suite() {
               assertEqual(verified.payload.intent.plate, 'A 12345');
               assertEqual(verified.payload.intent.notes, 'Bring espresso');
             }
+          });
+        } finally {
+          resetAll();
+        }
+      },
+    },
+
+    // ----- deferred email failure does NOT affect the (already sent) response
+    {
+      name: 'SMTP failure inside after() — response was already 200, no throw',
+      fn: async () => {
+        resetAll();
+        // throwOnSend simulates the SMTP transport blowing up.
+        const { transporter } = makeFakeMailer({ throwOnSend: true });
+        _setMailerForTests(transporter);
+        const cap = installAfterRecorder();
+        stubFetchOk();
+        try {
+          await withEnv(FULL_ENV, async () => {
+            const res = await POST(makeRequest(makeBody(), { ip: '203.0.113.50' }));
+            // Response already shipped, even though the deferred email is
+            // about to fail.
+            assertEqual(res.status, 200);
+            const j = (await res.json()) as { ok: boolean; pending: boolean };
+            assertEqual(j.ok, true);
+            assertEqual(j.pending, true);
+
+            // Run the deferred work — it must swallow the SMTP error.
+            let threw = false;
+            try {
+              await drainAfter(cap);
+            } catch {
+              threw = true;
+            }
+            assert(!threw, 'deferred SMTP failure must not propagate');
           });
         } finally {
           resetAll();
@@ -420,11 +505,12 @@ export default function suite() {
 
     // ----- unknown service id --------------------------------------------
     {
-      name: 'unknown service id → 200 generic, no email',
+      name: 'unknown service id → 200 generic, no email scheduled',
       fn: async () => {
         resetAll();
         const { transporter, captured } = makeFakeMailer();
         _setMailerForTests(transporter);
+        const cap = installAfterRecorder();
         stubFetchOk();
         try {
           await withEnv(FULL_ENV, async () => {
@@ -432,6 +518,7 @@ export default function suite() {
               makeRequest(makeBody({ serviceId: 9999 })),
             );
             assertEqual(res.status, 200);
+            assertEqual(cap.count, 0, 'unknown service must not schedule deferred work');
             assertEqual(captured.msg, undefined);
           });
         } finally {
