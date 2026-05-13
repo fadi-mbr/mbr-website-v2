@@ -79,12 +79,53 @@ function extractIds(payload: unknown): { contactId?: number; conversationId?: nu
   return {};
 }
 
+/**
+ * Try to recover the conversation id from `document.referrer`. The parent
+ * page that loads the iframe is the Chatwoot conversation view at
+ * `https://connect.mbrme.com/app/accounts/<n>/inbox/<n>/conversations/<id>`,
+ * so the conversation id is reliably present in the path even when the
+ * dashboard-app handshake fails.
+ *
+ * Returns the conversation id as a number, or `null` if none is found
+ * (referrer empty, different origin, malformed path).
+ */
+function extractConversationIdFromReferrer(): number | null {
+  if (typeof document === 'undefined') return null;
+  const ref = document.referrer;
+  if (!ref) return null;
+  let u: URL;
+  try {
+    u = new URL(ref);
+  } catch {
+    return null;
+  }
+  if (u.origin !== 'https://connect.mbrme.com') return null;
+  const m = /\/conversations\/(\d+)/.exec(u.pathname);
+  if (!m) return null;
+  const id = Number(m[1]);
+  return Number.isFinite(id) && id > 0 ? id : null;
+}
+
 export function DashboardAppContextWaiter(): React.ReactElement {
   const [status, setStatus] = useState<Status>({ kind: 'waiting' });
 
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
+
+    // Fast path: the parent URL almost always contains /conversations/<id>.
+    // The server page accepts conversation_id alone and derives contact_id
+    // from Chatwoot's conversation envelope — no postMessage handshake
+    // required. This makes the iframe resilient to parent-frame races
+    // (e.g. when Chatwoot re-renders the contact pane after a save).
+    const referrerConvId = extractConversationIdFromReferrer();
+    if (referrerConvId) {
+      setStatus({ kind: 'received' });
+      const next = new URL(window.location.href);
+      next.searchParams.set('conversation_id', String(referrerConvId));
+      window.location.replace(next.toString());
+      return () => {};
+    }
 
     const onMessage = (event: MessageEvent) => {
       // Origin allow-list — only our Chatwoot host can hand us context.
