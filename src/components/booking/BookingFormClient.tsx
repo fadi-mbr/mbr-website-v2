@@ -15,12 +15,16 @@
 
 import React, { useMemo, useState } from 'react';
 import SlotPicker, { type SlotValue } from './SlotPicker';
+import CarMakeModelPicker from './CarMakeModelPicker';
+import UaePlatePicker from './UaePlatePicker';
 import {
   EMAIL_RE,
   maskUaePhoneInput,
   normalizeUaePhone,
 } from '@/lib/booking-phone';
 import type { BookingService } from '@/lib/booking-types';
+import { OTHER_SENTINEL } from '@/lib/car-catalog';
+import { FOREIGN_SENTINEL, formatPlate } from '@/lib/uae-plates';
 
 export interface BookingSubmitPayload {
   mode: 'agent' | 'public';
@@ -106,7 +110,8 @@ type FieldErrors = Partial<
     | 'email'
     | 'vehicleYear'
     | 'vehicleMake'
-    | 'vehicleModel',
+    | 'vehicleModel'
+    | 'vehiclePlate',
     string
   >
 >;
@@ -130,9 +135,19 @@ export default function BookingFormClient({
   );
   const [email, setEmail] = useState(prefill?.email ?? '');
   const [vehicleYear, setVehicleYear] = useState('');
+  // Make/Model: when the picker selects "Other", the sentinel `__OTHER__`
+  // is stored here and the actual user-typed name goes into customMake /
+  // customModel. At submit time we resolve to the real string.
   const [vehicleMake, setVehicleMake] = useState('');
+  const [customMake, setCustomMake] = useState('');
   const [vehicleModel, setVehicleModel] = useState('');
-  const [vehiclePlate, setVehiclePlate] = useState('');
+  const [customModel, setCustomModel] = useState('');
+  // Plate: composed from emirate + category + number, or from foreignText
+  // when emirate === FOREIGN_SENTINEL.
+  const [plateEmirate, setPlateEmirate] = useState('');
+  const [plateCategory, setPlateCategory] = useState('');
+  const [plateNumber, setPlateNumber] = useState('');
+  const [plateForeign, setPlateForeign] = useState('');
   const [notes, setNotes] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -164,14 +179,51 @@ export default function BookingFormClient({
     normalizeUaePhone(v) ? undefined : 'Enter a valid UAE mobile (e.g. 050 123 4567).';
   const checkEmail = (v: string) =>
     EMAIL_RE.test(v.trim()) ? undefined : 'Enter a valid email address.';
-  const checkVehicleMake = (v: string) =>
-    v.trim() ? undefined : 'Please enter the vehicle make.';
-  const checkVehicleModel = (v: string) =>
-    v.trim() ? undefined : 'Please enter the vehicle model.';
+  const checkVehicleMake = (make: string, custom: string) => {
+    if (!make) return 'Please select the vehicle make.';
+    if (make === OTHER_SENTINEL && !custom.trim()) {
+      return 'Please type the make.';
+    }
+    return undefined;
+  };
+  const checkVehicleModel = (
+    make: string,
+    model: string,
+    custom: string
+  ) => {
+    if (!make) return 'Please select a make first.';
+    if (make === OTHER_SENTINEL) {
+      return custom.trim() ? undefined : 'Please type the model.';
+    }
+    if (!model) return 'Please select the vehicle model.';
+    if (model === OTHER_SENTINEL && !custom.trim()) {
+      return 'Please type the model.';
+    }
+    return undefined;
+  };
   const checkVehicleYear = (v: string) => {
     const y = Number(v);
     if (!Number.isFinite(y) || y < 1980 || y > CURRENT_YEAR + 1) {
       return `Enter a year between 1980 and ${CURRENT_YEAR + 1}.`;
+    }
+    return undefined;
+  };
+  const checkPlate = (
+    emirate: string,
+    category: string,
+    number: string,
+    foreignText: string
+  ) => {
+    if (!emirate) return 'Please pick the emirate (or Foreign plate).';
+    if (emirate === FOREIGN_SENTINEL) {
+      return foreignText.trim()
+        ? undefined
+        : 'Please type the country + plate.';
+    }
+    if (!category) return 'Please pick the plate code.';
+    if (!number.trim()) return 'Please enter the plate number.';
+    if (!/^\d{1,5}$/.test(number.trim())) {
+      return 'Plate number must be 1–5 digits.';
     }
     return undefined;
   };
@@ -184,9 +236,15 @@ export default function BookingFormClient({
     e.lastName = checkLastName(lastName);
     e.phone = checkPhone(phone);
     e.email = checkEmail(email);
-    e.vehicleMake = checkVehicleMake(vehicleMake);
-    e.vehicleModel = checkVehicleModel(vehicleModel);
+    e.vehicleMake = checkVehicleMake(vehicleMake, customMake);
+    e.vehicleModel = checkVehicleModel(vehicleMake, vehicleModel, customModel);
     e.vehicleYear = checkVehicleYear(vehicleYear);
+    e.vehiclePlate = checkPlate(
+      plateEmirate,
+      plateCategory,
+      plateNumber,
+      plateForeign
+    );
     // Strip undefined values so Object.keys() works as expected.
     for (const k of Object.keys(e) as (keyof FieldErrors)[]) {
       if (!e[k]) delete e[k];
@@ -283,6 +341,18 @@ export default function BookingFormClient({
     }
 
     const normPhone = normalizeUaePhone(phone)!;
+    const resolvedMake =
+      vehicleMake === OTHER_SENTINEL ? customMake.trim() : vehicleMake;
+    const resolvedModel =
+      vehicleMake === OTHER_SENTINEL || vehicleModel === OTHER_SENTINEL
+        ? customModel.trim()
+        : vehicleModel;
+    const resolvedPlate = formatPlate({
+      emirate: plateEmirate,
+      category: plateCategory,
+      number: plateNumber,
+      foreignText: plateForeign,
+    });
     const payload: BookingSubmitPayload = {
       mode,
       serviceId: serviceId!,
@@ -292,9 +362,9 @@ export default function BookingFormClient({
       ownerPhone: normPhone,
       ownerEmail: email.trim(),
       vehicleYear: Number(vehicleYear),
-      vehicleMake: vehicleMake.trim(),
-      vehicleModel: vehicleModel.trim(),
-      vehiclePlate: vehiclePlate.trim() || undefined,
+      vehicleMake: resolvedMake,
+      vehicleModel: resolvedModel,
+      vehiclePlate: resolvedPlate || undefined,
       notes: notes.trim() || undefined,
     };
     setLastPayload(payload);
@@ -552,7 +622,7 @@ export default function BookingFormClient({
         >
           Vehicle
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Field
             id="vehicleYear"
             label="Year"
@@ -571,46 +641,65 @@ export default function BookingFormClient({
             inputMode="numeric"
             autoComplete="off"
             enterKeyHint="next"
+            placeholder="2023"
           />
-          <Field
-            id="vehicleMake"
-            label="Make"
-            value={vehicleMake}
-            onChange={setVehicleMake}
+          <CarMakeModelPicker
+            make={vehicleMake}
+            setMake={setVehicleMake}
+            customMake={customMake}
+            setCustomMake={setCustomMake}
+            model={vehicleModel}
+            setModel={setVehicleModel}
+            customModel={customModel}
+            setCustomModel={setCustomModel}
+            errors={{
+              make: errors.vehicleMake,
+              model: errors.vehicleModel,
+            }}
+            onBlur={(field) => {
+              if (field === 'make') {
+                setErrors((p) => ({
+                  ...p,
+                  vehicleMake: checkVehicleMake(vehicleMake, customMake),
+                }));
+              } else {
+                setErrors((p) => ({
+                  ...p,
+                  vehicleModel: checkVehicleModel(
+                    vehicleMake,
+                    vehicleModel,
+                    customModel
+                  ),
+                }));
+              }
+            }}
+          />
+        </div>
+        <div>
+          <h3 className="text-xs uppercase tracking-wide text-neutral-400 mb-2">
+            Licence plate
+          </h3>
+          <UaePlatePicker
+            emirate={plateEmirate}
+            setEmirate={setPlateEmirate}
+            category={plateCategory}
+            setCategory={setPlateCategory}
+            number={plateNumber}
+            setNumber={setPlateNumber}
+            foreignText={plateForeign}
+            setForeignText={setPlateForeign}
+            error={errors.vehiclePlate}
             onBlur={() =>
               setErrors((p) => ({
                 ...p,
-                vehicleMake: checkVehicleMake(vehicleMake),
+                vehiclePlate: checkPlate(
+                  plateEmirate,
+                  plateCategory,
+                  plateNumber,
+                  plateForeign
+                ),
               }))
             }
-            error={errors.vehicleMake}
-            required
-            autoComplete="off"
-            enterKeyHint="next"
-          />
-          <Field
-            id="vehicleModel"
-            label="Model"
-            value={vehicleModel}
-            onChange={setVehicleModel}
-            onBlur={() =>
-              setErrors((p) => ({
-                ...p,
-                vehicleModel: checkVehicleModel(vehicleModel),
-              }))
-            }
-            error={errors.vehicleModel}
-            required
-            autoComplete="off"
-            enterKeyHint="next"
-          />
-          <Field
-            id="vehiclePlate"
-            label="Plate"
-            value={vehiclePlate}
-            onChange={setVehiclePlate}
-            autoComplete="off"
-            enterKeyHint="next"
           />
         </div>
       </section>
