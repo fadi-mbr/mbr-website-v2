@@ -231,23 +231,31 @@ export default function suite() {
       },
     },
     {
-      name: 'unknown service id (catalogue lookup miss) → kind:submit-failed code:UNKNOWN_SERVICE',
+      name: 'confirm path skips the ARC services fetch (uses token data directly)',
       fn: async () => {
         silenceLogger();
+        let fetchServicesCalled = false;
         _setArcDepsForTests({
-          fetchServices: async () => [SERVICE_42],
+          fetchServices: async () => {
+            fetchServicesCalled = true;
+            return [SERVICE_42];
+          },
           submitBooking: async () => undefined,
         });
         installFakeChatwoot();
         try {
-          const payload = makePayload({
-            intent: { ...makePayload().intent, serviceId: 9999 },
-          });
+          const payload = makePayload();
           const token = await signToken(payload, SECRET_HEX);
           const r = await confirmFromToken(token, SECRET_HEX);
-          assertEqual(r.kind, 'submit-failed');
-          if (r.kind === 'submit-failed') {
-            assertEqual(r.code, 'UNKNOWN_SERVICE');
+          assertEqual(r.kind, 'ok');
+          assert(
+            !fetchServicesCalled,
+            'fetchServices must not be called on the confirm path',
+          );
+          if (r.kind === 'ok') {
+            // serviceName + durationH come straight from the token.
+            assertEqual(r.serviceName, payload.intent.serviceName);
+            assertEqual(r.estimatedDuration, payload.intent.durationH);
           }
         } finally {
           _resetDepsForTests();

@@ -64,7 +64,19 @@ export interface SubmitOptions {
     conversationId: number;
     contactId: number;
   };
+  /**
+   * If true, skip the ARC services-catalogue fetch and trust the intent's
+   * own `serviceName` + `durationH`. ARC's `serviceType` field is hardcoded
+   * to `INSPECTION` — currently every MBR-facing service in the catalogue
+   * is INSPECTION, so the fetch is dead weight on the confirm path
+   * (~500-1000ms per submit). If MBR adds non-INSPECTION services, flip
+   * this off on the confirm path (or thread the type through the token).
+   */
+  skipServicesFetch?: boolean;
 }
+
+/** Hardcoded ARC serviceType used when `skipServicesFetch` is on. */
+const DEFAULT_ARC_SERVICE_TYPE = "INSPECTION";
 
 // ---------------------------------------------------------------------------
 // Test seams — swap real ARC + Chatwoot clients for in-memory fakes.
@@ -235,30 +247,44 @@ export async function submitConfirmedBooking(
   options: SubmitOptions = {},
 ): Promise<SubmitResult> {
   // 1. Service lookup — bail with SERVICE_LOOKUP_FAILED on transport errors.
-  let services: ServiceSummary[];
-  try {
-    services = await arcDeps.fetchServices();
-  } catch (e) {
-    logFn({
-      event: "booking.services_fail",
-      status: 502,
-      reason: e instanceof Error ? e.message : String(e),
-    });
-    return {
-      ok: false,
-      code: "SERVICE_LOOKUP_FAILED",
-      message: "Service catalogue unavailable, please retry shortly.",
+  //    Skipped on the confirm path: the v:2 token already carries
+  //    serviceName + durationH, and every MBR service is INSPECTION today.
+  let service: ServiceSummary;
+  if (options.skipServicesFetch) {
+    service = {
+      id: intent.serviceId,
+      title: intent.serviceName,
+      type: DEFAULT_ARC_SERVICE_TYPE,
+      duration_h: intent.durationH,
+      price: null,
+      templateType: null,
     };
-  }
-
-  const service = services.find((s) => s.id === intent.serviceId);
-  if (!service) {
-    return {
-      ok: false,
-      code: "UNKNOWN_SERVICE",
-      message:
-        "Unknown serviceId — fetch /api/booking/services for the current list.",
-    };
+  } else {
+    let services: ServiceSummary[];
+    try {
+      services = await arcDeps.fetchServices();
+    } catch (e) {
+      logFn({
+        event: "booking.services_fail",
+        status: 502,
+        reason: e instanceof Error ? e.message : String(e),
+      });
+      return {
+        ok: false,
+        code: "SERVICE_LOOKUP_FAILED",
+        message: "Service catalogue unavailable, please retry shortly.",
+      };
+    }
+    const found = services.find((s) => s.id === intent.serviceId);
+    if (!found) {
+      return {
+        ok: false,
+        code: "UNKNOWN_SERVICE",
+        message:
+          "Unknown serviceId — fetch /api/booking/services for the current list.",
+      };
+    }
+    service = found;
   }
 
   // 2. ARC submit.

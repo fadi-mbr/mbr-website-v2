@@ -71,7 +71,12 @@ export async function confirmFromToken(
     return { kind: "invalid-token", reason: verified.reason };
   }
   const intent = verified.payload.intent;
-  const result = await submitConfirmedBooking(intentToBookingIntent(intent));
+  // Skip the ARC services-catalogue fetch — the token already carries
+  // serviceName + durationH, and every MBR service is INSPECTION today.
+  // Saves ~500-1000ms per confirm submit. See SubmitOptions docstring.
+  const result = await submitConfirmedBooking(intentToBookingIntent(intent), {
+    skipServicesFetch: true,
+  });
   if (!result.ok) {
     return {
       kind: "submit-failed",
