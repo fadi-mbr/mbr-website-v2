@@ -12,10 +12,10 @@
  * can decide how to surface it (typically: log + return a generic 200 so
  * we don't leak whether an address exists).
  *
- * HTML escaping: user-supplied strings (firstName, serviceName) are escaped
- * before interpolation. The confirmUrl is *not* escaped because it must
- * round-trip its base64url segments through the `href` attribute; callers
- * MUST pass an already-validated absolute URL.
+ * Body rendering lives in `booking-email-template.ts`. This module owns
+ * only the SMTP transport plumbing and the subject line; the visual
+ * template (header, summary card, CTA button, footer) is in the template
+ * module so it can be edited without touching transport code.
  *
  * Tests use a module seam (`_setMailerForTests`) to inject a fake
  * transporter — nodemailer's `createTransport` returns a stateful object
@@ -23,6 +23,12 @@
  */
 
 import nodemailer from "nodemailer";
+import {
+  renderConfirmationEmailHtml,
+  renderConfirmationEmailText,
+  escapeHtml as templateEscapeHtml,
+  formatDubai as templateFormatDubai,
+} from "./booking-email-template";
 
 export interface SmtpConfig {
   host: string;
@@ -79,101 +85,27 @@ function buildTransporter(smtp: SmtpConfig): TransporterLike {
 }
 
 // ---------------------------------------------------------------------------
-// HTML escape
+// Subject + body builders
 // ---------------------------------------------------------------------------
-
-export function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-// ---------------------------------------------------------------------------
-// Date formatting (Asia/Dubai)
-// ---------------------------------------------------------------------------
-
-export function formatDubai(when: Date | number): string {
-  const epochMs = typeof when === "number" ? when : when.getTime();
-  try {
-    return new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Dubai",
-      weekday: "short",
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).format(new Date(epochMs));
-  } catch {
-    return new Date(epochMs).toISOString();
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Subject + body builders (exported for tests)
-// ---------------------------------------------------------------------------
+//
+// The HTML/text body builders moved to booking-email-template.ts. We
+// re-export them here under the historical names so older imports
+// (and tests) keep working.
 
 export const CONFIRMATION_SUBJECT =
   "Confirm your booking at MBR — expires in 30 minutes";
 
-const BRAND_BG = "#000";
-const BRAND_FG = "#ffffff";
-const BRAND_ACCENT = "#b08d57";
-const FOOTER_TEXT =
-  "If you didn't request this, ignore this email — no booking will be created. MBR Auto Services · Al Quoz, Dubai";
+/** Re-export for back-compat — escapes the five HTML special chars. */
+export const escapeHtml = templateEscapeHtml;
 
-export function renderConfirmationHtml(input: {
-  firstName: string;
-  serviceName: string;
-  requestedAt: Date | number;
-  confirmUrl: string;
-}): string {
-  const safeFirstName = escapeHtml(input.firstName || "there");
-  const safeServiceName = escapeHtml(input.serviceName);
-  const when = escapeHtml(formatDubai(input.requestedAt));
-  const safeUrl = escapeHtml(input.confirmUrl);
+/** Re-export for back-compat — formats a timestamp in Asia/Dubai locale. */
+export const formatDubai = templateFormatDubai;
 
-  return [
-    `<!doctype html>`,
-    `<html><body style="margin:0;padding:0;background:${BRAND_BG};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:${BRAND_FG};">`,
-    `<div style="max-width:560px;margin:0 auto;padding:32px 24px;background:${BRAND_BG};color:${BRAND_FG};">`,
-    `<h1 style="font-size:22px;font-weight:600;margin:0 0 16px 0;color:${BRAND_ACCENT};">Confirm your booking</h1>`,
-    `<p style="font-size:15px;line-height:1.5;margin:0 0 12px 0;color:${BRAND_FG};">Hi ${safeFirstName},</p>`,
-    `<p style="font-size:15px;line-height:1.5;margin:0 0 24px 0;color:${BRAND_FG};">We received a booking request for <strong style="color:${BRAND_ACCENT};">${safeServiceName}</strong> on <strong>${when}</strong>. Click below to confirm — the link expires in 30 minutes.</p>`,
-    `<p style="margin:24px 0;text-align:center;">`,
-    `<a href="${safeUrl}" style="display:inline-block;background:${BRAND_ACCENT};color:${BRAND_BG};text-decoration:none;padding:14px 28px;border-radius:6px;font-size:15px;font-weight:600;">Confirm booking</a>`,
-    `</p>`,
-    `<p style="font-size:13px;line-height:1.5;margin:24px 0 8px 0;color:#999;">If the button doesn't work, paste this link into your browser:</p>`,
-    `<p style="font-size:13px;line-height:1.5;margin:0 0 32px 0;color:#bbb;word-break:break-all;">${safeUrl}</p>`,
-    `<hr style="border:none;border-top:1px solid #222;margin:24px 0;">`,
-    `<p style="font-size:12px;line-height:1.5;margin:0;color:#777;">${escapeHtml(FOOTER_TEXT)}</p>`,
-    `</div></body></html>`,
-  ].join("");
-}
+/** Re-export under the legacy name. */
+export const renderConfirmationHtml = renderConfirmationEmailHtml;
 
-export function renderConfirmationText(input: {
-  firstName: string;
-  serviceName: string;
-  requestedAt: Date | number;
-  confirmUrl: string;
-}): string {
-  const when = formatDubai(input.requestedAt);
-  return [
-    `Hi ${input.firstName || "there"},`,
-    ``,
-    `We received a booking request for ${input.serviceName} on ${when}.`,
-    `Click the link below to confirm — it expires in 30 minutes.`,
-    ``,
-    input.confirmUrl,
-    ``,
-    `--`,
-    FOOTER_TEXT,
-  ].join("\n");
-}
+/** Re-export under the legacy name. */
+export const renderConfirmationText = renderConfirmationEmailText;
 
 // ---------------------------------------------------------------------------
 // Send
@@ -195,13 +127,13 @@ export async function sendConfirmationEmail(
       from: input.fromEmail,
       replyTo: input.fromEmail,
       subject: CONFIRMATION_SUBJECT,
-      text: renderConfirmationText({
+      text: renderConfirmationEmailText({
         firstName: input.firstName,
         serviceName: input.serviceName,
         requestedAt: input.requestedAt,
         confirmUrl: input.confirmUrl,
       }),
-      html: renderConfirmationHtml({
+      html: renderConfirmationEmailHtml({
         firstName: input.firstName,
         serviceName: input.serviceName,
         requestedAt: input.requestedAt,

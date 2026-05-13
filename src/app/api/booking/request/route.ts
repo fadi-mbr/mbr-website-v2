@@ -16,6 +16,31 @@
  *   4. Token expiry — 30 min, signed with HMAC-SHA256. A booking intent
  *      that doesn't get confirmed within 30 minutes simply dies.
  *
+ * Latency posture (Next 15 `after()`):
+ *   This route used to block on SMTP through ImprovMX (3-3.5s), so the
+ *   browser waited ~4s for the "Check your email…" response. The SMTP
+ *   send now runs via `after()` from `next/server` — the response ships
+ *   as soon as the token is signed, then the email goes out on the
+ *   still-warm function instance. Vercel keeps the lambda alive for
+ *   `after()` callbacks.
+ *
+ *   What stays synchronous (must complete before the response):
+ *     - honeypot, IP rate-limit, validation, phone rate-limit
+ *     - services-catalogue lookup (in-memory cache; only the first call
+ *       of the hour pays the ~600ms network round-trip)
+ *     - token signing (the URL goes in the email AND the confirm route
+ *       trusts the token's serviceName + durationH to skip its own ARC
+ *       lookup; if we deferred sign we'd have to defer the catalogue
+ *       too, which would race the email render)
+ *     - phone rate-limit recordBooking (must persist before we return so
+ *       a quick second submit is rejected even before the email lands)
+ *     - SMTP env-var presence check
+ *
+ *   What runs deferred via `after()`:
+ *     - the actual SMTP send (3-3.5s of synchronous wait, gone)
+ *   A failure inside the deferred block is logged but cannot affect the
+ *   response — it has already been sent.
+ *
  * No KV. The intent is embedded inside the token (booking-token.ts v:2);
  * if abuse becomes real we'd graduate the IP bucket to Redis/KV.
  *
@@ -25,7 +50,7 @@
  * a caller sees is the email arriving in their inbox.
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { normalisePhone } from '../_lib/arc-client';
 // Namespace import so tests can swap `fetchServices` via the module object.
 import * as arcClient from '../_lib/arc-client';
@@ -95,6 +120,101 @@ function deriveSiteUrl(): string {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return 'https://mbrme.com';
 }
+
+// ---------------------------------------------------------------------------
+// Test seam — `after()` from next/server only runs inside a real request
+// scope; in unit tests we need to capture and invoke the callback so we
+// can assert on the email send. `_setAfterRunnerForTests` lets a test
+// inject a runner that records callbacks instead of deferring them.
+// ---------------------------------------------------------------------------
+
+type AfterRunner = (cb: () => Promise<void> | void) => void;
+
+let afterRunner: AfterRunner | null = null;
+
+export function _setAfterRunnerForTests(fn: AfterRunner): void {
+  afterRunner = fn;
+}
+
+export function _resetAfterRunnerForTests(): void {
+  afterRunner = null;
+}
+
+function scheduleDeferred(cb: () => Promise<void> | void): void {
+  if (afterRunner) {
+    afterRunner(cb);
+    return;
+  }
+  // In a real Next 15 request, `after()` defers until the response is sent.
+  // It must be called *within* the request execution context — calling it
+  // outside throws. We are inside the POST handler, so this is safe.
+  after(cb);
+}
+
+// ---------------------------------------------------------------------------
+// Deferred-work helper — extracted so the synchronous path stays readable
+// and so a unit test can assert on it directly.
+// ---------------------------------------------------------------------------
+
+interface DeferredEmailArgs {
+  intent: TokenIntent;
+  /** Already-signed token, baked into the confirm URL. */
+  confirmUrl: string;
+  /** SMTP config — already validated as present at request time. */
+  smtp: { host: string; port: number; user: string; password: string };
+  fromEmail: string;
+  /** Request start time, for end-to-end deferred-latency logging. */
+  t0: number;
+}
+
+export async function _runDeferredEmail(args: DeferredEmailArgs): Promise<void> {
+  try {
+    const sendResult = await sendConfirmationEmail({
+      smtp: args.smtp,
+      fromEmail: args.fromEmail,
+      to: args.intent.email,
+      firstName: args.intent.firstName,
+      serviceName: args.intent.serviceName,
+      requestedAt: args.intent.timeStartMs,
+      confirmUrl: args.confirmUrl,
+    });
+
+    if (!sendResult.ok) {
+      logBooking({
+        event: 'booking.request.deferred_email_fail',
+        phone: args.intent.phone,
+        serviceId: args.intent.serviceId,
+        latencyMs: Date.now() - args.t0,
+        status: 200,
+        reason: sendResult.error,
+      });
+      return;
+    }
+
+    logBooking({
+      event: 'booking.request.deferred_email_ok',
+      phone: args.intent.phone,
+      serviceId: args.intent.serviceId,
+      latencyMs: Date.now() - args.t0,
+      status: 200,
+    });
+  } catch (e) {
+    // sendConfirmationEmail already catches its own errors, but defensive:
+    // never let a throw propagate out of the deferred callback.
+    logBooking({
+      event: 'booking.request.deferred_email_fail',
+      phone: args.intent.phone,
+      serviceId: args.intent.serviceId,
+      latencyMs: Date.now() - args.t0,
+      status: 200,
+      reason: e instanceof Error ? e.message : String(e),
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// POST handler
+// ---------------------------------------------------------------------------
 
 export async function POST(req: Request): Promise<NextResponse> {
   const t0 = Date.now();
@@ -194,7 +314,14 @@ export async function POST(req: Request): Promise<NextResponse> {
     return jsonResponse(GENERIC_SUCCESS, 200);
   }
 
-  // ----- 7. Look up the service (for the email body) -----------------------
+  // ----- 7. Look up the service (for the email body + token intent) -------
+  // The catalogue is cached for 1h in arc-client, so this is fast for all
+  // calls after the first of the hour. Kept synchronous because:
+  //   (a) the confirm route trusts the token's serviceName + durationH and
+  //       passes `skipServicesFetch: true` to ARC — if we leave them blank
+  //       at sign time the confirm submit can't name the service correctly.
+  //   (b) unknown service id is a hard bail; better to fail before signing
+  //       a token we'll never use.
   let serviceName: string | null = null;
   let durationH = 1;
   try {
@@ -217,7 +344,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   if (!serviceName) {
     // If the lookup failed or the service id is bogus, exit success-shaped.
     // The confirm step would have caught it too; better to bail before we
-    // burn an email send.
+    // burn an email send and a token sign.
     logBooking({
       event: 'booking.request.unknown_service',
       phone: parsed.ownerPhone,
@@ -291,9 +418,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     );
   }
 
-  // ----- 9. Build confirm URL + send email ---------------------------------
-  const confirmUrl = `${deriveSiteUrl()}/book/confirm?token=${encodeURIComponent(token)}`;
-
+  // ----- 9. SMTP env presence (synchronous — fail fast on misconfig) ------
   const smtpHost = process.env.BOOKING_SMTP_HOST;
   const smtpPortRaw = process.env.BOOKING_SMTP_PORT;
   const smtpUser = process.env.BOOKING_SMTP_USER;
@@ -309,39 +434,30 @@ export async function POST(req: Request): Promise<NextResponse> {
     return jsonResponse(GENERIC_SUCCESS, 200);
   }
   const smtpPort = Number(smtpPortRaw);
+  const confirmUrl = `${deriveSiteUrl()}/book/confirm?token=${encodeURIComponent(token)}`;
 
-  const sendResult = await sendConfirmationEmail({
-    smtp: {
-      host: smtpHost,
-      port: Number.isFinite(smtpPort) ? smtpPort : 587,
-      user: smtpUser,
-      password: smtpPass,
-    },
-    fromEmail,
-    to: intent.email,
-    firstName: intent.firstName,
-    serviceName,
-    requestedAt: intent.timeStartMs,
-    confirmUrl,
-  });
-
-  // Whether the email transport succeeded or not, we consume one credit
-  // against the phone rate-limiter — otherwise a flapping SMTP makes the
-  // limiter trivially bypassable.
+  // ----- 10. Consume phone rate-limit credit (synchronous) -----------------
+  // Must happen before we return so a quick second submit is rejected even
+  // if the deferred email is still in flight. Whether the email transport
+  // succeeds or not, this request consumed a credit — otherwise a flapping
+  // SMTP makes the limiter trivially bypassable.
   recordBooking(parsed.ownerPhone);
 
-  if (!sendResult.ok) {
-    logBooking({
-      event: 'booking.request.email_fail',
-      phone: parsed.ownerPhone,
-      serviceId: parsed.serviceId,
-      latencyMs: Date.now() - t0,
-      status: 200,
-      reason: sendResult.error,
-    });
-    // Still return GENERIC_SUCCESS so we don't reveal the failure mode.
-    return jsonResponse(GENERIC_SUCCESS, 200);
-  }
+  // ----- 11. Defer the SMTP send -------------------------------------------
+  scheduleDeferred(() =>
+    _runDeferredEmail({
+      intent,
+      confirmUrl,
+      smtp: {
+        host: smtpHost,
+        port: Number.isFinite(smtpPort) ? smtpPort : 587,
+        user: smtpUser,
+        password: smtpPass,
+      },
+      fromEmail,
+      t0,
+    }),
+  );
 
   logBooking({
     event: 'booking.request.ok',
