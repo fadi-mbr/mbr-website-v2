@@ -194,7 +194,7 @@ export default () =>
       },
     },
     {
-      name: "renderConfirmationHtml — includes confirm URL + button + footer",
+      name: "renderConfirmationHtml — includes confirm URL + button + footer + brand logo",
       fn: () => {
         const html = renderConfirmationHtml({
           firstName: "Fadi",
@@ -206,6 +206,84 @@ export default () =>
         assert(html.toLowerCase().includes("confirm booking"));
         assert(html.includes("MBR Auto Services"));
         assert(html.includes("max-width:560px"));
+        // Brand: horizontal logo lives at mbrme.com/images/...
+        assert(
+          html.includes("https://mbrme.com/images/Logo_horizontal.svg"),
+          "header must reference the MBR horizontal logo",
+        );
+        // Bronze accent on the CTA button.
+        assert(html.toLowerCase().includes("#b08d57"), "bronze accent must appear");
+        // Expiry note must be present so the user knows the window is 30 min.
+        assert(
+          html.toLowerCase().includes("30 minutes"),
+          "expiry note (30 minutes) must appear in body",
+        );
+        // Asia/Dubai display marker.
+        assert(html.includes("GMT+4"), "Asia/Dubai marker (GMT+4) must appear");
+        // Summary card labels.
+        assert(html.toLowerCase().includes("service"));
+        assert(html.toLowerCase().includes("when"));
+        assert(html.toLowerCase().includes("where"));
+        // Footer contact info.
+        assert(
+          html.includes("+971 56 501 5800") || html.includes("971565015800"),
+          "footer must include phone number",
+        );
+        assert(html.includes("wa.me/971565015800"), "footer must include WhatsApp link");
+        // Reassurance copy.
+        assert(html.toLowerCase().includes("service advisor"));
+      },
+    },
+    {
+      name: "renderConfirmationHtml — HTML-escapes scripts in firstName",
+      fn: () => {
+        const html = renderConfirmationHtml({
+          firstName: "<script>alert(1)</script>",
+          serviceName: "Oil change",
+          requestedAt: 1_700_000_000_000,
+          confirmUrl: "https://mbrme.com/book/confirm?token=abc",
+        });
+        assert(!html.includes("<script>alert(1)</script>"), "raw script tag must not appear");
+        assert(html.includes("&lt;script&gt;"), "firstName must be escaped");
+      },
+    },
+    {
+      name: "renderConfirmationHtml — escapes serviceName ampersand",
+      fn: () => {
+        const html = renderConfirmationHtml({
+          firstName: "Fadi",
+          serviceName: "Brakes & rotors",
+          requestedAt: 1_700_000_000_000,
+          confirmUrl: "https://mbrme.com/book/confirm?token=abc",
+        });
+        assert(
+          html.includes("Brakes &amp; rotors"),
+          "ampersand in serviceName must be escaped",
+        );
+      },
+    },
+    {
+      name: "renderConfirmationText — plaintext body is HTML-safe (no < or >)",
+      fn: async () => {
+        const { renderConfirmationText } = await import("@/lib/booking-email");
+        const txt = renderConfirmationText({
+          firstName: "Fadi",
+          serviceName: "Oil change",
+          requestedAt: 1_700_000_000_000,
+          confirmUrl: "https://mbrme.com/book/confirm?token=abc",
+        });
+        assert(!txt.includes("<"), "plaintext must not contain raw < characters");
+        assert(!txt.includes(">"), "plaintext must not contain raw > characters");
+        // URL on its own line for terminal mail-client linkification.
+        const lines = txt.split("\n");
+        assert(
+          lines.includes("https://mbrme.com/book/confirm?token=abc"),
+          "confirm URL must appear on its own line",
+        );
+        // Mentions expiry + the service name + brand.
+        assert(txt.includes("30 minutes"));
+        assert(txt.includes("Oil change"));
+        assert(txt.includes("MBR Auto Services"));
       },
     },
   ]);

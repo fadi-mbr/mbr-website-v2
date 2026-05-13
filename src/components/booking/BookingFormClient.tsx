@@ -15,12 +15,16 @@
 
 import React, { useMemo, useState } from 'react';
 import SlotPicker, { type SlotValue } from './SlotPicker';
+import CarMakeModelPicker from './CarMakeModelPicker';
+import UaePlatePicker from './UaePlatePicker';
 import {
   EMAIL_RE,
-  maskUaePhoneInput,
-  normalizeUaePhone,
+  maskIntlPhoneInput,
+  normalizeIntlPhone,
 } from '@/lib/booking-phone';
 import type { BookingService } from '@/lib/booking-types';
+import { OTHER_SENTINEL } from '@/lib/car-catalog';
+import { FOREIGN_SENTINEL, formatPlate } from '@/lib/uae-plates';
 
 export interface BookingSubmitPayload {
   mode: 'agent' | 'public';
@@ -106,7 +110,8 @@ type FieldErrors = Partial<
     | 'email'
     | 'vehicleYear'
     | 'vehicleMake'
-    | 'vehicleModel',
+    | 'vehicleModel'
+    | 'vehiclePlate',
     string
   >
 >;
@@ -126,13 +131,23 @@ export default function BookingFormClient({
   const [firstName, setFirstName] = useState(prefill?.firstName ?? '');
   const [lastName, setLastName] = useState(prefill?.lastName ?? '');
   const [phone, setPhone] = useState(
-    prefill?.phone ? maskUaePhoneInput(prefill.phone) : ''
+    prefill?.phone ? maskIntlPhoneInput(prefill.phone) : ''
   );
   const [email, setEmail] = useState(prefill?.email ?? '');
   const [vehicleYear, setVehicleYear] = useState('');
+  // Make/Model: when the picker selects "Other", the sentinel `__OTHER__`
+  // is stored here and the actual user-typed name goes into customMake /
+  // customModel. At submit time we resolve to the real string.
   const [vehicleMake, setVehicleMake] = useState('');
+  const [customMake, setCustomMake] = useState('');
   const [vehicleModel, setVehicleModel] = useState('');
-  const [vehiclePlate, setVehiclePlate] = useState('');
+  const [customModel, setCustomModel] = useState('');
+  // Plate: composed from emirate + category + number, or from foreignText
+  // when emirate === FOREIGN_SENTINEL.
+  const [plateEmirate, setPlateEmirate] = useState('');
+  const [plateCategory, setPlateCategory] = useState('');
+  const [plateNumber, setPlateNumber] = useState('');
+  const [plateForeign, setPlateForeign] = useState('');
   const [notes, setNotes] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -161,17 +176,54 @@ export default function BookingFormClient({
   const checkLastName = (v: string) =>
     v.trim() ? undefined : 'Please enter your last name.';
   const checkPhone = (v: string) =>
-    normalizeUaePhone(v) ? undefined : 'Enter a valid UAE mobile (e.g. 050 123 4567).';
+    normalizeIntlPhone(v) ? undefined : 'Enter a valid phone number.';
   const checkEmail = (v: string) =>
     EMAIL_RE.test(v.trim()) ? undefined : 'Enter a valid email address.';
-  const checkVehicleMake = (v: string) =>
-    v.trim() ? undefined : 'Please enter the vehicle make.';
-  const checkVehicleModel = (v: string) =>
-    v.trim() ? undefined : 'Please enter the vehicle model.';
+  const checkVehicleMake = (make: string, custom: string) => {
+    if (!make) return 'Please select the vehicle make.';
+    if (make === OTHER_SENTINEL && !custom.trim()) {
+      return 'Please type the make.';
+    }
+    return undefined;
+  };
+  const checkVehicleModel = (
+    make: string,
+    model: string,
+    custom: string
+  ) => {
+    if (!make) return 'Please select a make first.';
+    if (make === OTHER_SENTINEL) {
+      return custom.trim() ? undefined : 'Please type the model.';
+    }
+    if (!model) return 'Please select the vehicle model.';
+    if (model === OTHER_SENTINEL && !custom.trim()) {
+      return 'Please type the model.';
+    }
+    return undefined;
+  };
   const checkVehicleYear = (v: string) => {
     const y = Number(v);
     if (!Number.isFinite(y) || y < 1980 || y > CURRENT_YEAR + 1) {
       return `Enter a year between 1980 and ${CURRENT_YEAR + 1}.`;
+    }
+    return undefined;
+  };
+  const checkPlate = (
+    emirate: string,
+    category: string,
+    number: string,
+    foreignText: string
+  ) => {
+    if (!emirate) return 'Please pick the emirate (or Foreign plate).';
+    if (emirate === FOREIGN_SENTINEL) {
+      return foreignText.trim()
+        ? undefined
+        : 'Please type the country + plate.';
+    }
+    if (!category) return 'Please pick the plate code.';
+    if (!number.trim()) return 'Please enter the plate number.';
+    if (!/^\d{1,5}$/.test(number.trim())) {
+      return 'Plate number must be 1–5 digits.';
     }
     return undefined;
   };
@@ -184,9 +236,15 @@ export default function BookingFormClient({
     e.lastName = checkLastName(lastName);
     e.phone = checkPhone(phone);
     e.email = checkEmail(email);
-    e.vehicleMake = checkVehicleMake(vehicleMake);
-    e.vehicleModel = checkVehicleModel(vehicleModel);
+    e.vehicleMake = checkVehicleMake(vehicleMake, customMake);
+    e.vehicleModel = checkVehicleModel(vehicleMake, vehicleModel, customModel);
     e.vehicleYear = checkVehicleYear(vehicleYear);
+    e.vehiclePlate = checkPlate(
+      plateEmirate,
+      plateCategory,
+      plateNumber,
+      plateForeign
+    );
     // Strip undefined values so Object.keys() works as expected.
     for (const k of Object.keys(e) as (keyof FieldErrors)[]) {
       if (!e[k]) delete e[k];
@@ -282,7 +340,19 @@ export default function BookingFormClient({
       return;
     }
 
-    const normPhone = normalizeUaePhone(phone)!;
+    const normPhone = normalizeIntlPhone(phone)!;
+    const resolvedMake =
+      vehicleMake === OTHER_SENTINEL ? customMake.trim() : vehicleMake;
+    const resolvedModel =
+      vehicleMake === OTHER_SENTINEL || vehicleModel === OTHER_SENTINEL
+        ? customModel.trim()
+        : vehicleModel;
+    const resolvedPlate = formatPlate({
+      emirate: plateEmirate,
+      category: plateCategory,
+      number: plateNumber,
+      foreignText: plateForeign,
+    });
     const payload: BookingSubmitPayload = {
       mode,
       serviceId: serviceId!,
@@ -292,9 +362,9 @@ export default function BookingFormClient({
       ownerPhone: normPhone,
       ownerEmail: email.trim(),
       vehicleYear: Number(vehicleYear),
-      vehicleMake: vehicleMake.trim(),
-      vehicleModel: vehicleModel.trim(),
-      vehiclePlate: vehiclePlate.trim() || undefined,
+      vehicleMake: resolvedMake,
+      vehicleModel: resolvedModel,
+      vehiclePlate: resolvedPlate || undefined,
       notes: notes.trim() || undefined,
     };
     setLastPayload(payload);
@@ -348,6 +418,7 @@ export default function BookingFormClient({
   return (
     <form
       onSubmit={handleSubmit}
+      method="post"
       noValidate
       aria-label="MBR Booking"
       className="space-y-8 text-white"
@@ -486,6 +557,7 @@ export default function BookingFormClient({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Field
             id="firstName"
+            name="given-name"
             label="First name"
             value={firstName}
             onChange={setFirstName}
@@ -494,11 +566,12 @@ export default function BookingFormClient({
             }
             error={errors.firstName}
             required
-            autoComplete="given-name"
+            autoComplete="section-contact given-name"
             enterKeyHint="next"
           />
           <Field
             id="lastName"
+            name="family-name"
             label="Last name"
             value={lastName}
             onChange={setLastName}
@@ -507,28 +580,43 @@ export default function BookingFormClient({
             }
             error={errors.lastName}
             required
-            autoComplete="family-name"
+            autoComplete="section-contact family-name"
             enterKeyHint="next"
           />
         </div>
         <Field
           id="phone"
+          name="tel"
           label="Phone"
           value={phone}
-          onChange={(v) => setPhone(maskUaePhoneInput(v))}
-          onBlur={() =>
-            setErrors((p) => ({ ...p, phone: checkPhone(phone) }))
-          }
+          onChange={(v) => setPhone(maskIntlPhoneInput(v))}
+          onFocus={() => {
+            if (!phone.trim()) setPhone('+971 ');
+          }}
+          onBlur={() => {
+            // If the user focused, didn't type anything beyond the default
+            // prefix, and tabbed away — clear back to empty so the field
+            // doesn't look pre-filled. Otherwise validate.
+            const stripped = phone.replace(/\s+/g, '');
+            if (stripped === '+971' || stripped === '+') {
+              setPhone('');
+              setErrors((p) => ({ ...p, phone: undefined }));
+              return;
+            }
+            setErrors((p) => ({ ...p, phone: checkPhone(phone) }));
+          }}
           error={errors.phone}
           required
+          type="tel"
           inputMode="tel"
-          autoComplete="tel"
+          autoComplete="section-contact tel"
           enterKeyHint="next"
           placeholder="+971 50 123 4567"
-          hint="UAE mobile only — we’ll text the appointment confirmation."
+          hint="We'll text you the confirmation. UAE +971 by default — type +country code for other numbers."
         />
         <Field
           id="email"
+          name="email"
           label="Email"
           value={email}
           onChange={setEmail}
@@ -539,7 +627,7 @@ export default function BookingFormClient({
           required
           type="email"
           inputMode="email"
-          autoComplete="email"
+          autoComplete="section-contact email"
           enterKeyHint="next"
         />
       </section>
@@ -552,7 +640,7 @@ export default function BookingFormClient({
         >
           Vehicle
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Field
             id="vehicleYear"
             label="Year"
@@ -571,46 +659,65 @@ export default function BookingFormClient({
             inputMode="numeric"
             autoComplete="off"
             enterKeyHint="next"
+            placeholder="2023"
           />
-          <Field
-            id="vehicleMake"
-            label="Make"
-            value={vehicleMake}
-            onChange={setVehicleMake}
+          <CarMakeModelPicker
+            make={vehicleMake}
+            setMake={setVehicleMake}
+            customMake={customMake}
+            setCustomMake={setCustomMake}
+            model={vehicleModel}
+            setModel={setVehicleModel}
+            customModel={customModel}
+            setCustomModel={setCustomModel}
+            errors={{
+              make: errors.vehicleMake,
+              model: errors.vehicleModel,
+            }}
+            onBlur={(field) => {
+              if (field === 'make') {
+                setErrors((p) => ({
+                  ...p,
+                  vehicleMake: checkVehicleMake(vehicleMake, customMake),
+                }));
+              } else {
+                setErrors((p) => ({
+                  ...p,
+                  vehicleModel: checkVehicleModel(
+                    vehicleMake,
+                    vehicleModel,
+                    customModel
+                  ),
+                }));
+              }
+            }}
+          />
+        </div>
+        <div>
+          <h3 className="text-xs uppercase tracking-wide text-neutral-400 mb-2">
+            Licence plate
+          </h3>
+          <UaePlatePicker
+            emirate={plateEmirate}
+            setEmirate={setPlateEmirate}
+            category={plateCategory}
+            setCategory={setPlateCategory}
+            number={plateNumber}
+            setNumber={setPlateNumber}
+            foreignText={plateForeign}
+            setForeignText={setPlateForeign}
+            error={errors.vehiclePlate}
             onBlur={() =>
               setErrors((p) => ({
                 ...p,
-                vehicleMake: checkVehicleMake(vehicleMake),
+                vehiclePlate: checkPlate(
+                  plateEmirate,
+                  plateCategory,
+                  plateNumber,
+                  plateForeign
+                ),
               }))
             }
-            error={errors.vehicleMake}
-            required
-            autoComplete="off"
-            enterKeyHint="next"
-          />
-          <Field
-            id="vehicleModel"
-            label="Model"
-            value={vehicleModel}
-            onChange={setVehicleModel}
-            onBlur={() =>
-              setErrors((p) => ({
-                ...p,
-                vehicleModel: checkVehicleModel(vehicleModel),
-              }))
-            }
-            error={errors.vehicleModel}
-            required
-            autoComplete="off"
-            enterKeyHint="next"
-          />
-          <Field
-            id="vehiclePlate"
-            label="Plate"
-            value={vehiclePlate}
-            onChange={setVehiclePlate}
-            autoComplete="off"
-            enterKeyHint="next"
           />
         </div>
       </section>
@@ -687,9 +794,17 @@ export default function BookingFormClient({
 
 interface FieldProps {
   id: string;
+  /**
+   * Browser autofill name. Defaults to `id` when not provided. We override
+   * this for contact fields so the `name` matches the browser autofill
+   * conventions (`given-name`, `family-name`, `tel`, `email`) — Safari and
+   * Chrome use the name attribute as a hint when scoring autofill matches.
+   */
+  name?: string;
   label: string;
   value: string;
   onChange: (v: string) => void;
+  onFocus?: () => void;
   onBlur?: () => void;
   error?: string;
   required?: boolean;
@@ -703,9 +818,11 @@ interface FieldProps {
 
 function Field({
   id,
+  name,
   label,
   value,
   onChange,
+  onFocus,
   onBlur,
   error,
   required,
@@ -735,11 +852,12 @@ function Field({
       </label>
       <input
         id={fieldId}
-        name={id}
+        name={name ?? id}
         type={type}
         inputMode={inputMode}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onFocus={onFocus}
         onBlur={onBlur}
         placeholder={placeholder}
         required={required}
