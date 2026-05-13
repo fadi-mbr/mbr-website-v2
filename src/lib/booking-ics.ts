@@ -2,8 +2,12 @@
  * Minimal client-side .ics generator for the booking confirmation step.
  *
  * No external dependency. Produces a single VEVENT inside a VCALENDAR
- * envelope, with UTC timestamps (DTSTART/DTEND/DTSTAMP) so the file
- * imports cleanly into Google Calendar, Apple Calendar, and Outlook.
+ * envelope, with `DTSTART`/`DTEND` referencing a `VTIMEZONE` block for
+ * Asia/Dubai so calendar apps render the appointment in the shop's local
+ * time (GMT+4) instead of UTC.
+ *
+ * `DTSTAMP` stays in UTC per RFC 5545 — only the local event times use the
+ * floating TZID form.
  */
 
 interface IcsInput {
@@ -20,7 +24,7 @@ interface IcsInput {
 const pad = (n: number): string => String(n).padStart(2, '0');
 
 /** Format an epoch-ms timestamp as `YYYYMMDDTHHMMSSZ` (UTC, basic form). */
-function fmt(ms: number): string {
+function fmtUtc(ms: number): string {
   const d = new Date(ms);
   return (
     String(d.getUTCFullYear()) +
@@ -31,6 +35,24 @@ function fmt(ms: number): string {
     pad(d.getUTCMinutes()) +
     pad(d.getUTCSeconds()) +
     'Z'
+  );
+}
+
+/**
+ * Format an epoch-ms timestamp as `YYYYMMDDTHHMMSS` (no Z) wall-clock time
+ * in Asia/Dubai. Dubai is a no-DST, fixed-offset +04:00 zone so the math
+ * is trivial: shift by 4h and emit the resulting UTC components.
+ */
+function fmtDubai(ms: number): string {
+  const shifted = new Date(ms + 4 * 60 * 60 * 1000);
+  return (
+    String(shifted.getUTCFullYear()) +
+    pad(shifted.getUTCMonth() + 1) +
+    pad(shifted.getUTCDate()) +
+    'T' +
+    pad(shifted.getUTCHours()) +
+    pad(shifted.getUTCMinutes()) +
+    pad(shifted.getUTCSeconds())
   );
 }
 
@@ -47,11 +69,21 @@ export function buildIcs(input: IcsInput): string {
     'PRODID:-//MBR Auto Services//Booking//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
+    // Asia/Dubai is a no-DST fixed offset +04:00.
+    'BEGIN:VTIMEZONE',
+    'TZID:Asia/Dubai',
+    'BEGIN:STANDARD',
+    'DTSTART:19700101T000000',
+    'TZOFFSETFROM:+0400',
+    'TZOFFSETTO:+0400',
+    'TZNAME:GST',
+    'END:STANDARD',
+    'END:VTIMEZONE',
     'BEGIN:VEVENT',
     `UID:${input.uid}`,
-    `DTSTAMP:${fmt(Date.now())}`,
-    `DTSTART:${fmt(input.startMs)}`,
-    `DTEND:${fmt(input.endMs)}`,
+    `DTSTAMP:${fmtUtc(Date.now())}`,
+    `DTSTART;TZID=Asia/Dubai:${fmtDubai(input.startMs)}`,
+    `DTEND;TZID=Asia/Dubai:${fmtDubai(input.endMs)}`,
     `SUMMARY:${esc(input.title)}`,
     input.description ? `DESCRIPTION:${esc(input.description)}` : '',
     input.location ? `LOCATION:${esc(input.location)}` : '',
