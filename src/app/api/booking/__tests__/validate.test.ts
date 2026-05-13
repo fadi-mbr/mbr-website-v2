@@ -56,10 +56,80 @@ export default () => runSuite("validateBookingRequest", [
     },
   },
   {
-    name: "phone in local form (not pre-normalised) is rejected",
+    name: "phone in UAE local form is normalised, not rejected",
     fn: () => {
       const b = baseBody();
       b.ownerPhone = "0501234567";
+      const r = validateBookingRequest(b);
+      assert(!("code" in r));
+      assertEqual((r as { ownerPhone: string }).ownerPhone, "971501234567");
+    },
+  },
+  {
+    name: "phone with +971 spaces is normalised",
+    fn: () => {
+      const b = baseBody();
+      b.ownerPhone = "+971 50 123 4567";
+      const r = validateBookingRequest(b);
+      assert(!("code" in r));
+      assertEqual((r as { ownerPhone: string }).ownerPhone, "971501234567");
+    },
+  },
+  {
+    name: "phone with 00971 international prefix is normalised",
+    fn: () => {
+      const b = baseBody();
+      b.ownerPhone = "00971 50 1234567";
+      const r = validateBookingRequest(b);
+      assert(!("code" in r));
+      assertEqual((r as { ownerPhone: string }).ownerPhone, "971501234567");
+    },
+  },
+  {
+    name: "phone with 9-digit UAE shorthand is normalised",
+    fn: () => {
+      const b = baseBody();
+      b.ownerPhone = "50 1234567";
+      const r = validateBookingRequest(b);
+      assert(!("code" in r));
+      assertEqual((r as { ownerPhone: string }).ownerPhone, "971501234567");
+    },
+  },
+  {
+    name: "UK +44 international number is accepted",
+    fn: () => {
+      const b = baseBody();
+      b.ownerPhone = "+44 7700 900123";
+      const r = validateBookingRequest(b);
+      assert(!("code" in r));
+      assertEqual((r as { ownerPhone: string }).ownerPhone, "447700900123");
+    },
+  },
+  {
+    name: "US +1 international number is accepted",
+    fn: () => {
+      const b = baseBody();
+      b.ownerPhone = "+1 555 123 4567";
+      const r = validateBookingRequest(b);
+      assert(!("code" in r));
+      assertEqual((r as { ownerPhone: string }).ownerPhone, "15551234567");
+    },
+  },
+  {
+    name: "garbage phone (letters) is rejected",
+    fn: () => {
+      const b = baseBody();
+      b.ownerPhone = "not-a-phone";
+      const r = validateBookingRequest(b);
+      assert("code" in r);
+      assertEqual(r.field, "ownerPhone");
+    },
+  },
+  {
+    name: "too-short phone is rejected",
+    fn: () => {
+      const b = baseBody();
+      b.ownerPhone = "12345";
       const r = validateBookingRequest(b);
       assert("code" in r);
       assertEqual(r.field, "ownerPhone");
