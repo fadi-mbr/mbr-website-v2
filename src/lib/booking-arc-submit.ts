@@ -20,10 +20,13 @@ import type { BookingIntent } from "./booking-types";
 import {
   ArcError,
   fetchServices as defaultFetchServices,
+  fetchWeekAppointmentsRaw as defaultFetchWeekAppointmentsRaw,
   submitBooking as defaultSubmitBooking,
+  type ArcWeekAppointmentRecord,
   type BookingBody,
   type ServiceSummary,
 } from "@/app/api/booking/_lib/arc-client";
+import { getWorkerToken as defaultGetWorkerToken } from "@/app/api/booking/_lib/worker-token-cache";
 import {
   loadChatwootConfig as defaultLoadChatwootConfig,
   renderConfirmationMessage as defaultRenderConfirmationMessage,
@@ -38,7 +41,10 @@ import {
 
 export interface SubmitOk {
   ok: true;
+  /** Populated when the post-submit week lookup matched the new appointment. */
   arcAppointmentId?: number;
+  /** Populated when the post-submit week lookup matched the new appointment. */
+  arcRepairId?: number;
   confirmAt: string;
   serviceName: string;
   estimatedDuration: number;
@@ -86,6 +92,10 @@ const DEFAULT_ARC_SERVICE_TYPE = "INSPECTION";
 export interface ArcDeps {
   fetchServices: typeof defaultFetchServices;
   submitBooking: typeof defaultSubmitBooking;
+  /** Worker-auth lookup for newly-created appointment IDs. Best-effort. */
+  fetchWeekAppointmentsRaw?: typeof defaultFetchWeekAppointmentsRaw;
+  /** Worker-token acquisition for the lookup. Best-effort. */
+  getWorkerToken?: typeof defaultGetWorkerToken;
 }
 
 export interface ChatwootDeps {
@@ -98,6 +108,8 @@ export interface ChatwootDeps {
 let arcDeps: ArcDeps = {
   fetchServices: defaultFetchServices,
   submitBooking: defaultSubmitBooking,
+  fetchWeekAppointmentsRaw: defaultFetchWeekAppointmentsRaw,
+  getWorkerToken: defaultGetWorkerToken,
 };
 
 let chatwootDeps: ChatwootDeps = {
@@ -119,6 +131,8 @@ export function _resetDepsForTests(): void {
   arcDeps = {
     fetchServices: defaultFetchServices,
     submitBooking: defaultSubmitBooking,
+    fetchWeekAppointmentsRaw: defaultFetchWeekAppointmentsRaw,
+    getWorkerToken: defaultGetWorkerToken,
   };
   chatwootDeps = {
     loadConfig: defaultLoadChatwootConfig,
@@ -187,6 +201,47 @@ function buildBookingBody(
     vehicleId: null,
     concern: intent.plate ? `Plate: ${intent.plate}` : "",
   };
+}
+
+/**
+ * Best-effort: after a successful ARC submit, hit the worker-auth
+ * /appointment/week/workers endpoint and try to find the just-created
+ * appointment by matching ownerEmail + timeStartMs. Returns
+ * {appointmentId, repairId} when matched, or null on any failure.
+ *
+ * Never throws — the caller wraps this in a try and treats failure as
+ * "lookup returned nothing". A failure here must not affect the OK status
+ * of the booking itself; the appointment exists in ARC regardless.
+ *
+ * Cost: ~300-500ms (one worker-token-cached call + one week-workers fetch).
+ * Worth it because the alternative is a fuzzy customer-search URL in the
+ * sales-team notification, which is much less actionable than a direct
+ * appointment link.
+ */
+async function lookupArcIds(
+  intent: BookingIntent,
+): Promise<{ arcAppointmentId?: number; arcRepairId?: number } | null> {
+  const fetchWeek = arcDeps.fetchWeekAppointmentsRaw;
+  const getToken = arcDeps.getWorkerToken;
+  if (!fetchWeek || !getToken) return null;
+  try {
+    const token = await getToken();
+    const dateAnchor = new Date(intent.timeStartMs).toISOString().slice(0, 10);
+    const records = await fetchWeek(token, dateAnchor);
+    const targetEmail = intent.email.trim().toLowerCase();
+    const match = records.find((r: ArcWeekAppointmentRecord) => {
+      if (r.startMs !== intent.timeStartMs) return false;
+      if (!r.ownerEmail) return false;
+      return r.ownerEmail.trim().toLowerCase() === targetEmail;
+    });
+    if (!match) return null;
+    return {
+      arcAppointmentId: match.appointmentId,
+      arcRepairId: match.repairId,
+    };
+  } catch {
+    return null;
+  }
 }
 
 async function postChatwoot(
@@ -367,6 +422,32 @@ export async function submitConfirmedBooking(
     };
   }
 
+  // 2b. Best-effort: try to capture ARC IDs from the worker-auth week
+  // endpoint so the booking-notify path can render a precise approve
+  // link instead of a fuzzy customer-search fallback. Failure here is
+  // non-fatal — we just leave the IDs undefined and let the notifier
+  // fall back.
+  let arcAppointmentId: number | undefined;
+  let arcRepairId: number | undefined;
+  const lookupT0 = Date.now();
+  const ids = await lookupArcIds(intent);
+  if (ids) {
+    arcAppointmentId = ids.arcAppointmentId;
+    arcRepairId = ids.arcRepairId;
+    logFn({
+      event: "booking.arc_id_lookup_ok",
+      status: 200,
+      latencyMs: Date.now() - lookupT0,
+      reason: `appt=${arcAppointmentId ?? '?'} ro=${arcRepairId ?? '?'}`,
+    });
+  } else {
+    logFn({
+      event: "booking.arc_id_lookup_miss",
+      status: 200,
+      latencyMs: Date.now() - lookupT0,
+    });
+  }
+
   // 3. Chatwoot — best-effort, never fails the response.
   if (options.chatwoot) {
     try {
@@ -382,6 +463,8 @@ export async function submitConfirmedBooking(
 
   return {
     ok: true,
+    arcAppointmentId,
+    arcRepairId,
     confirmAt: new Date(intent.timeStartMs).toISOString(),
     serviceName: service.title,
     estimatedDuration: service.duration_h,
