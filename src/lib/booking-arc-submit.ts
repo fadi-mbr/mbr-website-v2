@@ -224,24 +224,42 @@ async function lookupArcIds(
   const fetchWeek = arcDeps.fetchWeekAppointmentsRaw;
   const getToken = arcDeps.getWorkerToken;
   if (!fetchWeek || !getToken) return null;
-  try {
-    const token = await getToken();
-    const dateAnchor = new Date(intent.timeStartMs).toISOString().slice(0, 10);
-    const records = await fetchWeek(token, dateAnchor);
-    const targetEmail = intent.email.trim().toLowerCase();
-    const match = records.find((r: ArcWeekAppointmentRecord) => {
-      if (r.startMs !== intent.timeStartMs) return false;
-      if (!r.ownerEmail) return false;
-      return r.ownerEmail.trim().toLowerCase() === targetEmail;
-    });
-    if (!match) return null;
-    return {
-      arcAppointmentId: match.appointmentId,
-      arcRepairId: match.repairId,
-    };
-  } catch {
-    return null;
-  }
+
+  // ARC's /appointment/week/workers has a brief indexing delay after
+  // /public/appointment creates the record. The first lookup typically
+  // misses; wait 600ms and try once more. Adds ~600ms to the post-submit
+  // best-effort path but it runs inside `after()` so it doesn't impact
+  // user-visible latency.
+  const tryOnce = async (): Promise<{
+    arcAppointmentId?: number;
+    arcRepairId?: number;
+  } | null> => {
+    try {
+      const token = await getToken();
+      const dateAnchor = new Date(intent.timeStartMs)
+        .toISOString()
+        .slice(0, 10);
+      const records = await fetchWeek(token, dateAnchor);
+      const targetEmail = intent.email.trim().toLowerCase();
+      const match = records.find((r: ArcWeekAppointmentRecord) => {
+        if (r.startMs !== intent.timeStartMs) return false;
+        if (!r.ownerEmail) return false;
+        return r.ownerEmail.trim().toLowerCase() === targetEmail;
+      });
+      if (!match) return null;
+      return {
+        arcAppointmentId: match.appointmentId,
+        arcRepairId: match.repairId,
+      };
+    } catch {
+      return null;
+    }
+  };
+
+  const first = await tryOnce();
+  if (first) return first;
+  await new Promise((r) => setTimeout(r, 600));
+  return await tryOnce();
 }
 
 async function postChatwoot(

@@ -27,6 +27,7 @@
 
 import type { Metadata } from 'next';
 import BookingForm from '@/components/booking/BookingForm';
+import { DashboardAppContextWaiter } from '@/components/booking/DashboardAppContextWaiter';
 import type { BookingService } from '@/lib/booking-types';
 import type {
   BookingSubmitPayload,
@@ -133,17 +134,13 @@ export default async function AgentBookingPage({ searchParams }: PageProps) {
     conversationId > 0;
 
   if (!validIds) {
-    return (
-      <div className="min-h-screen bg-black text-white">
-        <main className="mx-auto max-w-[720px] px-4 py-10">
-          <h1 className="text-xl font-light mb-2">Missing conversation context</h1>
-          <p className="text-sm text-neutral-400">
-            This page must be opened from the MBR Connect Dashboard App with
-            a valid <code>contact_id</code> and <code>conversation_id</code>.
-          </p>
-        </main>
-      </div>
-    );
+    // Chatwoot Dashboard Apps in some configurations don't substitute
+    // {{contact.id}} / {{conversation.id}} in the iframe URL. Fall back
+    // to listening for the conversation context via postMessage from
+    // the connect.mbrme.com parent frame; once received, the waiter
+    // redirects with the IDs in the URL and this Server Component
+    // re-renders normally.
+    return <DashboardAppContextWaiter />;
   }
 
   // ----- Prefill from Chatwoot (server-side; admin token never crosses the wire).

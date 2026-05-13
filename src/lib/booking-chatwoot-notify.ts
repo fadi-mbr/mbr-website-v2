@@ -222,7 +222,7 @@ export function _escapeMd(input: string | undefined | null): string {
   const stripped = input
     .replace(/[ -]/g, ' ')
     .trim();
-  return stripped.replace(/([\\`*_{}\[\]()#+\-!|<>])/g, '\\$1');
+  return stripped.replace(/([\\*_\[])/g, '\\$1');
 }
 
 interface RenderInput {
@@ -264,11 +264,11 @@ export function _renderBookingMessage(input: RenderInput): string {
     `🆕 *New booking — pending approval*`,
     ``,
     `**Customer**: ${_escapeMd(fullName)}`,
-    `**Phone**: ${_escapeMd(phoneLabel)}`,
-    `**Email**: ${_escapeMd(i.email)}`,
+    `**Phone**: ${phoneLabel}`,
+    `**Email**: ${i.email}`,
     ``,
-    `**Service**: ${_escapeMd(input.serviceName)} (${input.durationH}h)`,
-    `**When**: ${_escapeMd(when)}`,
+    `**Service**: ${input.serviceName} (${input.durationH}h)`,
+    `**When**: ${when}`,
     `**Vehicle**: ${_escapeMd(vehicleStr.replace(/ · Plate: .*/, ''))}${i.plate ? ` · Plate: ${_escapeMd(i.plate)}` : ''}`,
     `**Notes**: ${i.notes ? _escapeMd(i.notes) : '—'}`,
     ``,

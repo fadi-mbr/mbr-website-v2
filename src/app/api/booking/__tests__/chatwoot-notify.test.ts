@@ -73,11 +73,17 @@ function makeFakeFetch(
 export default () =>
   runSuite("booking-chatwoot-notify", [
     {
-      name: "_escapeMd backslash-escapes Markdown specials",
+      name: "_escapeMd backslash-escapes only inline-formatting Markdown chars",
       fn: () => {
+        // DO escape: backslash, asterisk (bold), underscore (italic), [ (link open)
         assertEqual(_escapeMd("**bold**"), "\\*\\*bold\\*\\*");
         assertEqual(_escapeMd("a_b"), "a\\_b");
-        assertEqual(_escapeMd("[x](y)"), "\\[x\\]\\(y\\)");
+        assertEqual(_escapeMd("[x"), "\\[x");
+        // DON'T over-escape: ] ( ) + - are literals inline; over-escaping
+        // makes phone numbers like "+971" render as "\+971" in Chatwoot.
+        assertEqual(_escapeMd("(y)"), "(y)");
+        assertEqual(_escapeMd("+971"), "+971");
+        assertEqual(_escapeMd("a-b"), "a-b");
         assertEqual(_escapeMd("plain"), "plain");
         assertEqual(_escapeMd(undefined), "");
       },
@@ -164,7 +170,10 @@ export default () =>
           !msg.match(/\*\*bold\*\*(?!\\)/) || msg.includes("\\*\\*bold\\*\\*"),
           "** in name is escaped",
         );
-        assert(msg.includes("\\[click\\]\\(http"), "[] and () in notes escaped");
+        // Only the link-opener `[` is escaped (enough to defang the
+        // [text](url) construct). `]` and `(` are left as-is to avoid
+        // visible backslashes in the message.
+        assert(msg.includes("\\[click](http"), "[ in notes link-syntax is escaped");
       },
     },
 
