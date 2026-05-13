@@ -90,19 +90,25 @@ export default () =>
     },
 
     {
-      name: "_buildArcUrl prefers repairId > appointmentId > customer search",
+      name: "_buildArcUrl uses hash-routed appointments path when appointmentId known",
       fn: () => {
-        assertEqual(
-          _buildArcUrl({ arcRepairId: 99, email: "a@b.com" }),
-          "https://autorepaircloud.com/main/repair?id=99",
-        );
+        // The canonical ARC deep-link for a pending booking is the
+        // hash-routed appointments view with the appointment ID in
+        // notificationId. Confirmed by operator 2026-05-13.
         assertEqual(
           _buildArcUrl({ arcAppointmentId: 12, email: "a@b.com" }),
-          "https://autorepaircloud.com/main/appointment-list?id=12",
+          "https://autorepaircloud.com/#/main/appointments?notificationId=12",
         );
+        // repairId is no longer preferred — appointment-by-id is the only
+        // working ARC URL format, so the builder ignores repairId.
+        assertEqual(
+          _buildArcUrl({ arcRepairId: 99, arcAppointmentId: 12, email: "a@b.com" }),
+          "https://autorepaircloud.com/#/main/appointments?notificationId=12",
+        );
+        // Fallback: hash-routed customer-search URL when no IDs known.
         assertEqual(
           _buildArcUrl({ email: "a+b@example.com" }),
-          "https://autorepaircloud.com/main/customer-list?search=a%2Bb%40example.com",
+          "https://autorepaircloud.com/#/main/customer-list?search=a%2Bb%40example.com",
         );
       },
     },
@@ -126,8 +132,8 @@ export default () =>
         assert(msg.includes("appointment `12345`"), "appt id rendered");
         assert(msg.includes("RO `6789`"), "ro id rendered");
         assert(
-          msg.includes("https://autorepaircloud.com/main/repair?id=6789"),
-          "ARC repair URL",
+          msg.includes("https://autorepaircloud.com/#/main/appointments?notificationId=12345"),
+          "ARC hash-routed appointments URL by notificationId",
         );
         // The "+" in GMT+4 gets backslash-escaped in our Markdown safety
         // pass. Accept either form so the renderer keeps the escape.
@@ -295,7 +301,7 @@ export default () =>
           const msgBody = JSON.parse(String(calls[2].init?.body));
           assert(typeof msgBody.content === "string");
           assert(msgBody.content.includes("Faisal Al Hashimi"));
-          assert(msgBody.content.includes("repair?id=6789"));
+          assert(msgBody.content.includes("notificationId=12345"));
           assertEqual(msgBody.message_type, "outgoing");
           assertEqual(msgBody.private, false);
         } finally {

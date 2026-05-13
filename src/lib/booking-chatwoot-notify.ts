@@ -190,16 +190,23 @@ export function _buildArcUrl(input: {
   arcRepairId?: number;
   email: string;
 }): string {
-  if (typeof input.arcRepairId === 'number' && Number.isFinite(input.arcRepairId)) {
-    return `${ARC_BASE}/main/repair?id=${input.arcRepairId}`;
-  }
+  // ARC is a hash-routed SPA. The canonical "open this pending booking"
+  // path is /#/main/appointments?notificationId={appointmentId} —
+  // confirmed by the operator (2026-05-13). Hitting this URL drops the
+  // team straight into the pending-approval view for the specific
+  // appointment, where they can click Save to push it onto the calendar.
+  //
+  // We previously tried /main/repair?id= and /main/appointment-list?id=;
+  // both render as empty pages because they bypass the hash router.
   if (
     typeof input.arcAppointmentId === 'number' &&
     Number.isFinite(input.arcAppointmentId)
   ) {
-    return `${ARC_BASE}/main/appointment-list?id=${input.arcAppointmentId}`;
+    return `${ARC_BASE}/#/main/appointments?notificationId=${input.arcAppointmentId}`;
   }
-  return `${ARC_BASE}/main/customer-list?search=${encodeURIComponent(input.email)}`;
+  // Fallback when the post-submit ID lookup misses (ARC indexing delay):
+  // a hash-routed customer-search URL the team can use to navigate.
+  return `${ARC_BASE}/#/main/customer-list?search=${encodeURIComponent(input.email)}`;
 }
 
 // ---------------------------------------------------------------------------
