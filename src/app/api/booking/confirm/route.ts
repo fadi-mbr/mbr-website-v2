@@ -17,9 +17,10 @@
  * duplicates that result from a double-click (decision 2026-05-12).
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { verifyToken } from '@/lib/booking-token';
 import { confirmFromToken } from '@/lib/booking-confirm';
+import { notifyTeamOfNewBooking } from '@/lib/booking-chatwoot-notify';
 import { logBooking } from '../_lib/log';
 
 export const runtime = 'nodejs';
@@ -88,6 +89,30 @@ function setCached(tokenId: string, body: unknown, status: number): void {
 /** Exposed for tests so a clean slate is achievable per spec. */
 export function _resetIdempotencyCacheForTests(): void {
   idempotencyCache.clear();
+}
+
+// ---------------------------------------------------------------------------
+// after() test seam — see request/route.ts for the rationale. In tests
+// we substitute a synchronous runner so we can assert on the deferred work.
+// ---------------------------------------------------------------------------
+
+type AfterRunner = (cb: () => Promise<void> | void) => void;
+let afterRunner: AfterRunner | null = null;
+
+export function _setAfterRunnerForTests(fn: AfterRunner): void {
+  afterRunner = fn;
+}
+
+export function _resetAfterRunnerForTests(): void {
+  afterRunner = null;
+}
+
+function scheduleDeferred(cb: () => Promise<void> | void): void {
+  if (afterRunner) {
+    afterRunner(cb);
+    return;
+  }
+  after(cb);
 }
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -207,10 +232,64 @@ export async function POST(req: Request): Promise<NextResponse> {
     intent: result.intent,
     tokenId: result.tokenId,
     arcAppointmentId: result.arcAppointmentId,
+    arcRepairId: result.arcRepairId,
     confirmAt: result.confirmAt,
     serviceName: result.serviceName,
     estimatedDuration: result.estimatedDuration,
   };
   setCached(result.tokenId, body, 200);
+
+  // Best-effort: notify the sales team in MBR Connect (Chatwoot). Deferred
+  // via `after()` so the customer's success card renders without waiting
+  // on Chatwoot. A failure here is logged but never reaches the client —
+  // the ARC booking is already created and that's the source of truth.
+  const notifyIntent = result.intent;
+  const notifyArcApptId = result.arcAppointmentId;
+  const notifyArcRoId = result.arcRepairId;
+  const notifyServiceName = result.serviceName;
+  const notifyDurationH = result.estimatedDuration;
+  scheduleDeferred(async () => {
+    try {
+      const notifyT0 = Date.now();
+      const res = await notifyTeamOfNewBooking({
+        intent: {
+          serviceId: notifyIntent.serviceId,
+          serviceName: notifyIntent.serviceName,
+          timeStartMs: notifyIntent.timeStartMs,
+          durationH: notifyIntent.durationH,
+          firstName: notifyIntent.firstName,
+          lastName: notifyIntent.lastName,
+          phone: notifyIntent.phone,
+          email: notifyIntent.email,
+          vehicleYear: notifyIntent.vehicleYear,
+          vehicleMake: notifyIntent.vehicleMake,
+          vehicleModel: notifyIntent.vehicleModel,
+          plate: notifyIntent.plate ?? '',
+          notes: notifyIntent.notes,
+        },
+        arcAppointmentId: notifyArcApptId,
+        arcRepairId: notifyArcRoId,
+        serviceName: notifyServiceName,
+        durationH: notifyDurationH,
+      });
+      logBooking({
+        event: res.ok
+          ? 'booking.confirm.chatwoot_notify_ok'
+          : 'booking.confirm.chatwoot_notify_fail',
+        latencyMs: Date.now() - notifyT0,
+        status: 200,
+        reason: res.ok
+          ? `conversationId=${res.conversationId ?? '?'}`
+          : res.reason,
+      });
+    } catch (e) {
+      logBooking({
+        event: 'booking.confirm.chatwoot_notify_threw',
+        status: 200,
+        reason: e instanceof Error ? e.message : String(e),
+      });
+    }
+  });
+
   return jsonResponse(body, 200);
 }

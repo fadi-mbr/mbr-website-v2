@@ -47,6 +47,10 @@ function fakeOkArc() {
   return {
     fetchServices: async () => [SERVICE_42],
     submitBooking: async () => undefined,
+    // Stub the worker-auth lookup so we don't accidentally try to log in
+    // against real ARC during unit tests. Default = no match (lookup miss).
+    fetchWeekAppointmentsRaw: async () => [],
+    getWorkerToken: async () => "fake-token",
   };
 }
 
@@ -285,6 +289,95 @@ export default () =>
             chatwoot: { conversationId: 123, contactId: 456 },
           });
           assert(r.ok, "booking should succeed despite chatwoot failure");
+        } finally {
+          _resetDepsForTests();
+          _resetLoggerForTests();
+        }
+      },
+    },
+    {
+      name: "post-submit ARC ID lookup — match populates arcAppointmentId + arcRepairId",
+      fn: async () => {
+        _setLoggerForTests(() => {});
+        _setArcDepsForTests({
+          fetchServices: async () => [SERVICE_42],
+          submitBooking: async () => undefined,
+          getWorkerToken: async () => "tok",
+          fetchWeekAppointmentsRaw: async () => [
+            {
+              appointmentId: 12345,
+              repairId: 6789,
+              startMs: INTENT.timeStartMs,
+              endMs: INTENT.timeStartMs + 3_600_000,
+              workerId: 1,
+              ownerEmail: INTENT.email,
+            },
+          ],
+        });
+        try {
+          const r = await submitConfirmedBooking(INTENT);
+          assert(r.ok);
+          if (r.ok) {
+            assertEqual(r.arcAppointmentId, 12345);
+            assertEqual(r.arcRepairId, 6789);
+          }
+        } finally {
+          _resetDepsForTests();
+          _resetLoggerForTests();
+        }
+      },
+    },
+    {
+      name: "post-submit ARC ID lookup — throw leaves arcAppointmentId undefined",
+      fn: async () => {
+        _setLoggerForTests(() => {});
+        _setArcDepsForTests({
+          fetchServices: async () => [SERVICE_42],
+          submitBooking: async () => undefined,
+          getWorkerToken: async () => "tok",
+          fetchWeekAppointmentsRaw: async () => {
+            throw new Error("ARC week endpoint 503");
+          },
+        });
+        try {
+          const r = await submitConfirmedBooking(INTENT);
+          assert(r.ok, "submit should still succeed despite lookup failure");
+          if (r.ok) {
+            assertEqual(r.arcAppointmentId, undefined);
+            assertEqual(r.arcRepairId, undefined);
+          }
+        } finally {
+          _resetDepsForTests();
+          _resetLoggerForTests();
+        }
+      },
+    },
+    {
+      name: "post-submit ARC ID lookup — no email/start match leaves IDs undefined",
+      fn: async () => {
+        _setLoggerForTests(() => {});
+        _setArcDepsForTests({
+          fetchServices: async () => [SERVICE_42],
+          submitBooking: async () => undefined,
+          getWorkerToken: async () => "tok",
+          fetchWeekAppointmentsRaw: async () => [
+            {
+              appointmentId: 99999,
+              repairId: 88888,
+              startMs: INTENT.timeStartMs + 3_600_000, // different time
+              endMs: INTENT.timeStartMs + 7_200_000,
+              workerId: 1,
+              ownerEmail: "someone-else@example.com",
+            },
+          ],
+        });
+        try {
+          const r = await submitConfirmedBooking(INTENT);
+          assert(r.ok);
+          if (r.ok) {
+            assertEqual(r.arcAppointmentId, undefined);
+            assertEqual(r.arcRepairId, undefined);
+          }
         } finally {
           _resetDepsForTests();
           _resetLoggerForTests();

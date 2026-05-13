@@ -16,7 +16,12 @@
  *   - no BOOKING_TOKEN_SECRET configured → 503
  */
 
-import { POST } from '../confirm/route';
+import {
+  POST,
+  _setAfterRunnerForTests,
+  _resetAfterRunnerForTests,
+  _resetIdempotencyCacheForTests,
+} from '../confirm/route';
 import { signToken, type TokenPayload } from '@/lib/booking-token';
 import {
   _setArcDepsForTests,
@@ -41,6 +46,16 @@ const SERVICE_42 = {
 
 function silenceLogger(): void {
   _setLoggerForTests(() => {});
+}
+
+/**
+ * Install a no-op `after()` runner. Production code calls `after(fn)`
+ * from `next/server`, which only works inside an actual request-scope
+ * created by the Next.js runtime. In our zero-dep test harness we drive
+ * `POST` directly, so the route's test seam lets us swap the runner.
+ */
+function installNoopAfter(): void {
+  _setAfterRunnerForTests(() => {});
 }
 
 function installOkArc(): void {
@@ -120,6 +135,8 @@ export default function suite() {
         silenceLogger();
         installOkArc();
         installFakeChatwoot();
+        installNoopAfter();
+        _resetIdempotencyCacheForTests();
         try {
           await withSecret(SECRET_HEX, async () => {
             const payload = makePayload();
@@ -139,6 +156,36 @@ export default function suite() {
         } finally {
           _resetDepsForTests();
           _resetLoggerForTests();
+          _resetAfterRunnerForTests();
+        }
+      },
+    },
+    {
+      name: 'happy path schedules a deferred chatwoot-notify callback via after()',
+      fn: async () => {
+        silenceLogger();
+        installOkArc();
+        installFakeChatwoot();
+        _resetIdempotencyCacheForTests();
+        let scheduledCount = 0;
+        _setAfterRunnerForTests((cb) => {
+          scheduledCount++;
+          // Don't actually invoke; we only care that one callback was
+          // scheduled past the response.
+          void cb;
+        });
+        try {
+          await withSecret(SECRET_HEX, async () => {
+            const payload = makePayload();
+            const token = await signToken(payload, SECRET_HEX);
+            const res = await POST(makeRequest({ token }));
+            assertEqual(res.status, 200);
+            assertEqual(scheduledCount, 1, 'one after() callback expected');
+          });
+        } finally {
+          _resetDepsForTests();
+          _resetLoggerForTests();
+          _resetAfterRunnerForTests();
         }
       },
     },
@@ -182,6 +229,8 @@ export default function suite() {
         silenceLogger();
         installOkArc();
         installFakeChatwoot();
+        installNoopAfter();
+        _resetIdempotencyCacheForTests();
         try {
           await withSecret(SECRET_HEX, async () => {
             const payload = makePayload({
@@ -233,6 +282,8 @@ export default function suite() {
           },
         });
         installFakeChatwoot();
+        installNoopAfter();
+        _resetIdempotencyCacheForTests();
         try {
           await withSecret(SECRET_HEX, async () => {
             const payload = makePayload();
@@ -261,6 +312,8 @@ export default function suite() {
           },
         });
         installFakeChatwoot();
+        installNoopAfter();
+        _resetIdempotencyCacheForTests();
         try {
           await withSecret(SECRET_HEX, async () => {
             const payload = makePayload();

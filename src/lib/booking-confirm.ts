@@ -28,6 +28,7 @@ export type ConfirmResult =
       intent: TokenIntent;
       tokenId: string;
       arcAppointmentId?: number;
+      arcRepairId?: number;
       confirmAt: string;
       serviceName: string;
       estimatedDuration: number;
@@ -95,6 +96,7 @@ export async function confirmFromToken(
     intent,
     tokenId: verified.payload.id,
     arcAppointmentId: result.arcAppointmentId,
+    arcRepairId: result.arcRepairId,
     confirmAt: result.confirmAt,
     serviceName: result.serviceName,
     estimatedDuration: result.estimatedDuration,

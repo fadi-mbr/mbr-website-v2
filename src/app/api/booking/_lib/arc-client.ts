@@ -357,6 +357,25 @@ export interface BookedInterval {
   workerId: number;
 }
 
+/**
+ * Richer per-appointment record returned by {@link fetchWeekAppointmentsRaw}.
+ * Used by the post-submit ARC ID lookup so the booking-notify path can
+ * surface a precise "Open in ARC" link instead of a fallback search URL.
+ *
+ * Fields are best-effort — ARC's week endpoint shape is loosely typed and
+ * varies per worker; consumers should treat all optional fields as
+ * potentially absent.
+ */
+export interface ArcWeekAppointmentRecord {
+  appointmentId?: number;
+  repairId?: number;
+  startMs: number;
+  endMs: number;
+  workerId: number;
+  ownerEmail?: string;
+  ownerPhone?: string;
+}
+
 interface ArcWeekAppointment {
   timeStart?: number;
   timeEnd?: number;
@@ -466,6 +485,90 @@ export async function fetchWeekBookedIntervals(
       }
     }
     out.set(day.date, intervals);
+  }
+  return out;
+}
+
+/**
+ * GET /appointment/week/workers — same call as {@link fetchWeekBookedIntervals},
+ * but returns the rich per-appointment payload so callers can match a
+ * just-created appointment to its ARC IDs (by owner email + timeStart).
+ *
+ * Best-effort: ARC sometimes returns customer details under
+ * `appointments[].owner.email` and sometimes under `customer.email` — we
+ * walk both shapes. The function never throws "not found"; it just returns
+ * an empty array when the lookup yields nothing.
+ *
+ * The /week/workers response embeds the appointment object verbatim per
+ * worker. We don't model every field — only the ones the booking-notify
+ * path needs.
+ */
+export async function fetchWeekAppointmentsRaw(
+  workerToken: string,
+  dateAnchor: string
+): Promise<ArcWeekAppointmentRecord[]> {
+  const week = weekDatesFor(dateAnchor);
+  const res = await arcWorkerFetch("/appointment/week/workers", {
+    token: workerToken,
+    qs: week,
+  });
+  const payload = await parseJsonSafe(res);
+  if (!res.ok) {
+    throw new ArcError(`ARC week-workers fetch failed: ${res.status}`, {
+      status: res.status,
+      code: extractArcCode(payload),
+      payload,
+    });
+  }
+  const out: ArcWeekAppointmentRecord[] = [];
+  const p = (payload ?? {}) as ArcWeekResponse;
+  const days = Array.isArray(p.workerWeek) ? p.workerWeek : [];
+  for (const day of days) {
+    if (!day || typeof day.date !== "string") continue;
+    const data = Array.isArray(day.data) ? day.data : [];
+    for (const entry of data) {
+      const workerId = Number(entry?.worker?.id ?? 0);
+      const appts = Array.isArray(entry?.appointments) ? entry.appointments : [];
+      for (const a of appts) {
+        if (!a || typeof a !== "object") continue;
+        const obj = a as Record<string, unknown>;
+        const s = typeof obj.timeStart === "number" ? obj.timeStart : null;
+        const e = typeof obj.timeEnd === "number" ? obj.timeEnd : null;
+        if (s === null || e === null || !(e > s)) continue;
+
+        // ARC inconsistently nests the customer record. Check both shapes.
+        const owner = (obj.owner ?? obj.customer ?? null) as
+          | Record<string, unknown>
+          | null;
+        const ownerEmail =
+          typeof owner?.email === "string" ? owner.email : undefined;
+        const ownerPhone =
+          typeof owner?.phone === "string" ? owner.phone : undefined;
+
+        const appointmentId =
+          typeof obj.id === "number"
+            ? obj.id
+            : typeof obj.appointmentId === "number"
+              ? obj.appointmentId
+              : undefined;
+        const repairId =
+          typeof obj.repairId === "number"
+            ? obj.repairId
+            : typeof obj.roId === "number"
+              ? obj.roId
+              : undefined;
+
+        out.push({
+          appointmentId,
+          repairId,
+          startMs: s,
+          endMs: e,
+          workerId,
+          ownerEmail,
+          ownerPhone,
+        });
+      }
+    }
   }
   return out;
 }

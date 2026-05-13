@@ -10,6 +10,7 @@ import phoneSuite from "./phone.test";
 import validateSuite from "./validate.test";
 import rateLimitSuite from "./rate-limit.test";
 import chatwootSuite from "./chatwoot.test";
+import chatwootNotifySuite from "./chatwoot-notify.test";
 import tokenSuite from "./token.test";
 import emailSuite from "./email.test";
 import arcSubmitSuite from "./arc-submit.test";
@@ -28,6 +29,7 @@ async function main(): Promise<void> {
   await validateSuite();
   await rateLimitSuite();
   await chatwootSuite();
+  await chatwootNotifySuite();
   await tokenSuite();
   await emailSuite();
   await arcSubmitSuite();
