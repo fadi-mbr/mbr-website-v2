@@ -477,28 +477,19 @@ export const _weekDatesForTests = weekDatesFor;
 // Phone normalisation
 // ---------------------------------------------------------------------------
 
-const UAE_PHONE_RE = /^971\d{9}$/;
+import { normalizeIntlPhone } from "@/lib/booking-phone";
 
 /**
- * Normalise a user-typed phone to UAE E.164 digits-only form (`971XXXXXXXXX`).
+ * Normalise a user-typed phone to E.164 digits-only form (no leading `+`).
  *
- * Rules:
- *  - Strip all non-digit characters (drops `+`, spaces, dashes, parens).
- *  - If the result starts with `00971`, drop the `00`.
- *  - If it starts with `0` (local UAE prefix), drop the `0` and prepend `971`.
- *  - If it's exactly 9 digits starting with `5`, prepend `971`.
- *  - If it's exactly 12 digits starting with `971`, accept as-is.
- *  - Anything else → return `null` (caller surfaces a VALIDATION 400).
+ * Defaults to UAE (+971) when the input doesn't carry a country code.
+ * Accepts other-country numbers when the input starts with `+<cc>` or
+ * `00<cc>`. ARC's `/public/appointment` endpoint accepts digits-only
+ * phones; we don't need to prepend a `+`.
+ *
+ * Delegates to {@link normalizeIntlPhone} so the client and server agree
+ * on what counts as a valid phone.
  */
 export function normalisePhone(input: string): string | null {
-  if (typeof input !== "string") return null;
-  let digits = input.replace(/\D+/g, "");
-  if (!digits) return null;
-  if (digits.startsWith("00971")) digits = digits.slice(2);
-  if (digits.startsWith("0") && digits.length === 10) {
-    digits = "971" + digits.slice(1);
-  } else if (/^5\d{8}$/.test(digits)) {
-    digits = "971" + digits;
-  }
-  return UAE_PHONE_RE.test(digits) ? digits : null;
+  return normalizeIntlPhone(input);
 }
