@@ -599,7 +599,7 @@ export default function BookingFormClient({
         </div>
         <Field
           id="phone"
-          name="tel"
+          name="phone"
           label="Phone"
           value={phone}
           // Mask only when the user is *typing* (small delta). Safari's
@@ -629,7 +629,6 @@ export default function BookingFormClient({
           error={errors.phone}
           required
           type="tel"
-          inputMode="tel"
           autoComplete="tel"
           enterKeyHint="next"
           placeholder="+971 50 123 4567"
