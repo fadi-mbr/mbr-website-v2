@@ -97,13 +97,13 @@ export function ConfirmInProgress({ token }: { token: string }) {
     return (
       <div className="min-h-screen bg-black text-white">
         <main className="mx-auto max-w-[720px] px-4 py-16">
-          <div className="rounded-lg border border-[#b08d57]/40 bg-neutral-950 p-6 flex items-center gap-4">
+          <div className="rounded-lg border border-[#E30613]/40 bg-neutral-950 p-6 flex items-center gap-4">
             <span
-              className="inline-block h-6 w-6 rounded-full border-2 border-[#b08d57] border-t-transparent animate-spin"
+              className="inline-block h-6 w-6 rounded-full border-2 border-[#E30613] border-t-transparent animate-spin"
               aria-hidden="true"
             />
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] text-[#b08d57] mb-1">
+              <p className="text-xs uppercase tracking-[0.25em] text-[#E30613] mb-1">
                 One moment
               </p>
               <p className="text-base text-white">

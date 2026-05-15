@@ -106,10 +106,26 @@ export default async function BookPage() {
   // Layout note: dev's app/layout.tsx renders <SiteFooter /> globally, so
   // we don't render a footer here — that would duplicate it.
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="relative min-h-screen bg-black text-white flex flex-col">
       <ProfessionalNavigation />
-      <main className="flex-1 max-w-3xl w-full mx-auto px-4 pt-28 pb-12">
-        <h1 className="text-3xl font-light mb-6">Book an appointment</h1>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-gradient-to-b from-[#E30613]/[0.06] via-transparent to-transparent"
+      />
+      <main className="relative flex-1 max-w-3xl w-full mx-auto px-4 pt-28 pb-12">
+        <header className="mb-8">
+          <p className="text-xs uppercase tracking-[0.25em] text-[#E30613]/80 mb-3">
+            MBR · Al Quoz, Dubai
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-light tracking-tight">
+            Book your service
+          </h1>
+          <p className="mt-3 max-w-xl text-sm text-neutral-400 leading-relaxed">
+            Pick a service, choose a time, and we&apos;ll email you a
+            confirmation link. Walk-ins are welcome — but a booking
+            guarantees your slot.
+          </p>
+        </header>
         <BookingFormClient
           mode="public"
           services={services}

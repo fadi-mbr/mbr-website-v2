@@ -65,7 +65,7 @@ export default function UaePlatePicker({
             className="block text-xs uppercase tracking-wide text-neutral-400 mb-1"
           >
             Emirate
-            <span aria-hidden="true" className="text-[#b08d57] ml-1">*</span>
+            <span aria-hidden="true" className="text-[#E30613] ml-1">*</span>
           </label>
           <select
             id={emirateId}
@@ -81,7 +81,7 @@ export default function UaePlatePicker({
             aria-describedby={errId}
             className={[
               'w-full rounded border bg-neutral-900 px-3 py-2 text-sm text-white',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]',
               error ? 'border-red-700' : 'border-neutral-700',
             ].join(' ')}
           >
@@ -103,7 +103,7 @@ export default function UaePlatePicker({
             >
               Code
               {emirate && (
-                <span aria-hidden="true" className="text-[#b08d57] ml-1">*</span>
+                <span aria-hidden="true" className="text-[#E30613] ml-1">*</span>
               )}
             </label>
             <select
@@ -116,7 +116,7 @@ export default function UaePlatePicker({
               aria-describedby={errId}
               className={[
                 'w-full rounded border bg-neutral-900 px-3 py-2 text-sm text-white',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]',
                 !emirate ? 'opacity-50 cursor-not-allowed' : '',
                 error ? 'border-red-700' : 'border-neutral-700',
               ].join(' ')}
@@ -140,7 +140,7 @@ export default function UaePlatePicker({
             >
               Number
               {emirate && (
-                <span aria-hidden="true" className="text-[#b08d57] ml-1">*</span>
+                <span aria-hidden="true" className="text-[#E30613] ml-1">*</span>
               )}
             </label>
             <input
@@ -160,7 +160,7 @@ export default function UaePlatePicker({
               aria-describedby={errId}
               className={[
                 'w-full rounded border bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]',
                 !emirate ? 'opacity-50 cursor-not-allowed' : '',
                 error ? 'border-red-700' : 'border-neutral-700',
               ].join(' ')}
@@ -176,7 +176,7 @@ export default function UaePlatePicker({
               className="block text-xs uppercase tracking-wide text-neutral-400 mb-1"
             >
               Country + plate
-              <span aria-hidden="true" className="text-[#b08d57] ml-1">*</span>
+              <span aria-hidden="true" className="text-[#E30613] ml-1">*</span>
             </label>
             <input
               id={foreignId}
@@ -190,7 +190,7 @@ export default function UaePlatePicker({
               aria-describedby={errId}
               className={[
                 'w-full rounded border bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]',
                 error ? 'border-red-700' : 'border-neutral-700',
               ].join(' ')}
             />
