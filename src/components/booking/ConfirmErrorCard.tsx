@@ -40,7 +40,7 @@ export function ConfirmErrorCard({
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/book"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-3 bg-[#b08d57] text-black font-medium hover:bg-[#c79c63] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-[#b08d57]"
+              className="inline-flex items-center justify-center rounded-lg px-5 py-3 bg-[#E30613] text-black font-medium hover:bg-[#FF1A2E] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-[#E30613]"
             >
               Book again
             </Link>
@@ -50,14 +50,14 @@ export function ConfirmErrorCard({
                   href={`https://wa.me/${MBR_WHATSAPP.replace(/[^\d]/g, '')}?text=${WHATSAPP_TEXT}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 border border-neutral-700 text-white hover:border-[#b08d57] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 border border-neutral-700 text-white hover:border-[#E30613] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]"
                 >
                   <FaWhatsapp className="w-4 h-4" aria-hidden="true" />
                   Chat to book
                 </a>
                 <a
                   href={`tel:${MBR_PHONE}`}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 border border-neutral-700 text-white hover:border-[#b08d57] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 border border-neutral-700 text-white hover:border-[#E30613] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]"
                 >
                   <FaPhone className="w-4 h-4" aria-hidden="true" />
                   Call us

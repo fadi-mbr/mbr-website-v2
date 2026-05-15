@@ -113,13 +113,13 @@ export function ConfirmSuccessCard(props: ConfirmSuccessCardProps) {
   return (
     <div className="min-h-screen bg-black text-white">
       <main className="mx-auto max-w-[720px] px-4 py-16">
-        <div className="rounded-lg border border-[#b08d57]/40 bg-neutral-950 p-6">
-          <p className="text-xs uppercase tracking-[0.25em] text-[#b08d57] mb-2">
+        <div className="rounded-lg border border-[#E30613]/40 bg-neutral-950 p-6">
+          <p className="text-xs uppercase tracking-[0.25em] text-[#E30613] mb-2">
             Booking confirmed
           </p>
           <h1 className="text-2xl font-light mb-4">
             We&apos;ll see you on{' '}
-            <span className="text-[#b08d57]">{when}</span>.
+            <span className="text-[#E30613]">{when}</span>.
           </h1>
           <p className="text-sm text-neutral-300 leading-relaxed mb-6">
             Hi {firstName}, your booking for{' '}
@@ -128,7 +128,7 @@ export function ConfirmSuccessCard(props: ConfirmSuccessCardProps) {
             {arcAppointmentId !== undefined && (
               <>
                 {' '}Reference{' '}
-                <span className="font-mono text-[#b08d57]">
+                <span className="font-mono text-[#E30613]">
                   #{arcAppointmentId}
                 </span>
                 .
@@ -167,7 +167,7 @@ export function ConfirmSuccessCard(props: ConfirmSuccessCardProps) {
                   href={MBR_MAPS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#b08d57] hover:text-white underline-offset-4 hover:underline"
+                  className="text-[#E30613] hover:text-white underline-offset-4 hover:underline"
                 >
                   {MBR_ADDRESS_HUMAN}
                 </a>
@@ -179,7 +179,7 @@ export function ConfirmSuccessCard(props: ConfirmSuccessCardProps) {
             <a
               href={icsHref}
               download={icsFilename}
-              className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 bg-[#b08d57] text-black font-medium hover:bg-[#c79c63] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-[#b08d57]"
+              className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 bg-[#E30613] text-black font-medium hover:bg-[#FF1A2E] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-[#E30613]"
             >
               <FaCalendarAlt className="w-4 h-4" aria-hidden="true" />
               Add to calendar (.ics)
@@ -188,7 +188,7 @@ export function ConfirmSuccessCard(props: ConfirmSuccessCardProps) {
               href={`https://wa.me/${MBR_WHATSAPP.replace(/[^\d]/g, '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 border border-neutral-700 text-white hover:border-[#b08d57] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]"
+              className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 border border-neutral-700 text-white hover:border-[#E30613] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]"
             >
               <FaWhatsapp className="w-4 h-4" aria-hidden="true" />
               Message us
@@ -199,7 +199,7 @@ export function ConfirmSuccessCard(props: ConfirmSuccessCardProps) {
             Need to change or cancel? Reply to the WhatsApp thread or call{' '}
             <a
               href={`tel:${MBR_PHONE}`}
-              className="text-[#b08d57] hover:text-white"
+              className="text-[#E30613] hover:text-white"
             >
               {MBR_PHONE}
             </a>
