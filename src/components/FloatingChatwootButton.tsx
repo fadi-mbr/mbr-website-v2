@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiOutlineChatBubbleLeftRight } from 'react-icons/hi2';
+import Image from 'next/image';
 
 declare global {
   interface Window {
@@ -26,7 +26,7 @@ export default function FloatingChatwootButton() {
     // Configure Chatwoot to suppress its own launcher — we render our own.
     window.chatwootSettings = {
       hideMessageBubble: true,
-      position: 'left',
+      position: 'right',
       locale: 'en',
       type: 'standard',
     };
@@ -90,9 +90,11 @@ export default function FloatingChatwootButton() {
         <motion.button
           type="button"
           onClick={handleClick}
-          // Desktop only — mobile keeps WhatsApp as the dominant CTA on the right.
-          // On <md screens we suppress this entirely.
-          className="hidden md:flex fixed bottom-8 left-8 z-50 group items-center"
+          // Stacked above the WhatsApp button on the bottom-right.
+          // WhatsApp button: 56px (mobile) / 64px (desktop) + 24/32 from edge.
+          // We sit ~88px (mobile) / 112px (desktop) from the bottom so there's
+          // a clean 16px gap above the WhatsApp launcher on all viewports.
+          className="flex fixed bottom-[88px] right-6 md:bottom-28 md:right-8 z-50 group items-center"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
@@ -106,16 +108,20 @@ export default function FloatingChatwootButton() {
             <div className="absolute inset-0 rounded-full blur-xl opacity-40 group-hover:opacity-70 transition-opacity duration-500"
                  style={{ backgroundColor: '#BC222D' }} />
 
-            {/* Button core — luxury matte black with brand red border + icon */}
-            <div className="relative w-16 h-16 rounded-full shadow-2xl flex items-center justify-center cursor-pointer transition-all duration-300 border"
+            {/* Button core — luxury matte black with brand red border + MBR shield */}
+            <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl flex items-center justify-center cursor-pointer transition-all duration-300 border"
                  style={{
                    background: 'linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%)',
                    borderColor: '#BC222D',
                    boxShadow: '0 12px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(188,34,45,0.25), inset 0 1px 0 rgba(255,255,255,0.06)',
                  }}>
-              <HiOutlineChatBubbleLeftRight
-                className="w-7 h-7 transition-colors duration-300"
-                style={{ color: '#BC222D' }}
+              <Image
+                src="/images/MBR_Logo_shield.svg"
+                alt="MBR Connect"
+                width={36}
+                height={36}
+                priority
+                className="w-8 h-8 md:w-9 md:h-9 object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
               />
 
               {/* Subtle pulse ring — slower than WhatsApp's so they don't compete */}
@@ -132,11 +138,11 @@ export default function FloatingChatwootButton() {
               )}
             </div>
 
-            {/* Tooltip — appears on the right since button is bottom-left */}
-            <div className="absolute left-20 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+            {/* Tooltip — appears on the left since button is bottom-right */}
+            <div className="hidden md:block absolute right-20 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
               <div className="bg-black/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm whitespace-nowrap shadow-xl border border-white/10">
                 Live chat with our team
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-black/90 rotate-45 border-l border-t border-white/10" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-2 h-2 bg-black/90 rotate-45 border-r border-t border-white/10" />
               </div>
             </div>
           </div>
