@@ -134,7 +134,7 @@ function ComboBox({
       >
         {label}
         {required && (
-          <span aria-hidden="true" className="text-[#b08d57] ml-1">
+          <span aria-hidden="true" className="text-[#E30613] ml-1">
             *
           </span>
         )}
@@ -174,7 +174,7 @@ function ComboBox({
         onKeyDown={handleKeyDown}
         className={[
           'w-full rounded border bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]',
           disabled ? 'opacity-50 cursor-not-allowed' : '',
           error ? 'border-red-700' : 'border-neutral-700',
         ].join(' ')}
@@ -205,7 +205,7 @@ function ComboBox({
                 className={[
                   'cursor-pointer px-3 py-2 text-sm',
                   active
-                    ? 'bg-[#b08d57] text-black'
+                    ? 'bg-[#E30613] text-black'
                     : 'text-white hover:bg-neutral-800',
                   opt === OTHER_SENTINEL ? 'italic text-neutral-300' : '',
                 ].join(' ')}
@@ -313,7 +313,7 @@ export default function CarMakeModelPicker({
               className="block text-xs uppercase tracking-wide text-neutral-400 mb-1"
             >
               Specify make
-              <span aria-hidden="true" className="text-[#b08d57] ml-1">*</span>
+              <span aria-hidden="true" className="text-[#E30613] ml-1">*</span>
             </label>
             <input
               id={otherMakeId}
@@ -325,7 +325,7 @@ export default function CarMakeModelPicker({
               placeholder="Type the make"
               className={[
                 'w-full rounded border bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]',
                 errors?.make ? 'border-red-700' : 'border-neutral-700',
               ].join(' ')}
             />
@@ -359,7 +359,7 @@ export default function CarMakeModelPicker({
               className="block text-xs uppercase tracking-wide text-neutral-400 mb-1"
             >
               Specify model
-              <span aria-hidden="true" className="text-[#b08d57] ml-1">*</span>
+              <span aria-hidden="true" className="text-[#E30613] ml-1">*</span>
             </label>
             <input
               id={otherModelId}
@@ -371,7 +371,7 @@ export default function CarMakeModelPicker({
               placeholder="Type the model"
               className={[
                 'w-full rounded border bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]',
                 errors?.model ? 'border-red-700' : 'border-neutral-700',
               ].join(' ')}
             />

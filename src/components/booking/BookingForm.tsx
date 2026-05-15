@@ -52,7 +52,7 @@ export default function BookingForm({
     <div className="min-h-screen bg-black text-white">
       <header className="border-b border-neutral-900">
         <div className="mx-auto max-w-[720px] px-4 py-4 flex items-center justify-between">
-          <span className="text-sm tracking-[0.2em] uppercase text-[#b08d57]">
+          <span className="text-sm tracking-[0.2em] uppercase text-[#E30613]">
             MBR
           </span>
           <span className="text-xs text-neutral-500">

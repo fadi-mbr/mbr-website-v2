@@ -168,11 +168,11 @@ export default function SlotPicker({
                 aria-pressed={isSelected}
                 className={[
                   'snap-start shrink-0 flex flex-col items-center justify-center',
-                  'w-16 h-20 rounded-lg border transition-colors',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+                  'w-16 h-20 rounded-lg border transition-all duration-150',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613] focus-visible:ring-offset-2 focus-visible:ring-offset-black',
                   isSelected
-                    ? 'bg-[#b08d57] border-[#b08d57] text-black'
-                    : 'bg-neutral-900 border-neutral-700 text-white hover:border-[#b08d57]',
+                    ? 'border-[#E30613] bg-gradient-to-b from-[#E30613]/20 to-[#E30613]/5 text-white shadow-[0_0_0_1px_rgba(227,6,19,0.4)]'
+                    : 'border-white/10 bg-white/[0.02] text-white hover:border-[#E30613]/60 hover:bg-white/[0.04]',
                 ].join(' ')}
               >
                 <span className="text-[10px] uppercase tracking-wide opacity-80">
@@ -222,7 +222,7 @@ export default function SlotPicker({
               <button
                 type="button"
                 onClick={() => setRetryKey((k) => k + 1)}
-                className="mt-2 px-3 py-1 rounded border border-[#b08d57] text-[#b08d57] hover:bg-[#b08d57] hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]"
+                className="mt-2 px-3 py-1 rounded border border-[#E30613] text-[#E30613] hover:bg-[#E30613] hover:text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]"
               >
                 Try again
               </button>
@@ -258,11 +258,11 @@ export default function SlotPicker({
                         }
                         aria-pressed={isSelected}
                         className={[
-                          'w-full px-3 py-2 rounded border text-sm transition-colors',
-                          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+                          'w-full px-3 py-2 rounded-lg border text-sm transition-all duration-150',
+                          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613] focus-visible:ring-offset-2 focus-visible:ring-offset-black',
                           isSelected
-                            ? 'bg-[#b08d57] border-[#b08d57] text-black'
-                            : 'bg-neutral-900 border-neutral-700 text-white hover:border-[#b08d57]',
+                            ? 'border-[#E30613] bg-gradient-to-br from-[#E30613]/20 to-[#E30613]/5 text-white font-medium shadow-[0_0_0_1px_rgba(227,6,19,0.4)]'
+                            : 'border-white/10 bg-white/[0.02] text-white hover:border-[#E30613]/60 hover:bg-white/[0.04]',
                         ].join(' ')}
                       >
                         {formatSlotTime(s.startMs)}

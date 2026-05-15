@@ -460,11 +460,19 @@ export default function BookingFormClient({
           : 'Booking confirmed';
     return (
       <div
-        className="rounded-lg border border-[#b08d57]/40 bg-neutral-900 p-6 text-white"
+        className="relative overflow-hidden rounded-xl border border-[#E30613]/30 bg-gradient-to-br from-[#1a0306] via-neutral-950 to-black p-6 text-white shadow-[0_20px_60px_-30px_rgba(227,6,19,0.6)]"
         role="status"
         aria-live="polite"
       >
-        <h2 className="text-xl font-light mb-2">{heading}</h2>
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-12 -right-12 h-40 w-40 rounded-full bg-[#E30613]/20 blur-3xl"
+        />
+        <div className="relative">
+        <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#E30613]/15 ring-1 ring-[#E30613]/40">
+          <span aria-hidden="true" className="text-lg text-[#FF4757]">✓</span>
+        </div>
+        <h2 className="text-xl font-light tracking-wide mb-2">{heading}</h2>
         {isPublicPending ? (
           <p className="text-sm text-neutral-300">{success.pendingMessage}</p>
         ) : isAgent ? (
@@ -500,6 +508,7 @@ export default function BookingFormClient({
             after you click the link.
           </p>
         )}
+        </div>
       </div>
     );
   }
@@ -515,16 +524,29 @@ export default function BookingFormClient({
       {/* Mode banner: makes the agent vs public flow obvious before submit. */}
       <div
         className={[
-          'rounded-md border px-3 py-2 text-xs',
+          'flex items-start gap-3 rounded-lg border px-4 py-3 text-sm backdrop-blur',
           mode === 'agent'
-            ? 'border-[#b08d57]/40 bg-[#b08d57]/10 text-[#d8b27e]'
-            : 'border-neutral-700 bg-neutral-900 text-neutral-300',
+            ? 'border-[#E30613]/40 bg-[#E30613]/10 text-[#FFB3B3]'
+            : 'border-white/10 bg-white/[0.03] text-neutral-300',
         ].join(' ')}
         role="note"
       >
-        {mode === 'agent'
-          ? 'This booking will be sent to ARC immediately for team approval — no email step.'
-          : "We'll email you a confirmation link to finalize this booking."}
+        <span
+          aria-hidden="true"
+          className={[
+            'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold',
+            mode === 'agent'
+              ? 'bg-[#E30613]/20 text-[#FFB3B3]'
+              : 'bg-white/10 text-neutral-200',
+          ].join(' ')}
+        >
+          {mode === 'agent' ? 'A' : 'i'}
+        </span>
+        <span className="leading-snug">
+          {mode === 'agent'
+            ? 'Agent booking — sent to ARC immediately for team approval. No email step for the customer.'
+            : "We'll email you a confirmation link to finalize this booking — no account needed."}
+        </span>
       </div>
 
       {banner && (
@@ -538,7 +560,7 @@ export default function BookingFormClient({
             <button
               type="button"
               onClick={handleRetry}
-              className="shrink-0 rounded border border-red-700 px-2 py-1 text-xs text-red-100 hover:bg-red-900/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]"
+              className="shrink-0 rounded border border-red-700 px-2 py-1 text-xs text-red-100 hover:bg-red-900/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613]"
             >
               Retry
             </button>
@@ -550,8 +572,12 @@ export default function BookingFormClient({
       <section aria-labelledby="booking-service-heading" className="space-y-3">
         <h2
           id="booking-service-heading"
-          className="text-lg font-light text-white"
+          className="flex items-center gap-3 text-lg font-light tracking-wide text-white"
         >
+          <span
+            aria-hidden="true"
+            className="h-px w-8 bg-gradient-to-r from-[#E30613] to-[#E30613]/0"
+          />
           Service
         </h2>
         <div
@@ -574,34 +600,35 @@ export default function BookingFormClient({
                   setErrors((p) => ({ ...p, service: undefined }));
                 }}
                 className={[
-                  'text-left rounded-lg border p-4 transition-colors',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
+                  'group relative text-left rounded-xl border p-4 transition-all duration-200',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613] focus-visible:ring-offset-2 focus-visible:ring-offset-black',
                   selected
-                    ? 'bg-[#b08d57] border-[#b08d57] text-black shadow-md'
-                    : 'border-neutral-700 bg-neutral-900 text-white hover:border-[#b08d57] hover:bg-neutral-800',
+                    ? 'border-[#E30613] bg-gradient-to-br from-[#E30613]/15 via-[#1a0306] to-neutral-950 shadow-[0_0_0_1px_rgba(227,6,19,0.3),0_8px_24px_-12px_rgba(227,6,19,0.6)]'
+                    : 'border-white/10 bg-white/[0.02] hover:border-[#E30613]/60 hover:bg-white/[0.04]',
                 ].join(' ')}
               >
-                <div className="font-medium">{s.title}</div>
-                <div
-                  className={[
-                    'mt-1 text-xs',
-                    selected ? 'text-black/70' : 'text-neutral-400',
-                  ].join(' ')}
-                >
-                  {s.duration_h === 1
-                    ? '1 hour'
-                    : `${s.duration_h} hours`}
+                {selected && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-[#E30613] text-[10px] font-bold text-white shadow"
+                  >
+                    ✓
+                  </span>
+                )}
+                <div className="font-medium tracking-wide text-white pr-7">
+                  {s.title}
+                </div>
+                <div className="mt-1.5 flex items-baseline gap-2 text-xs">
+                  <span className="text-neutral-400">
+                    {s.duration_h === 1 ? '1 hour' : `${s.duration_h} hours`}
+                  </span>
                   {s.price != null && (
-                    <span
-                      className={[
-                        'ml-2',
-                        selected
-                          ? 'text-black/80 font-medium'
-                          : 'text-[#b08d57]',
-                      ].join(' ')}
-                    >
-                      AED {s.price.toLocaleString('en-US')}
-                    </span>
+                    <>
+                      <span aria-hidden className="text-neutral-700">·</span>
+                      <span className="font-semibold text-[#FF4757]">
+                        AED {s.price.toLocaleString('en-US')}
+                      </span>
+                    </>
                   )}
                 </div>
               </button>
@@ -624,8 +651,12 @@ export default function BookingFormClient({
       <section aria-labelledby="booking-when-heading" className="space-y-3">
         <h2
           id="booking-when-heading"
-          className="text-lg font-light text-white"
+          className="flex items-center gap-3 text-lg font-light tracking-wide text-white"
         >
+          <span
+            aria-hidden="true"
+            className="h-px w-8 bg-gradient-to-r from-[#E30613] to-[#E30613]/0"
+          />
           When
         </h2>
         <div id="booking-slot">
@@ -670,7 +701,7 @@ export default function BookingFormClient({
             }
             error={errors.firstName}
             required
-            autoComplete="section-contact given-name"
+            autoComplete="given-name"
             enterKeyHint="next"
           />
           <Field
@@ -684,7 +715,7 @@ export default function BookingFormClient({
             }
             error={errors.lastName}
             required
-            autoComplete="section-contact family-name"
+            autoComplete="family-name"
             enterKeyHint="next"
           />
         </div>
@@ -694,15 +725,13 @@ export default function BookingFormClient({
           label="Phone"
           value={phone}
           onChange={(v) => setPhone(maskIntlPhoneInput(v))}
-          onFocus={() => {
-            if (!phone.trim()) setPhone('+971 ');
-          }}
           onBlur={() => {
-            // If the user focused, didn't type anything beyond the default
-            // prefix, and tabbed away — clear back to empty so the field
-            // doesn't look pre-filled. Otherwise validate.
+            // If the user only typed the dial prefix and tabbed away,
+            // clear it so the field doesn't look pre-filled. Otherwise
+            // validate. We do NOT inject "+971 " on focus — Safari only
+            // offers Contacts autofill when the field starts empty.
             const stripped = phone.replace(/\s+/g, '');
-            if (stripped === '+971' || stripped === '+') {
+            if (!stripped || stripped === '+971' || stripped === '+') {
               setPhone('');
               setErrors((p) => ({ ...p, phone: undefined }));
               return;
@@ -713,10 +742,10 @@ export default function BookingFormClient({
           required
           type="tel"
           inputMode="tel"
-          autoComplete="section-contact tel"
+          autoComplete="tel"
           enterKeyHint="next"
           placeholder="+971 50 123 4567"
-          hint="We'll text you the confirmation. UAE +971 by default — type +country code for other numbers."
+          hint="UAE numbers default to +971. For other countries, type the + and country code."
         />
         <Field
           id="email"
@@ -731,7 +760,7 @@ export default function BookingFormClient({
           required
           type="email"
           inputMode="email"
-          autoComplete="section-contact email"
+          autoComplete="email"
           enterKeyHint="next"
         />
       </section>
@@ -740,8 +769,12 @@ export default function BookingFormClient({
       <section aria-labelledby="booking-vehicle-heading" className="space-y-3">
         <h2
           id="booking-vehicle-heading"
-          className="text-lg font-light text-white"
+          className="flex items-center gap-3 text-lg font-light tracking-wide text-white"
         >
+          <span
+            aria-hidden="true"
+            className="h-px w-8 bg-gradient-to-r from-[#E30613] to-[#E30613]/0"
+          />
           Vehicle
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -830,8 +863,12 @@ export default function BookingFormClient({
       <section aria-labelledby="booking-notes-heading" className="space-y-3">
         <h2
           id="booking-notes-heading"
-          className="text-lg font-light text-white"
+          className="flex items-center gap-3 text-lg font-light tracking-wide text-white"
         >
+          <span
+            aria-hidden="true"
+            className="h-px w-8 bg-gradient-to-r from-[#E30613] to-[#E30613]/0"
+          />
           Notes
         </h2>
         <div>
@@ -844,10 +881,10 @@ export default function BookingFormClient({
             onChange={(e) => setNotes(e.target.value.slice(0, 500))}
             rows={4}
             maxLength={500}
-            placeholder="Anything we should know? (optional)"
+            placeholder="e.g. dropping off in the morning, parking pass needed, low-clearance car — optional"
             autoComplete="off"
             enterKeyHint="done"
-            className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]"
+            className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613] focus-visible:border-[#E30613]/50 transition-colors"
             aria-describedby="booking-notes-count"
           />
           <p
@@ -879,20 +916,31 @@ export default function BookingFormClient({
         <button
           type="submit"
           disabled={submitting}
+          aria-busy={submitting || undefined}
           className={[
-            'w-full rounded-lg px-5 py-3 font-medium transition-colors',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black focus-visible:ring-[#b08d57]',
-            submitting
-              ? 'bg-[#b08d57]/60 text-black/70 cursor-not-allowed'
-              : 'bg-[#b08d57] text-black hover:bg-[#c79c63]',
+            'liquid-glass-btn liquid-glass-btn-primary w-full justify-center rounded-lg px-5 py-3 text-base font-medium tracking-wide',
+            submitting ? 'opacity-70 cursor-not-allowed' : '',
           ].join(' ')}
         >
-          {submitting
-            ? 'Submitting…'
-            : mode === 'agent'
-              ? 'Book appointment now'
-              : 'Email me the confirmation link'}
+          {submitting ? (
+            <span className="inline-flex items-center gap-2">
+              <span
+                aria-hidden="true"
+                className="inline-block h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin"
+              />
+              Submitting…
+            </span>
+          ) : mode === 'agent' ? (
+            'Book appointment now'
+          ) : (
+            'Email me the confirmation link'
+          )}
         </button>
+        {mode === 'public' && !submitting && (
+          <p className="mt-2 text-center text-[11px] text-neutral-500">
+            No account required. Confirmation link expires in 30 minutes.
+          </p>
+        )}
       </div>
     </form>
   );
@@ -953,7 +1001,7 @@ function Field({
       >
         {label}
         {required && (
-          <span aria-hidden="true" className="text-[#b08d57] ml-1">
+          <span aria-hidden="true" className="text-[#E30613] ml-1">
             *
           </span>
         )}
@@ -974,9 +1022,9 @@ function Field({
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
         className={[
-          'w-full rounded border bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b08d57]',
-          error ? 'border-red-700' : 'border-neutral-700',
+          'w-full rounded-lg border bg-white/[0.02] px-3 py-2.5 text-sm text-white placeholder:text-neutral-500',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E30613] focus-visible:border-[#E30613]/50 transition-colors',
+          error ? 'border-red-700/70' : 'border-white/10',
         ].join(' ')}
       />
       {hint && !error && (

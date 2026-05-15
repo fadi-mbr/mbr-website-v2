@@ -210,7 +210,7 @@ export function DashboardAppContextWaiter(): React.ReactElement {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-6 w-6 rounded-full border-2 border-[#b08d57] border-t-transparent animate-spin mb-3" aria-hidden="true" />
+          <div className="inline-block h-6 w-6 rounded-full border-2 border-[#E30613] border-t-transparent animate-spin mb-3" aria-hidden="true" />
           <p className="text-sm text-neutral-400">Waiting for MBR Connect to send the conversation…</p>
         </div>
       </div>
@@ -230,7 +230,7 @@ export function DashboardAppContextWaiter(): React.ReactElement {
             href="https://mbrme.com/book"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#b08d57] underline"
+            className="text-[#E30613] underline"
           >
             mbrme.com/book
           </a>{' '}
