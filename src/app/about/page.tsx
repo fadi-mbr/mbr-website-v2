@@ -83,7 +83,7 @@ export default function AboutPage() {
             priority
           />
           <p className="text-eyebrow mb-5">About MBR Auto Services</p>
-          <h1 className="font-display font-light text-white leading-[1.05] tracking-[-0.025em] text-[clamp(2.5rem,6vw,5rem)] mb-7">
+          <h1 className="font-display font-light text-white leading-[1.05] tracking-[-0.025em] text-[clamp(2.25rem,5vw,4.25rem)] mb-7">
             The workshop behind the cars.
           </h1>
           <p className="text-subheading text-[var(--text-body)] leading-relaxed max-w-2xl mx-auto">
@@ -243,14 +243,6 @@ export default function AboutPage() {
       <section className="relative py-20 md:py-28">
         <div className="container-luxury max-w-6xl mx-auto">
           <div className="text-center mb-16 md:mb-20">
-            <Image
-              src="/images/MBR_Logo_shield.svg"
-              alt=""
-              width={28}
-              height={28}
-              className="w-6 h-6 md:w-7 md:h-7 mx-auto mb-4 opacity-60"
-              aria-hidden="true"
-            />
             <p className="text-eyebrow mb-4">Operating philosophy</p>
             <div
               className="h-px w-16 mx-auto mb-7"
@@ -272,15 +264,12 @@ export default function AboutPage() {
                 className="relative p-8 md:p-10 rounded-2xl border border-white/10 bg-[var(--surface-2)] hover:border-[var(--accent-bronze)]/40 transition-colors duration-300"
               >
                 <div
-                  className="font-display text-[var(--primary)] mb-5 leading-none"
-                  style={{
-                    fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
-                    fontFeatureSettings: '"tnum" 1, "lnum" 1',
-                  }}
+                  className="text-marker mb-4"
+                  style={{ color: 'var(--primary)' }}
                 >
                   0{i + 1}
                 </div>
-                <h3 className="font-display text-2xl md:text-3xl text-white font-light leading-tight tracking-[-0.01em] mb-4">
+                <h3 className="font-display text-white font-light leading-[1.15] tracking-[-0.01em] mb-4" style={{ fontSize: 'clamp(1.5rem, 2.4vw, 2rem)' }}>
                   {p.title}
                 </h3>
                 <p className="text-body text-[var(--text-body)] leading-relaxed">

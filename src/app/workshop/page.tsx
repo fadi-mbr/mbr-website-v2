@@ -98,7 +98,7 @@ export default function WorkshopPage() {
             priority
           />
           <p className="text-eyebrow mb-5">The Workshop</p>
-          <h1 className="font-display font-light text-white leading-[1.05] tracking-[-0.025em] text-[clamp(2.5rem,6vw,5rem)] mb-7">
+          <h1 className="font-display font-light text-white leading-[1.05] tracking-[-0.025em] text-[clamp(2.25rem,5vw,4.25rem)] mb-7">
             Where the cars spend the afternoon.
           </h1>
           <p className="text-subheading text-[var(--text-body)] leading-relaxed max-w-2xl mx-auto">
@@ -276,15 +276,12 @@ export default function WorkshopPage() {
                 className="relative p-7 md:p-8 rounded-2xl border border-white/10 bg-[var(--surface-2)]"
               >
                 <div
-                  className="font-display text-[var(--primary)] mb-4 leading-none"
-                  style={{
-                    fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
-                    fontFeatureSettings: '"tnum" 1, "lnum" 1',
-                  }}
+                  className="text-marker mb-3"
+                  style={{ color: 'var(--primary)' }}
                 >
                   {step.n}
                 </div>
-                <h3 className="font-display text-xl md:text-2xl text-white font-light leading-tight tracking-[-0.01em] mb-3">
+                <h3 className="font-display text-white font-light leading-[1.15] tracking-[-0.01em] mb-3" style={{ fontSize: 'clamp(1.35rem, 2vw, 1.75rem)' }}>
                   {step.title}
                 </h3>
                 <p className="text-sm text-[var(--text-body)] leading-relaxed">

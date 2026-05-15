@@ -54,17 +54,14 @@ export default function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
           {/* Brand block */}
           <div className="flex flex-col items-start">
-            <Link href="/" className="inline-flex items-center gap-3 group">
+            <Link href="/" className="inline-flex items-center group" aria-label="MBR Auto Services L.L.C.">
               <Image
-                src="/images/MBR_Logo_shield.svg"
-                alt="MBR Auto Services"
-                width={44}
-                height={44}
-                className="w-10 h-10 md:w-11 md:h-11 opacity-95 group-hover:opacity-100 transition-opacity"
+                src="/images/MBR_Logo_horizontal.svg"
+                alt="MBR Auto Services L.L.C."
+                width={260}
+                height={70}
+                className="h-12 md:h-14 w-auto opacity-95 group-hover:opacity-100 transition-opacity"
               />
-              <span className="text-white text-lg tracking-[0.18em] uppercase font-light">
-                MBR Auto
-              </span>
             </Link>
             <p className="mt-5 text-sm leading-relaxed text-[var(--text-muted)] max-w-xs">
               Independent luxury & exotic-car workshop in Dubai. Ferrari,

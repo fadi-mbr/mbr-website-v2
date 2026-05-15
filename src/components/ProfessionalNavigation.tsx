@@ -94,11 +94,11 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
           >
             <Link href="/" className="flex-shrink-0 relative group">
             <Image
-              src="/images/MBR_Logo_horizontal.svg"
-              alt="MBR Auto Services L.L.C. Premium Car Repair Dubai, Luxury Auto Service UAE"
-              width={180}
-              height={48}
-                className="logo-md opacity-95 transition-all duration-300 group-hover:opacity-100 group-hover:brightness-110"
+              src="/images/MBR_Logo_shield.svg"
+              alt="MBR Auto Services. Luxury and exotic-car workshop, Dubai"
+              width={56}
+              height={56}
+                className="w-12 h-12 md:w-14 md:h-14 opacity-95 transition-all duration-300 group-hover:opacity-100 group-hover:brightness-110"
               priority
             />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
