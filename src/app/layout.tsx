@@ -85,11 +85,12 @@ export const metadata: Metadata = {
     canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://mbrme.com",
   },
   // Multi-format favicon coverage:
-  //   - favicon.ico (multi-resolution 16/32) for legacy browsers + Safari URL bar
+  //   - favicon.ico (multi-resolution 16/32/48) for legacy browsers + Safari URL bar
   //   - PNG 16/32 for Chrome / Firefox tab
   //   - apple-touch-icon (180) for iOS home-screen
   //   - android-chrome 192/512 for Android home-screen + PWA install
   //   - mstile-150 for Windows Start tile (paired with msapplication-TileColor)
+  //   - safari-pinned-tab.svg (monochrome) for Safari pinned tabs (mask-icon)
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -100,6 +101,13 @@ export const metadata: Metadata = {
     ],
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      {
+        rel: 'mask-icon',
+        url: '/safari-pinned-tab.svg',
+        color: '#E30613',
+      },
     ],
     shortcut: '/favicon.ico',
   },
