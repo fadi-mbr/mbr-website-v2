@@ -258,8 +258,11 @@ export default function SophisticatedHero({
               </p>
 
               {/* Tabular stat strip — Fraunces serif numerals, four beats.
-                  This is the brand-anchor moment under the headline. */}
-              <div className="mt-2 mb-12 grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-6 md:gap-x-4 max-w-3xl mx-auto motion-calm">
+                  Numerals stay subordinate to the headline (h1 maxes at 5rem,
+                  these top out at ~3rem so the eye lands on the headline first).
+                  Labels use the canonical .text-eyebrow scale for cross-section
+                  consistency. */}
+              <div className="mt-2 mb-12 grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-6 md:gap-x-4 max-w-3xl mx-auto motion-calm">
                 {[
                   { to: 4.9, decimals: 1, suffix: '★', label: 'Google rating' },
                   { to: 5000, suffix: '+', label: 'Cars serviced' },
@@ -270,7 +273,7 @@ export default function SophisticatedHero({
                     <div
                       className="font-display font-light text-white leading-none tracking-tight"
                       style={{
-                        fontSize: 'clamp(2.25rem, 4.5vw, 3.5rem)',
+                        fontSize: 'clamp(1.85rem, 3.6vw, 3rem)',
                         fontFeatureSettings: '"tnum" 1, "lnum" 1',
                       }}
                     >
@@ -278,14 +281,14 @@ export default function SophisticatedHero({
                       <span className="text-[var(--primary)]">{stat.suffix}</span>
                     </div>
                     <div
-                      className="h-px w-8 mt-3 mb-2"
+                      className="h-px w-8 mt-3 mb-3"
                       style={{
                         background:
                           'linear-gradient(90deg, transparent, var(--accent-bronze) 50%, transparent)',
                       }}
                       aria-hidden="true"
                     />
-                    <div className="text-eyebrow text-[0.65rem] md:text-[0.75rem]">
+                    <div className="text-eyebrow" style={{ fontSize: 'clamp(0.65rem, 0.85vw, 0.78rem)' }}>
                       {stat.label}
                     </div>
                   </div>

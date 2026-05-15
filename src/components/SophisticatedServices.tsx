@@ -182,10 +182,12 @@ function ServiceSlabRow({
           {service.description}
         </p>
 
-        {/* Feature list */}
+        {/* Feature list — bullets always lead the text (LTR reading order).
+            On flipped slabs the whole row is right-aligned but each
+            <li> keeps bullet-then-text so the eye doesn't read it as RTL. */}
         <ul
           className={`grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 mb-7 text-sm text-[var(--text-muted)] ${
-            flipped ? 'lg:[&_li]:justify-end lg:[&_li]:flex-row-reverse' : ''
+            flipped ? 'lg:[&_li]:justify-end' : ''
           }`}
         >
           {service.features.map((f) => (
@@ -200,18 +202,17 @@ function ServiceSlabRow({
           ))}
         </ul>
 
-        {/* External reference (Leonardo, etc.) */}
+        {/* External reference (Leonardo, etc.) — arrow always trails the
+            label so it reads left-to-right regardless of slab side. */}
         {service.externalLink && (
           <a
             href={service.externalLink.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex items-center text-eyebrow text-[var(--text-muted)] hover:text-white transition-colors mb-7 ${
-              flipped ? 'lg:flex-row-reverse' : ''
-            }`}
+            className="inline-flex items-center text-eyebrow text-[var(--text-muted)] hover:text-white transition-colors mb-7"
           >
             <span>{service.externalLink.label}</span>
-            <span className={flipped ? 'mr-2' : 'ml-2'} aria-hidden="true">
+            <span className="ml-2" aria-hidden="true">
               →
             </span>
           </a>
