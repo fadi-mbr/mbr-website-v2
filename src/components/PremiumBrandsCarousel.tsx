@@ -18,7 +18,7 @@ const luxuryBrands = [
   { name: "Lamborghini",   slug: "lamborghini",   tier: "supercar",     logo: "/images/brands/lamborghini.svg",   keywords: "Lamborghini repair Dubai, Lamborghini service UAE, Lamborghini maintenance, Lamborghini mechanic Dubai" },
   { name: "Rolls-Royce",   slug: "rolls-royce",   tier: "ultra-luxury", logo: "/images/brands/rolls-royce.svg",   keywords: "Rolls-Royce repair Dubai, Rolls-Royce service UAE, Rolls Royce maintenance Dubai" },
   { name: "Bentley",       slug: "bentley",       tier: "ultra-luxury", logo: "/images/brands/bentley.svg",       keywords: "Bentley repair Dubai, Bentley service UAE, Bentley maintenance Dubai" },
-  { name: "McLaren",       slug: "mclaren",       tier: "supercar",     logo: "/images/brands/mclaren.svg",       keywords: "McLaren repair Dubai, McLaren service UAE, McLaren maintenance Dubai" },
+  { name: "McLaren",       slug: "mclaren",       tier: "supercar",     logo: "/images/brands/mclaren-dark.svg",  keywords: "McLaren repair Dubai, McLaren service UAE, McLaren maintenance Dubai" },
   { name: "Maserati",      slug: "maserati",      tier: "luxury-gt",    logo: "/images/brands/maserati.svg",      keywords: "Maserati repair Dubai, Maserati service UAE, Maserati maintenance Dubai" },
   { name: "Porsche",       slug: "porsche",       tier: "luxury-sport", logo: "/images/brands/porsche.svg",       keywords: "Porsche repair Dubai, Porsche service UAE, Porsche maintenance Dubai" },
   { name: "Mercedes-Benz", slug: "mercedes-benz", tier: "luxury",       logo: "/images/brands/mercedes-benz.svg", keywords: "Mercedes repair Dubai, Mercedes service UAE, Mercedes-Benz maintenance, Mercedes AMG service Dubai" },
