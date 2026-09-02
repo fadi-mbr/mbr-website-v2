@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>MBR AI — Group Inventory and Owner Questionnaire</title>
+<style>
+  :root { --red:#B3121B; --red-dark:#8E0E15; --gold:#C9A227; --ink:#1d1d1f; --muted:#5f6368; --line:#e3e3e3; --bg:#f6f5f2; --card:#ffffff; --ok:#1f7a3a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width:1080px; margin:0 auto; padding:24px 16px 80px; }
+  header.brand { background:var(--card); border:1px solid var(--line); border-top:6px solid var(--red); border-radius:12px; padding:22px 26px; margin-bottom:18px; }
+  header.brand h1 { margin:0 0 4px; font-size:26px; letter-spacing:.2px; }
+  header.brand h1 span { color:var(--red); }
+  header.brand .meta { color:var(--muted); font-size:14px; display:flex; flex-wrap:wrap; gap:14px; margin-top:6px; }
+  header.brand p { margin:12px 0 0; }
+  .gold { color:var(--gold); font-weight:600; }
+  section.card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:22px 26px; margin-bottom:18px; }
+  section.card h2 { margin:0 0 6px; font-size:20px; border-left:4px solid var(--gold); padding-left:10px; }
+  section.card h3 { margin:22px 0 8px; font-size:16px; color:var(--red-dark); }
+  .hint { color:var(--muted); font-size:14px; margin:0 0 12px; }
+  label.q { display:block; font-weight:600; margin:16px 0 6px; }
+  label.q small { display:block; font-weight:400; color:var(--muted); margin-top:2px; }
+  input[type=text], input[type=number], input[type=email], textarea, select { width:100%; padding:9px 10px; border:1px solid #cfcfcf; border-radius:8px; font:inherit; background:#fff; }
+  textarea { min-height:70px; resize:vertical; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .choices { display:flex; flex-wrap:wrap; gap:8px 18px; margin:4px 0 6px; }
+  .choices label { font-weight:400; display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+  .tbl-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:10px; }
+  table { border-collapse:collapse; width:100%; min-width:1180px; font-size:14px; }
+  th, td { border-bottom:1px solid var(--line); padding:6px 6px; vertical-align:top; text-align:left; }
+  th { background:#faf8f3; font-weight:600; white-space:nowrap; position:sticky; top:0; }
+  td input[type=text], td input[type=number], td select { padding:6px 7px; font-size:14px; }
+  td .members label { display:block; font-size:13px; white-space:nowrap; }
+  td.idx { color:var(--muted); width:34px; text-align:center; padding-top:12px; }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border-radius:9px; border:1px solid var(--red); background:var(--red); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+  .btn:hover { background:var(--red-dark); }
+  .btn:disabled { opacity:.6; cursor:progress; }
+  .btn.secondary { background:#fff; color:var(--red); }
+  .btn.ghost { background:#fff; color:var(--ink); border-color:#cfcfcf; font-weight:500; }
+  .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:3px solid #f0d78a; outline-offset:1px; }
+  .actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; }
+  .status { font-size:14px; color:var(--muted); }
+  .status.ok { color:var(--ok); font-weight:600; }
+  #result { display:none; }
+  #summary { white-space:pre-wrap; background:#faf8f3; border:1px dashed #d8cfae; border-radius:10px; padding:14px; font:13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; max-height:420px; overflow:auto; }
+  dl.defs { margin:8px 0 0; font-size:14px; }
+  dl.defs dt { font-weight:600; margin-top:6px; }
+  dl.defs dd { margin:0; color:var(--muted); }
+  .footer { color:var(--muted); font-size:13px; margin-top:14px; }
+  @media (max-width: 720px) { .row { grid-template-columns:1fr; } header.brand h1 { font-size:22px; } }
+  @media print { body { background:#fff; } .actions, #savebar, .no-print { display:none !important; } section.card, header.brand { break-inside:avoid; border:none; padding:0 0 14px; } .tbl-wrap { overflow:visible; border:none; } table { min-width:0; font-size:11px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="brand">
+    <h1><span>MBR AI</span> — Group Inventory and Owner Questionnaire</h1>
+    <div class="meta"><span><strong>To:</strong> Dr. Basel Kelzia, CEO, MBR Auto Services L.L.C.</span><span><strong>From:</strong> Fadi Kelzia</span><span><strong>Date:</strong> 2 September 2026</span></div>
+    <p>Basel, we are planning <strong>MBR AI</strong>: an assistant that follows the team's WhatsApp groups, reports to you daily and weekly on operations, people, finance, marketing and customers, cross-checks what is said against ARC, the HR system and QuickBooks, and later helps your managers within limits you set. It will not talk to customers and it will not replace ARC, HR or QuickBooks.</p>
+    <p>Three things only you can give us are below. <span class="gold">Part 1 takes the longest</span>; a first pass with group names and purposes is enough to start. Your answers save in this browser as you type, so you can stop and continue later on the same device. When done, press <strong>Submit</strong> at the bottom: your answers go straight to my team and you will see a confirmation here. You can also keep a copy.</p>
+  </header>
+
+  <form id="q" autocomplete="off">
+  <section class="card">
+    <h2>Respondent</h2>
+    <div class="row">
+      <div><label class="q" for="r_name">Name</label><input type="text" id="r_name" name="r_name" value="Dr. Basel Kelzia"></div>
+      <div><label class="q" for="r_date">Date completed</label><input type="text" id="r_date" name="r_date" placeholder="e.g. 5 September 2026"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Part 1 — WhatsApp group inventory</h2>
+    <p class="hint">One row per group the company uses. Include groups with suppliers or partners and mark them as such. Leave a cell blank if you are not sure.</p>
+    <div class="tbl-wrap">
+      <table id="groups">
+        <thead><tr>
+          <th>#</th><th>Group name</th><th>Purpose (one line)</th><th>Members (tick all that apply)</th><th>Approx. members</th><th>Language(s)</th><th>Sensitivity</th><th>May history be exported?</th><th>Keep monitoring?</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="actions no-print"><button type="button" class="btn ghost" id="addrow">+ Add a group</button><span class="status" id="rowcount"></span></div>
+    <dl class="defs">
+      <dt>Sensitivity</dt><dd><strong>Low:</strong> work coordination — handovers, parts, schedules. <strong>Medium:</strong> customer names, plates, quotes, cash approvals. <strong>High:</strong> salaries, disciplinary or personal matters, anything a manager should not read.</dd>
+      <dt>Export</dt><dd>A one-time export of the group's history (text and media) from a member's phone, so the assistant knows what happened before it joined. Answer <em>no</em> where the history should stay closed.</dd>
+      <dt>Keep monitoring</dt><dd>Whether the assistant should follow the group from now on.</dd>
+    </dl>
+    <label class="q" for="p1_phone">Which phone holds the most complete history for each group — yours, or a named staff member's?</label>
+    <textarea id="p1_phone" name="p1_phone"></textarea>
+    <label class="q" for="p1_customer">Do any groups run on the customer-facing business number, or include customers? <small>Those are out of scope for the assistant; we only need to know they exist.</small></label>
+    <textarea id="p1_customer" name="p1_customer"></textarea>
+  </section>
+
+  <section class="card">
+    <h2>Part 2 — Decisions only you can make</h2>
+
+    <h3>Agent number and visibility</h3>
+    <label class="q">1. Are you comfortable with a visible member named <strong>"MBR AI"</strong> in the groups you mark for monitoring?</label>
+    <div class="choices"><label><input type="radio" name="q1" value="yes"> Yes</label><label><input type="radio" name="q1" value="no"> No</label><label><input type="radio" name="q1" value="some"> Yes, except some groups</label></div>
+    <input type="text" name="q1_note" placeholder="If not everywhere: which groups should it stay out of?">
+    <label class="q">2. We recommend a new MBR business number for the assistant — not your personal number and not the customer number. Do you agree?</label>
+    <div class="choices"><label><input type="radio" name="q2" value="yes"> Yes, a new MBR number</label><label><input type="radio" name="q2" value="other"> I prefer another number</label></div>
+    <input type="text" name="q2_note" placeholder="If another number: which one, and who owns it?">
+    <label class="q">3. Should external partners in a group be told that MBR AI is a member? <small>Recommended: yes, a one-line notice in the group.</small></label>
+    <div class="choices"><label><input type="radio" name="q3" value="yes"> Yes</label><label><input type="radio" name="q3" value="no"> No</label></div>
+
+    <h3>Management team</h3>
+    <label class="q">4. Who is on the management team the assistant may help? <small>Our notes list three roles: Workshop Manager, Finance/Accounts, Service Coordination. Please confirm names and roles.</small></label>
+    <textarea name="q4" placeholder="Name — role, one per line"></textarea>
+    <label class="q">5. For each manager: which areas may they ask about (Operations / People / Finance / Customers), which groups, and should they receive alerts or only get answers to their questions? <small>Default: managers see Operations and People only; no finance figures.</small></label>
+    <textarea name="q5"></textarea>
+    <label class="q">6. Who may change these permissions besides you? <small>Default: nobody.</small></label>
+    <input type="text" name="q6" placeholder="Nobody / name">
+
+    <h3>Staff notice and data</h3>
+    <label class="q">7. How should staff be informed that the assistant follows the groups? <small>UAE data-protection law requires at least a clear notice; our legal checklist will confirm the exact form.</small></label>
+    <div class="choices"><label><input type="radio" name="q7" value="notice"> A written notice from me</label><label><input type="radio" name="q7" value="briefing"> A team briefing</label><label><input type="radio" name="q7" value="consent"> Individual consent</label></div>
+    <label class="q">8. How long should the assistant keep messages and media?</label>
+    <div class="choices"><label><input type="radio" name="q8" value="90d"> 90 days</label><label><input type="radio" name="q8" value="12m"> 12 months</label><label><input type="radio" name="q8" value="other"> Another period</label></div>
+    <input type="text" name="q8_note" placeholder="If another period: how long?">
+    <label class="q">9. Do you want per-person observations from the start (who committed to what, who followed through, tone), or team-level summaries first?</label>
+    <div class="choices"><label><input type="radio" name="q9" value="person"> Per-person from the start</label><label><input type="radio" name="q9" value="team"> Team-level summaries first</label></div>
+
+    <h3>Your assistant — calendar, email, tasks</h3>
+    <label class="q">10. Which calendar and which mailbox should the assistant work with, and with what rights?</label>
+    <div class="row"><input type="text" name="q10_accounts" placeholder="Calendar / mailbox (e.g. my MBR Google account)"><select name="q10_rights"><option value="">Rights…</option><option value="read">Read only</option><option value="draft">Create and edit entries; draft emails for my approval</option><option value="send">Create, edit and send on my behalf</option></select></div>
+    <label class="q">11. Should it also see anyone else's calendar — for example the workshop schedule?</label>
+    <input type="text" name="q11">
+
+    <h3>Budget and risk appetite</h3>
+    <label class="q">12. The AI provider account and hosting will be billed to MBR. What monthly range is acceptable for the first six months? <small>We will return a cost model with the plan.</small></label>
+    <input type="text" name="q12" placeholder="e.g. up to AED 1,500 per month">
+    <label class="q">13. Following existing WhatsApp groups needs a linked-device connection that WhatsApp's terms do not officially allow. The main practical risk is that the assistant's own number gets blocked — not yours and not the company's.</label>
+    <div class="choices"><label><input type="checkbox" name="q13_pilot" value="yes"> Acceptable for a two-week pilot on low-sensitivity groups</label><label><input type="checkbox" name="q13_long" value="yes"> Acceptable long term</label></div>
+    <input type="text" name="q13_note" placeholder="Conditions or concerns">
+    <label class="q">14. Are you open to moving internal team communication to Telegram, or another tool that keeps proper records, over time — with WhatsApp kept for customers?</label>
+    <div class="choices"><label><input type="radio" name="q14" value="yes"> Yes</label><label><input type="radio" name="q14" value="no"> No</label><label><input type="radio" name="q14" value="later"> Later</label></div>
+
+    <h3>Marketing and web</h3>
+    <label class="q">15. Which accounts may the assistant read for marketing and website reports, and who grants the access?</label>
+    <div class="choices"><label><input type="checkbox" name="q15_ig" value="yes"> Instagram (@mbr.auto)</label><label><input type="checkbox" name="q15_fb" value="yes"> Facebook (@mbrautoservices)</label><label><input type="checkbox" name="q15_gbp" value="yes"> Google Business Profile</label><label><input type="checkbox" name="q15_ga" value="yes"> Google Analytics</label><label><input type="checkbox" name="q15_web" value="yes"> Website analytics</label></div>
+    <input type="text" name="q15_note" placeholder="Who grants the access?">
+
+    <h3>Customer number — separate project, same timeline</h3>
+    <label class="q">16. Connecting the customer number <strong>+971 56 501 5800</strong> to the official WhatsApp Business platform is a one-way move: the number stops working in the WhatsApp app on a phone and works only through the MBR Connect inbox. Do you consent, and from when?</label>
+    <div class="choices"><label><input type="radio" name="q16" value="yes"> Yes</label><label><input type="radio" name="q16" value="no"> No</label><label><input type="radio" name="q16" value="later"> Not yet</label></div>
+    <input type="text" name="q16_note" placeholder="From when, or what would need to be true first?">
+  </section>
+
+  <section class="card">
+    <h2>Part 3 — How the assistant should behave</h2>
+    <label class="q">17. Tone and language: direct and brief, as you prefer? Reports in English, Arabic, or both?</label>
+    <div class="row"><input type="text" name="q17_tone" placeholder="Tone"><select name="q17_lang"><option value="">Report language…</option><option value="en">English</option><option value="ar">Arabic</option><option value="both">Both</option></select></div>
+    <label class="q">18. What should reach you immediately rather than in the daily digest? <small>Examples: a cash approval above a set amount (which amount?), a customer complaint, a car released without full payment, work started without a signed quotation, a technician absent without leave.</small></label>
+    <textarea name="q18"></textarea>
+    <label class="q">19. Working hours: when should the daily digest arrive, when the weekly one, and are there hours when the assistant should not message you at all?</label>
+    <div class="row"><input type="text" name="q19_daily" placeholder="Daily digest time"><input type="text" name="q19_weekly" placeholder="Weekly digest day and time"></div>
+    <input type="text" name="q19_quiet" placeholder="Quiet hours (no messages)" style="margin-top:10px">
+    <label class="q" for="extra">Anything else we should know</label>
+    <textarea id="extra" name="extra"></textarea>
+  </section>
+
+  <section class="card no-print" id="savebar">
+    <h2>Submit</h2>
+    <p class="hint">Submit sends your answers directly to the MBR AI team and shows a summary of what was sent. Partial answers are fine; submit again later and the update is added to the same thread. <strong>Keep a copy</strong> downloads your answers as a file.</p>
+    <div class="actions">
+      <button type="button" class="btn" id="submit">Submit</button>
+      <button type="button" class="btn secondary" id="download">Keep a copy</button>
+      <button type="button" class="btn secondary" id="copy">Copy summary</button>
+      <button type="button" class="btn ghost" id="print">Print / save as PDF</button>
+      <button type="button" class="btn ghost" id="clear">Clear all answers</button>
+      <span class="status" id="status" role="status" aria-live="polite"></span>
+    </div>
+    <div id="result">
+      <h3>Summary of what was sent</h3>
+      <div id="summary"></div>
+    </div>
+    <p class="footer">Part 1 and questions 1, 2, 4, 5, 13 and 14 decide the design; the rest can follow within the month. Prepared by Fadi Kelzia for MBR Auto Services. Your answers go to a private inbox in MBR Connect that only administrators can see.</p>
+  </section>
+  </form>
+</div>
+
+<script>
+(function () {
+  var FORM = document.getElementById('q');
+  var TBODY = document.querySelector('#groups tbody');
+  var KEY = 'mbr-ai-questionnaire-v1';
+  var MIN_ROWS = 12;
+  var CW = { base: 'https://connect.mbrme.com', inbox: 'Mc4e8VZUaJs9fnqSa4qgrfE3' };
+
+  function rowHtml(i) {
+    return '<td class="idx">' + i + '</td>' +
+      '<td><input type="text" name="g' + i + '_name" placeholder="Group name"></td>' +
+      '<td><input type="text" name="g' + i + '_purpose" placeholder="Purpose"></td>' +
+      '<td class="members"><label><input type="checkbox" name="g' + i + '_m_staff" value="yes"> Staff</label><label><input type="checkbox" name="g' + i + '_m_partners" value="yes"> External partners</label><label><input type="checkbox" name="g' + i + '_m_customers" value="yes"> Customers</label></td>' +
+      '<td><input type="number" min="0" step="1" name="g' + i + '_count" placeholder="e.g. 12"></td>' +
+      '<td><input type="text" name="g' + i + '_lang" placeholder="e.g. Arabic, English"></td>' +
+      '<td><select name="g' + i + '_sens"><option value=""></option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></td>' +
+      '<td><select name="g' + i + '_export"><option value=""></option><option value="yes">Yes</option><option value="no">No</option><option value="unsure">Not sure</option></select></td>' +
+      '<td><select name="g' + i + '_monitor"><option value=""></option><option value="yes">Yes</option><option value="no">No</option><option value="unsure">Not sure</option></select></td>';
+  }
+  function addRow() {
+    var i = TBODY.children.length + 1;
+    var tr = document.createElement('tr'); tr.innerHTML = rowHtml(i); TBODY.appendChild(tr);
+    document.getElementById('rowcount').textContent = i + ' rows';
+    return tr;
+  }
+  for (var r = 0; r < MIN_ROWS; r++) addRow();
+  document.getElementById('addrow').addEventListener('click', function () { addRow(); save(); });
+
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  function collect() {
+    var data = {};
+    Array.prototype.forEach.call(FORM.elements, function (el) {
+      if (!el.name) return;
+      if (el.type === 'checkbox') { data[el.name] = el.checked ? 'yes' : ''; }
+      else if (el.type === 'radio') { if (el.checked) data[el.name] = el.value; else if (!(el.name in data)) data[el.name] = ''; }
+      else { data[el.name] = el.value; }
+    });
+    return data;
+  }
+  function restore() {
+    var raw = lsGet(KEY); if (!raw) return;
+    var data; try { data = JSON.parse(raw); } catch (e) { return; }
+    var maxRow = 0; Object.keys(data).forEach(function (k) { var m = /^g(\d+)_/.exec(k); if (m) maxRow = Math.max(maxRow, parseInt(m[1], 10)); });
+    while (TBODY.children.length < maxRow) addRow();
+    Array.prototype.forEach.call(FORM.elements, function (el) {
+      if (!el.name || !(el.name in data)) return;
+      if (el.type === 'checkbox') el.checked = data[el.name] === 'yes';
+      else if (el.type === 'radio') el.checked = data[el.name] === el.value;
+      else el.value = data[el.name];
+    });
+    var when = lsGet(KEY + ':submitted_at');
+    setStatus(when ? 'Restored your saved answers. Last submitted ' + new Date(when).toLocaleString() + '.' : 'Restored your saved answers from this browser.', false);
+  }
+  function save() { lsSet(KEY, JSON.stringify(collect())); }
+  FORM.addEventListener('input', save); FORM.addEventListener('change', save);
+  restore();
+
+  function setStatus(msg, ok) { var s = document.getElementById('status'); s.textContent = msg; s.className = 'status' + (ok ? ' ok' : ''); }
+
+  function structured() {
+    var d = collect(); var groups = [];
+    for (var i = 1; i <= TBODY.children.length; i++) {
+      var g = { n: i, name: d['g' + i + '_name'] || '', purpose: d['g' + i + '_purpose'] || '',
+        members: [d['g' + i + '_m_staff'] === 'yes' ? 'staff' : null, d['g' + i + '_m_partners'] === 'yes' ? 'external partners' : null, d['g' + i + '_m_customers'] === 'yes' ? 'customers' : null].filter(Boolean),
+        approx_members: d['g' + i + '_count'] || '', languages: d['g' + i + '_lang'] || '', sensitivity: d['g' + i + '_sens'] || '', export_history: d['g' + i + '_export'] || '', keep_monitoring: d['g' + i + '_monitor'] || '' };
+      var empty = !g.name && !g.purpose && !g.members.length && !g.approx_members && !g.languages && !g.sensitivity && !g.export_history && !g.keep_monitoring;
+      if (!empty) groups.push(g);
+    }
+    var q = function (k) { return d[k] || ''; };
+    return {
+      form: 'mbr-ai-group-inventory-and-owner-questionnaire', version: '1.1', exported_at: new Date().toISOString(),
+      respondent: { name: q('r_name'), date_completed: q('r_date') },
+      part1: { groups: groups, most_complete_history_phone: q('p1_phone'), groups_on_customer_number_or_with_customers: q('p1_customer') },
+      part2: {
+        q1_visible_member_ok: q('q1'), q1_note: q('q1_note'), q2_new_mbr_number: q('q2'), q2_note: q('q2_note'), q3_tell_external_partners: q('q3'),
+        q4_management_team: q('q4'), q5_manager_scopes: q('q5'), q6_who_may_change_permissions: q('q6'),
+        q7_staff_notice_form: q('q7'), q8_retention: q('q8'), q8_note: q('q8_note'), q9_person_or_team_first: q('q9'),
+        q10_accounts: q('q10_accounts'), q10_rights: q('q10_rights'), q11_other_calendars: q('q11'),
+        q12_budget_range: q('q12'), q13_pilot_risk_ok: q('q13_pilot'), q13_long_term_risk_ok: q('q13_long'), q13_note: q('q13_note'), q14_move_internal_chat: q('q14'),
+        q15_accounts: { instagram: q('q15_ig'), facebook: q('q15_fb'), google_business_profile: q('q15_gbp'), google_analytics: q('q15_ga'), website_analytics: q('q15_web') }, q15_who_grants: q('q15_note'),
+        q16_customer_number_port_consent: q('q16'), q16_note: q('q16_note') },
+      part3: { q17_tone: q('q17_tone'), q17_language: q('q17_lang'), q18_immediate_alerts: q('q18'), q19_daily_digest: q('q19_daily'), q19_weekly_digest: q('q19_weekly'), q19_quiet_hours: q('q19_quiet'), anything_else: q('extra') }
+    };
+  }
+  function summaryText(s) {
+    var L = [];
+    L.push('MBR AI — Group Inventory and Owner Questionnaire'); L.push('Respondent: ' + (s.respondent.name || '—') + '   Date: ' + (s.respondent.date_completed || '—') + '   Exported: ' + s.exported_at); L.push('');
+    L.push('PART 1 — Groups (' + s.part1.groups.length + ')');
+    s.part1.groups.forEach(function (g) { L.push('  ' + g.n + '. ' + (g.name || '(unnamed)') + ' — ' + (g.purpose || '—') + ' | members: ' + (g.members.join(', ') || '—') + ' | ~' + (g.approx_members || '?') + ' | ' + (g.languages || '—') + ' | sensitivity: ' + (g.sensitivity || '—') + ' | export: ' + (g.export_history || '—') + ' | monitor: ' + (g.keep_monitoring || '—')); });
+    L.push('  Most complete history phone: ' + (s.part1.most_complete_history_phone || '—')); L.push('  Groups on the customer number / with customers: ' + (s.part1.groups_on_customer_number_or_with_customers || '—')); L.push('');
+    L.push('PART 2 — Decisions'); var p = s.part2;
+    L.push('  1 Visible "MBR AI" member: ' + (p.q1_visible_member_ok || '—') + (p.q1_note ? ' (' + p.q1_note + ')' : ''));
+    L.push('  2 New MBR number: ' + (p.q2_new_mbr_number || '—') + (p.q2_note ? ' (' + p.q2_note + ')' : ''));
+    L.push('  3 Tell external partners: ' + (p.q3_tell_external_partners || '—'));
+    L.push('  4 Management team: ' + (p.q4_management_team || '—').replace(/\n/g, '; '));
+    L.push('  5 Manager scopes: ' + (p.q5_manager_scopes || '—').replace(/\n/g, '; '));
+    L.push('  6 Who may change permissions: ' + (p.q6_who_may_change_permissions || '—'));
+    L.push('  7 Staff notice form: ' + (p.q7_staff_notice_form || '—'));
+    L.push('  8 Retention: ' + (p.q8_retention || '—') + (p.q8_note ? ' (' + p.q8_note + ')' : ''));
+    L.push('  9 Per-person or team first: ' + (p.q9_person_or_team_first || '—'));
+    L.push(' 10 Calendar/mailbox: ' + (p.q10_accounts || '—') + ' | rights: ' + (p.q10_rights || '—'));
+    L.push(' 11 Other calendars: ' + (p.q11_other_calendars || '—'));
+    L.push(' 12 Budget range: ' + (p.q12_budget_range || '—'));
+    L.push(' 13 Risk: pilot ' + (p.q13_pilot_risk_ok || 'no') + ', long term ' + (p.q13_long_term_risk_ok || 'no') + (p.q13_note ? ' (' + p.q13_note + ')' : ''));
+    L.push(' 14 Move internal chat off WhatsApp: ' + (p.q14_move_internal_chat || '—'));
+    var acc = Object.keys(p.q15_accounts).filter(function (k) { return p.q15_accounts[k] === 'yes'; });
+    L.push(' 15 Marketing accounts: ' + (acc.join(', ') || '—') + ' | grants: ' + (p.q15_who_grants || '—'));
+    L.push(' 16 Customer number port: ' + (p.q16_customer_number_port_consent || '—') + (p.q16_note ? ' (' + p.q16_note + ')' : '')); L.push('');
+    L.push('PART 3 — Behaviour'); var t = s.part3;
+    L.push(' 17 Tone: ' + (t.q17_tone || '—') + ' | language: ' + (t.q17_language || '—'));
+    L.push(' 18 Immediate alerts: ' + (t.q18_immediate_alerts || '—').replace(/\n/g, '; '));
+    L.push(' 19 Daily: ' + (t.q19_daily_digest || '—') + ' | weekly: ' + (t.q19_weekly_digest || '—') + ' | quiet: ' + (t.q19_quiet_hours || '—'));
+    L.push(' Anything else: ' + (t.anything_else || '—').replace(/\n/g, '; '));
+    return L.join('\n');
+  }
+  function download(name, text, type) {
+    var blob = new Blob([text], { type: type }); var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 800);
+  }
+
+  /* Submission goes to a private MBR Connect inbox through its public inbox API. */
+  function cwPost(path, body) {
+    return fetch(CW.base + '/public/api/v1/inboxes/' + CW.inbox + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { if (!r.ok) { throw new Error('HTTP ' + r.status); } return r.json(); });
+  }
+  function ensureConversation(name) {
+    var sid = lsGet(KEY + ':cw_source'); var cid = lsGet(KEY + ':cw_conv');
+    var p = sid ? Promise.resolve(sid) : cwPost('/contacts', { name: name || 'MBR owner', identifier: 'mbr-ai-questionnaire-owner' }).then(function (c) { lsSet(KEY + ':cw_source', c.source_id); return c.source_id; });
+    return p.then(function (s) {
+      if (cid) return { sid: s, cid: cid };
+      return cwPost('/contacts/' + s + '/conversations', {}).then(function (conv) { lsSet(KEY + ':cw_conv', String(conv.id)); return { sid: s, cid: String(conv.id) }; });
+    });
+  }
+  function postMessage(ids, content) { return cwPost('/contacts/' + ids.sid + '/conversations/' + ids.cid + '/messages', { content: content }); }
+
+  document.getElementById('submit').addEventListener('click', function () {
+    var btn = this; var s = structured(); var sum = summaryText(s); s.summary_text = sum;
+    var n = parseInt(lsGet(KEY + ':cw_count') || '0', 10) + 1;
+    document.getElementById('summary').textContent = sum; document.getElementById('result').style.display = 'block';
+    btn.disabled = true; setStatus('Sending…', false);
+    ensureConversation(s.respondent.name)
+      .then(function (ids) { return postMessage(ids, (n > 1 ? 'UPDATE ' + n + '\n' : '') + sum).then(function () { return ids; }); })
+      .then(function (ids) { return postMessage(ids, 'JSON export' + (n > 1 ? ' (update ' + n + ')' : '') + ':\n```json\n' + JSON.stringify(s, null, 2) + '\n```'); })
+      .then(function () { lsSet(KEY + ':cw_count', String(n)); lsSet(KEY + ':submitted_at', new Date().toISOString()); setStatus('Submitted to the MBR AI team at ' + new Date().toLocaleString() + (n > 1 ? ' (update ' + n + ').' : '.') + ' Thank you.', true); })
+      .catch(function (e) { setStatus('Could not send (' + (e && e.message ? e.message : 'network error') + '). Your answers are saved in this browser: try again in a minute, or use "Keep a copy" and email the file to Fadi.', false); })
+      .then(function () { btn.disabled = false; document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  });
+  document.getElementById('download').addEventListener('click', function () {
+    var s = structured(); s.summary_text = summaryText(s); var date = new Date().toISOString().slice(0, 10);
+    try { download('MBR-AI-questionnaire-' + date + '.json', JSON.stringify(s, null, 2), 'application/json'); setStatus('Copy downloaded.', true); }
+    catch (e) { setStatus('Download blocked by the browser: use "Copy summary" instead.', false); }
+  });
+  document.getElementById('copy').addEventListener('click', function () {
+    var sum = summaryText(structured()); document.getElementById('summary').textContent = sum; document.getElementById('result').style.display = 'block';
+    var done = function () { setStatus('Summary copied to the clipboard.', true); };
+    var fail = function () { setStatus('Copy failed: select the summary text and copy it manually.', false); };
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(sum).then(done, fail); }
+    else { var ta = document.createElement('textarea'); ta.value = sum; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) { fail(); } document.body.removeChild(ta); }
+  });
+  document.getElementById('print').addEventListener('click', function () { window.print(); });
+  document.getElementById('clear').addEventListener('click', function () {
+    if (!confirm('Clear all answers on this page? Anything already submitted stays with the team.')) return;
+    lsDel(KEY); lsDel(KEY + ':submitted_at');
+    FORM.reset(); document.getElementById('r_name').value = 'Dr. Basel Kelzia'; document.getElementById('result').style.display = 'none'; setStatus('Cleared.', false);
+  });
+})();
+</script>
+</body>
+</html>
