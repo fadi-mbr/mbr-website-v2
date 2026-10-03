@@ -13,9 +13,10 @@ test('booking renders the isolated catalogue with no indexing or analytics', asy
   const response = await page.goto('/book');
   expect(response?.headers()['x-robots-tag']).toContain('noindex');
   await expect(page.getByRole('heading', { name: 'Book an appointment' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Staging inspection/ })).toBeVisible();
+  await expect(page.getByRole('radio', { name: /Staging inspection/ })).toBeVisible();
   await page.getByLabel('Email', { exact: false }).fill('invalid');
   await page.getByLabel('First name', { exact: false }).click();
+  await expect(page.getByText('Enter a valid email address.', { exact: true })).toBeVisible();
   expect(external.filter(url => /google-analytics|googletagmanager|vercel-insights/.test(url))).toEqual([]);
 });
 
