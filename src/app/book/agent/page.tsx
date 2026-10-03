@@ -1,3 +1,4 @@
+import { fetchServices } from '@/app/api/booking/_lib/arc-client';
 import { bookingSiteOrigin, isProductionDeployment } from '@/lib/runtime-environment';
 /**
  * /book/agent — Chatwoot Dashboard App entry point.
@@ -64,13 +65,13 @@ function splitName(name?: string): { firstName?: string; lastName?: string } {
 
 const deriveBaseUrl = bookingSiteOrigin;
 
-async function loadServices(baseUrl: string): Promise<BookingService[]> {
+async function loadServices(): Promise<BookingService[]> {
   try {
-    const r = await fetch(`${baseUrl}/api/booking/services`, {
-      cache: 'no-store',
-    });
-    if (!r.ok) return [];
-    return (await r.json()) as BookingService[];
+    // Server-side calls must not loop through protected preview HTTP URLs.
+    return (await fetchServices()).map(service => ({
+      ...service,
+      templateType: service.templateType ?? undefined,
+    }));
   } catch {
     return [];
   }
@@ -215,8 +216,7 @@ export default async function AgentBookingPage({ searchParams }: PageProps) {
   const prefill = projectPrefill(contact);
 
   // ----- Service catalogue.
-  const baseUrl = deriveBaseUrl();
-  const services = await loadServices(baseUrl);
+  const services = await loadServices();
 
   // ----- Server Action — invoked from the client form on submit.
   //

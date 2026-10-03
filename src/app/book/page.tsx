@@ -1,3 +1,4 @@
+import { fetchServices } from '@/app/api/booking/_lib/arc-client';
 import { bookingSiteOrigin } from '@/lib/runtime-environment';
 /**
  * /book — public booking page (v2).
@@ -36,21 +37,20 @@ export const runtime = 'nodejs';
 
 const deriveBaseUrl = bookingSiteOrigin;
 
-async function loadServices(baseUrl: string): Promise<BookingService[]> {
+async function loadServices(): Promise<BookingService[]> {
   try {
-    const r = await fetch(`${baseUrl}/api/booking/services`, {
-      cache: 'no-store',
-    });
-    if (!r.ok) return [];
-    return (await r.json()) as BookingService[];
+    // Server-side calls must not loop through protected preview HTTP URLs.
+    return (await fetchServices()).map(service => ({
+      ...service,
+      templateType: service.templateType ?? undefined,
+    }));
   } catch {
     return [];
   }
 }
 
 export default async function BookPage() {
-  const baseUrl = deriveBaseUrl();
-  const services = await loadServices(baseUrl);
+  const services = await loadServices();
 
   // Server Action — POSTs to /api/booking/request. Returns the same
   // discriminated `ServerActionResult` the form expects. For the public
