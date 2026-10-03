@@ -7,7 +7,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "test:booking": "npx --yes tsx src/app/api/booking/__tests__/run-all.ts"
+    "test:booking": "tsx src/app/api/booking/__tests__/run-all.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.7",
@@ -32,6 +33,10 @@
     "eslint-config-next": "^15.5.7",
     "sharp": "^0.34.5",
     "tailwindcss": "^4",
+    "tsx": "4.20.6",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }
