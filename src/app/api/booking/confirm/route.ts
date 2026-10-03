@@ -1,3 +1,4 @@
+import { bookingSigningSecret } from '@/lib/runtime-environment';
 /**
  * POST /api/booking/confirm — magic-link confirm endpoint.
  *
@@ -118,7 +119,7 @@ function scheduleDeferred(cb: () => Promise<void> | void): void {
 export async function POST(req: Request): Promise<NextResponse> {
   const t0 = Date.now();
 
-  const secret = process.env.BOOKING_TOKEN_SECRET;
+  const secret = bookingSigningSecret();
   if (!secret) {
     logBooking({
       event: 'booking.confirm.no_secret_configured',

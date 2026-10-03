@@ -1,3 +1,5 @@
+import { bookingSiteOrigin, isProductionDeployment } from '@/lib/runtime-environment';
+import { bookingSigningSecret } from '@/lib/runtime-environment';
 /**
  * POST /api/booking/request
  *
@@ -113,13 +115,7 @@ function readClientIp(req: Request): string {
   return '';
 }
 
-function deriveSiteUrl(): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, '');
-  }
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return 'https://mbrme.com';
-}
+const deriveSiteUrl = bookingSiteOrigin;
 
 // ---------------------------------------------------------------------------
 // Test seam — `after()` from next/server only runs inside a real request
@@ -378,7 +374,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     notes,
   };
 
-  const secret = process.env.BOOKING_TOKEN_SECRET;
+  const secret = bookingSigningSecret();
   if (!secret) {
     logBooking({
       event: 'booking.request.no_token_secret',
@@ -419,11 +415,12 @@ export async function POST(req: Request): Promise<NextResponse> {
   }
 
   // ----- 9. SMTP env presence (synchronous — fail fast on misconfig) ------
-  const smtpHost = process.env.BOOKING_SMTP_HOST;
-  const smtpPortRaw = process.env.BOOKING_SMTP_PORT;
-  const smtpUser = process.env.BOOKING_SMTP_USER;
-  const smtpPass = process.env.BOOKING_SMTP_PASSWORD;
-  const fromEmail = process.env.BOOKING_FROM_EMAIL;
+  const production = isProductionDeployment();
+  const smtpHost = production ? process.env.BOOKING_SMTP_HOST : 'capture.invalid';
+  const smtpPortRaw = production ? process.env.BOOKING_SMTP_PORT : '587';
+  const smtpUser = production ? process.env.BOOKING_SMTP_USER : 'capture';
+  const smtpPass = production ? process.env.BOOKING_SMTP_PASSWORD : 'capture';
+  const fromEmail = production ? process.env.BOOKING_FROM_EMAIL : 'booking@example.invalid';
   if (!smtpHost || !smtpPortRaw || !smtpUser || !smtpPass || !fromEmail) {
     logBooking({
       event: 'booking.request.no_smtp_configured',

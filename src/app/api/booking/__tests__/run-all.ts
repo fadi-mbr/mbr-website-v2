@@ -1,3 +1,4 @@
+import isolationSuite from './isolation.test';
 /**
  * Entry point for `npm run test:booking`.
  *
@@ -26,6 +27,9 @@ import carCatalogSuite from "./car-catalog.test";
 import uaePlatesSuite from "./uae-plates.test";
 
 async function main(): Promise<void> {
+  // Legacy suites mock all integration transports while exercising production branches.
+  process.env.MBR_RUNTIME_ENV = 'production';
+  delete process.env.VERCEL_ENV;
   await phoneSuite();
   await validateSuite();
   await rateLimitSuite();
@@ -44,6 +48,7 @@ async function main(): Promise<void> {
   await icsSuite();
   await carCatalogSuite();
   await uaePlatesSuite();
+  await isolationSuite();
   console.log("\nAll booking unit tests passed.");
 }
 

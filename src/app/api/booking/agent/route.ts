@@ -1,3 +1,4 @@
+import { isProductionDeployment } from '@/lib/runtime-environment';
 /**
  * POST /api/booking/agent
  *
@@ -171,7 +172,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   const t0 = Date.now();
 
   // ----- 1. Auth -------------------------------------------------------------
-  const expected = process.env.BOOKING_AGENT_SECRET;
+  const expected = isProductionDeployment() ? process.env.BOOKING_AGENT_SECRET : process.env.BOOKING_TEST_AGENT_SECRET;
   if (!expected) {
     logBooking({
       event: 'booking.agent.no_secret_configured',

@@ -1,3 +1,4 @@
+import { isProductionDeployment } from './src/lib/runtime-environment';
 import type { NextConfig } from "next";
 
 const securityHeaders = [
@@ -22,7 +23,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/:path*',
-        headers: securityHeaders,
+        headers: [...securityHeaders, ...(!isProductionDeployment() ? [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' }] : [])],
       },
       {
         source: '/book',

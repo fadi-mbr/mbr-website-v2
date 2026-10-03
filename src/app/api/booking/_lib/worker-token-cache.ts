@@ -1,3 +1,4 @@
+import { isProductionDeployment } from '@/lib/runtime-environment';
 /**
  * Per-instance cache for the ARC worker bearer token.
  *
@@ -35,6 +36,7 @@ const TTL_MS = 25 * 60 * 1000; // 25 minutes
 const SAFETY_MS = 60 * 1000; // refresh 1 min before expiry
 
 export async function getWorkerToken(): Promise<string> {
+  if (!isProductionDeployment()) return 'staging-fixture';
   if (cache && cache.expiresAt > Date.now() + SAFETY_MS) {
     return cache.token;
   }

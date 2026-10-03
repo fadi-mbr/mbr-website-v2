@@ -1,3 +1,4 @@
+import { isProductionDeployment } from './runtime-environment';
 /**
  * Post a "new booking — pending approval" notification into the MBR
  * Connect (Chatwoot) "Booking Notifications" inbox after a public booking
@@ -139,6 +140,7 @@ async function postJson<T = unknown>(
   timeoutMs = FETCH_TIMEOUT_MS,
 ): Promise<{ ok: true; status: number; data: T } | { ok: false; status: number; reason: string; data?: unknown }> {
   const url = `${cfg.baseUrl}/api/v1/accounts/${cfg.accountId}${path}`;
+  if (!isProductionDeployment()) return { ok: false, status: 0, reason: 'staging_delivery_disabled' };
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {

@@ -1,3 +1,4 @@
+import { isProductionDeployment, mockArcResponse } from '@/lib/runtime-environment';
 /**
  * ARC public-endpoint client for the mbrme.com booking flow.
  *
@@ -95,6 +96,7 @@ async function arcFetch(
   path: string,
   init: RequestInit & { qs?: Record<string, string | number> } = {}
 ): Promise<Response> {
+  if (!isProductionDeployment()) return mockArcResponse(path);
   const { qs, ...rest } = init;
   // ARC's shopToken (e.g. `b/AMKISNzrs/FF1ZqOg3ag==`) contains `/` and `=`
   // characters. The standard URL class percent-encodes those, and ARC's
@@ -172,6 +174,7 @@ function mapService(raw: ArcService): ServiceSummary {
 export async function fetchServices(opts: { fresh?: boolean } = {}): Promise<
   ServiceSummary[]
 > {
+  if (!isProductionDeployment()) opts = { ...opts, fresh: true };
   const now = Date.now();
   if (
     !opts.fresh &&
@@ -212,6 +215,7 @@ let cachedTimetable: { fetchedAt: number; data: ArcShopTimetable } | null = null
 export async function fetchTimetable(opts: {
   fresh?: boolean;
 } = {}): Promise<ArcShopTimetable> {
+  if (!isProductionDeployment()) opts = { ...opts, fresh: true };
   const now = Date.now();
   if (
     !opts.fresh &&
@@ -287,6 +291,7 @@ async function arcWorkerFetch(
     token?: string;
   } = {}
 ): Promise<Response> {
+  if (!isProductionDeployment()) return mockArcResponse(path);
   const { qs, token, ...rest } = init;
   const qsParts: string[] = [];
   if (qs) {

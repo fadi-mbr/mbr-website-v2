@@ -22,3 +22,30 @@ Names only; obtain values through the authorized service credential loader. Neve
 - `NODE_ENV`
 - `OPENAI_API_KEY`
 - `VERCEL_URL`
+
+## Deployment isolation (MBR-7)
+
+`VERCEL_ENV=production` selects live integrations on Vercel. Other Vercel
+values always select isolated fixtures, even with `MBR_RUNTIME_ENV=production`.
+Outside Vercel only an explicit `MBR_RUNTIME_ENV=production` enables live
+integrations. `NODE_ENV=production` alone never enables them.
+
+Preview/development use `BOOKING_TEST_TOKEN_SECRET` (a separate random hex
+secret, never equal to `BOOKING_TOKEN_SECRET`) and `BOOKING_TEST_AGENT_SECRET`.
+No ARC, SMTP or Chatwoot credentials are required. ARC catalogue, availability
+and submission use in-process fixtures; SMTP renders through nodemailer JSON
+transport and discards the result after completion, without opening a socket.
+Tests can inspect rendered mail through the existing test-only transport seam.
+There is no public mail/token inspection endpoint or durable staging inbox yet.
+Chatwoot calls fail closed with `staging_delivery_disabled`.
+
+Confirmation links and server-action destinations ignore copied production
+site configuration in nonproduction: they use `VERCEL_URL` or localhost:3005.
+All nonproduction responses carry `X-Robots-Tag: noindex, nofollow, noarchive`;
+GA and Vercel Analytics are omitted, and pages identify simulated bookings.
+
+Run `npm run test:browser` after `npx playwright install --with-deps chromium`.
+It starts an isolated Next server on port 3005 and uses only synthetic data.
+The browser suite does not establish live ARC readiness or cross-instance
+idempotency. Keep automatic branch deployment disabled until the remaining
+staging integration and protected-host acceptance checks are complete.

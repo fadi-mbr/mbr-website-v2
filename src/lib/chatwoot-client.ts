@@ -1,3 +1,4 @@
+import { isProductionDeployment } from './runtime-environment';
 /**
  * Thin server-side Chatwoot v1 API client.
  *
@@ -74,6 +75,7 @@ async function chatwootFetch<T>(
   init: RequestInit,
   timeoutMs: number = FETCH_TIMEOUT_MS
 ): Promise<ChatwootResult<T>> {
+  if (!isProductionDeployment()) return { ok: false, status: 0, reason: 'staging_delivery_disabled' };
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {

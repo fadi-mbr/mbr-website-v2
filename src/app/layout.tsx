@@ -1,3 +1,4 @@
+import { isProductionDeployment } from '@/lib/runtime-environment';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from 'next/script';
@@ -110,11 +111,12 @@ export default function RootLayout({
             __html: JSON.stringify(aggregateRatingSchema)
           }}
         />
+        {!isProductionDeployment() && <div role="status" className="fixed bottom-0 inset-x-0 z-[100] bg-amber-100 text-black text-center p-2 text-sm">Test environment: bookings are simulated. No messages are sent.</div>}
         {children}
         <FloatingWhatsAppButton />
         <CookieConsentBanner />
-        <ConditionalGoogleAnalytics />
-        <Analytics />
+        {isProductionDeployment() && <ConditionalGoogleAnalytics />}
+        {isProductionDeployment() && <Analytics />}
       </body>
     </html>
   );

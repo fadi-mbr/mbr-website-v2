@@ -1,3 +1,4 @@
+import { isProductionDeployment } from './runtime-environment';
 /**
  * Nodemailer wrapper — sends the pre-relationship "Confirm your booking" email
  * for the public booking flow over SMTP.
@@ -52,6 +53,7 @@ export interface ConfirmationEmailInput {
 export interface SendResult {
   ok: boolean;
   error?: string;
+  captured?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -74,6 +76,10 @@ export function _resetMailerForTests(): void {
 }
 
 function buildTransporter(smtp: SmtpConfig): TransporterLike {
+  // Nonproduction has no SMTP transport, even if production credentials leak into env.
+  if (!isProductionDeployment()) {
+    return injectedTransporter || nodemailer.createTransport({ jsonTransport: true });
+  }
   if (injectedTransporter) return injectedTransporter;
   return nodemailer.createTransport({
     host: smtp.host,
@@ -140,7 +146,7 @@ export async function sendConfirmationEmail(
         confirmUrl: input.confirmUrl,
       }),
     });
-    return { ok: true };
+    return { ok: true, ...(!isProductionDeployment() ? { captured: true } : {}) };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }

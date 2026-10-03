@@ -1,3 +1,4 @@
+import { bookingSiteOrigin, isProductionDeployment } from '@/lib/runtime-environment';
 /**
  * /book/agent — Chatwoot Dashboard App entry point.
  *
@@ -61,16 +62,7 @@ function splitName(name?: string): { firstName?: string; lastName?: string } {
   };
 }
 
-function deriveBaseUrl(): string {
-  // Vercel sets VERCEL_URL without protocol. Fall back to mbrme.com in
-  // production-like envs; localhost for `next dev`.
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, '');
-  }
-  if (process.env.NODE_ENV === 'production') return 'https://mbrme.com';
-  return 'http://localhost:3000';
-}
+const deriveBaseUrl = bookingSiteOrigin;
 
 async function loadServices(baseUrl: string): Promise<BookingService[]> {
   try {
@@ -234,7 +226,7 @@ export default async function AgentBookingPage({ searchParams }: PageProps) {
     payload: BookingSubmitPayload
   ): Promise<ServerActionResult> {
     'use server';
-    const secret = process.env.BOOKING_AGENT_SECRET;
+    const secret = isProductionDeployment() ? process.env.BOOKING_AGENT_SECRET : process.env.BOOKING_TEST_AGENT_SECRET;
     if (!secret) {
       return {
         ok: false,

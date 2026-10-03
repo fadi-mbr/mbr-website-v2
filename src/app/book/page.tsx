@@ -1,3 +1,4 @@
+import { bookingSiteOrigin } from '@/lib/runtime-environment';
 /**
  * /book — public booking page (v2).
  *
@@ -33,14 +34,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-function deriveBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, '');
-  }
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  if (process.env.NODE_ENV === 'production') return 'https://mbrme.com';
-  return 'http://localhost:3000';
-}
+const deriveBaseUrl = bookingSiteOrigin;
 
 async function loadServices(baseUrl: string): Promise<BookingService[]> {
   try {

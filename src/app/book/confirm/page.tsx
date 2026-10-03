@@ -1,3 +1,4 @@
+import { bookingSigningSecret } from '@/lib/runtime-environment';
 /**
  * /book/confirm — magic-link landing for the public booking flow.
  *
@@ -55,7 +56,7 @@ export default async function ConfirmPage({ searchParams }: PageProps) {
     );
   }
 
-  const secret = process.env.BOOKING_TOKEN_SECRET;
+  const secret = bookingSigningSecret();
   if (!secret) {
     return (
       <ConfirmErrorCard
