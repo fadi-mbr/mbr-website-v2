@@ -1,5 +1,6 @@
+import { POST as submitAgentBooking } from '@/app/api/booking/agent/route';
 import { fetchServices } from '@/app/api/booking/_lib/arc-client';
-import { bookingSiteOrigin, isProductionDeployment } from '@/lib/runtime-environment';
+import { isProductionDeployment } from '@/lib/runtime-environment';
 /**
  * /book/agent — Chatwoot Dashboard App entry point.
  *
@@ -12,11 +13,10 @@ import { bookingSiteOrigin, isProductionDeployment } from '@/lib/runtime-environ
  *   1) Read `contact_id` + `conversation_id` from the URL.
  *   2) Fetch the contact server-side via `chatwoot-client.fetchContact()`
  *      so the admin token never reaches the browser.
- *   3) Fetch the service catalogue server-side from the existing
- *      `/api/booking/services` route.
+ *   3) Fetch the service catalogue directly through the ARC client.
  *   4) Render <BookingForm mode="agent" prefill={...} services={...}
  *      serverAction={agentSubmit} /> where `agentSubmit` is a Server
- *      Action that POSTs to `/api/booking/agent` with the shared agent
+ *      Action that invokes the `/api/booking/agent` handler with the shared agent
  *      secret in the `x-mbr-agent-secret` header.
  *
  * The page is robots-noindex. The CSP `frame-ancestors 'self'
@@ -63,7 +63,6 @@ function splitName(name?: string): { firstName?: string; lastName?: string } {
   };
 }
 
-const deriveBaseUrl = bookingSiteOrigin;
 
 async function loadServices(): Promise<BookingService[]> {
   try {
@@ -235,11 +234,10 @@ export default async function AgentBookingPage({ searchParams }: PageProps) {
           'Booking agent endpoint is not configured. Contact the platform team.',
       };
     }
-    const actionBaseUrl = deriveBaseUrl();
     try {
-      const res = await fetch(`${actionBaseUrl}/api/booking/agent`, {
+      // Reuse the authenticated handler without an HTTP hop through preview SSO.
+      const res = await submitAgentBooking(new Request('http://internal.invalid/api/booking/agent', {
         method: 'POST',
-        cache: 'no-store',
         headers: {
           'content-type': 'application/json',
           'x-mbr-agent-secret': secret,
@@ -249,7 +247,7 @@ export default async function AgentBookingPage({ searchParams }: PageProps) {
           conversationId,
           contactId,
         }),
-      });
+      }));
       const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
       if (res.ok && data.ok === true) {
         return {

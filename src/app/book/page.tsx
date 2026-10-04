@@ -1,11 +1,12 @@
 import { fetchServices } from '@/app/api/booking/_lib/arc-client';
-import { bookingSiteOrigin } from '@/lib/runtime-environment';
+import { headers } from 'next/headers';
+import { POST as requestBooking } from '@/app/api/booking/request/route';
 /**
  * /book — public booking page (v2).
  *
  * Replaces the old multi-step wizard. Renders the single-screen
- * <BookingForm mode="public" /> with a Server Action that POSTs the
- * payload to `/api/booking/request`. The API signs a magic-link token and
+ * <BookingForm mode="public" /> with a Server Action that invokes the
+ * `/api/booking/request` handler directly. The API signs a magic-link token and
  * emails the customer; the form's success state tells them to check their
  * inbox.
  *
@@ -35,8 +36,6 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const deriveBaseUrl = bookingSiteOrigin;
-
 async function loadServices(): Promise<BookingService[]> {
   try {
     // Server-side calls must not loop through protected preview HTTP URLs.
@@ -52,21 +51,27 @@ async function loadServices(): Promise<BookingService[]> {
 export default async function BookPage() {
   const services = await loadServices();
 
-  // Server Action — POSTs to /api/booking/request. Returns the same
+  // Server Action — invokes the guarded request handler. Returns the same
   // discriminated `ServerActionResult` the form expects. For the public
   // path the success branch is `{ ok: true, pending: true, message }`.
   async function publicSubmit(
     payload: BookingSubmitPayload,
   ): Promise<ServerActionResult> {
     'use server';
-    const actionBaseUrl = deriveBaseUrl();
     try {
-      const res = await fetch(`${actionBaseUrl}/api/booking/request`, {
+      const incoming = await headers();
+      // Invoke the same guarded handler inside this request; protected previews
+      // reject unauthenticated HTTP self-fetches. Preserve the caller IP bucket.
+      const requestHeaders = new Headers({ 'content-type': 'application/json' });
+      for (const name of ['x-forwarded-for', 'x-real-ip']) {
+        const value = incoming.get(name);
+        if (value) requestHeaders.set(name, value);
+      }
+      const res = await requestBooking(new Request('http://internal.invalid/api/booking/request', {
         method: 'POST',
-        cache: 'no-store',
-        headers: { 'content-type': 'application/json' },
+        headers: requestHeaders,
         body: JSON.stringify(payload),
-      });
+      }));
       const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
       if (res.ok && data.ok === true) {
         return {
