@@ -1,3 +1,4 @@
+import cronSuite from './reviews-cron.test';
 import isolationSuite from './isolation.test';
 /**
  * Entry point for `npm run test:booking`.
@@ -49,6 +50,7 @@ async function main(): Promise<void> {
   await carCatalogSuite();
   await uaePlatesSuite();
   await isolationSuite();
+  await cronSuite();
   console.log("\nAll booking unit tests passed.");
 }
 
