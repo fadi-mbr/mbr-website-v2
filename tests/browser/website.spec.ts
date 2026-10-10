@@ -21,6 +21,8 @@ test('retired booking APIs cannot accept requests', async ({ request }) => {
 });
 
 test('preview is noindex and sitemap excludes booking', async ({ request }) => {
-  expect((await request.get('/')).headers()['x-robots-tag']).toContain('noindex');
+  const headers = (await request.get('/')).headers();
+  expect(headers['x-robots-tag']).toContain('noindex');
+  expect(headers['content-security-policy']).toBe("frame-ancestors 'self'");
   expect(await (await request.get('/sitemap.xml')).text()).not.toContain('/book');
 });

@@ -109,6 +109,15 @@ class DenylistTests(unittest.TestCase):
 
 # ---------------------------------------------------------------- chunking
 class ChunkingTests(unittest.TestCase):
+    def test_large_single_hunk_is_preserved_without_silent_truncation(self):
+        diff = file_diff("removed.py", "@@ -1,800 +0,0 @@\n" + "".join(f"-unique_line_{i} = {i}\n" for i in range(800)))
+        plan = review.plan_review(diff, [], max_total=100_000, chunk_chars=2_000, max_chunks=40)
+        self.assertFalse(plan.truncated)
+        sent = "".join(chunk.text for chunk in plan.chunks)
+        for i in range(800):
+            self.assertEqual(sent.count(f"unique_line_{i} = {i}\n"), 1)
+        self.assertGreater(len(plan.chunks), 1)
+
     def test_small_files_pack_into_one_chunk(self):
         d = "".join(file_diff("f%d.py" % i) for i in range(3))
         plan = review.plan_review(d, [], max_total=10_000, chunk_chars=5_000, max_chunks=4)

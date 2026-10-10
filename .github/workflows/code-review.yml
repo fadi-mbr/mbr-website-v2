@@ -18,7 +18,7 @@ jobs:
       - run: python3 -m unittest discover -s .github/actions/tm-code-review/tests -v
   code-review:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 260
     permissions:
       contents: read
       pull-requests: write
@@ -43,6 +43,8 @@ jobs:
           model: tier/code
           blocking: 'false'
           timeout: '95'
+          max-diff-chars: '2000000'
+          max-chunks: '160'
       - name: Enforce completed AI review
         env:
           EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}

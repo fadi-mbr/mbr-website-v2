@@ -155,9 +155,9 @@ class Config:
             model=env.get("CODE_REVIEW_MODEL") or DEFAULT_MODEL,
             max_tokens=min(_int(env, "CODE_REVIEW_MAX_TOKENS", 1500), 4000),
             timeout=_int(env, "CODE_REVIEW_TIMEOUT", 180),
-            max_diff_chars=min(_int(env, "CODE_REVIEW_MAX_DIFF_CHARS", 60_000), 200_000),
+            max_diff_chars=min(_int(env, "CODE_REVIEW_MAX_DIFF_CHARS", 60_000), 2_000_000),
             chunk_chars=_int(env, "CODE_REVIEW_CHUNK_CHARS", 12_000),
-            max_chunks=min(_int(env, "CODE_REVIEW_MAX_CHUNKS", 6), 20),
+            max_chunks=min(_int(env, "CODE_REVIEW_MAX_CHUNKS", 6), 160),
             exclude=[g.strip() for g in (env.get("CODE_REVIEW_EXCLUDE") or "").split(",") if g.strip()],
             blocking=(env.get("CODE_REVIEW_BLOCKING", "").lower() == "true"),
             block_severity=sev if sev in SEVERITIES else "critical",
@@ -304,8 +304,16 @@ def _file_units(f: FileDiff, chunk_chars: int) -> list:
     units, cur = [], ""
     budget = max(chunk_chars - len(header), 200)
     for h in hunks:
-        if len(h) > budget:
-            h = h[:budget - 40] + "\n     ... [hunk truncated for review budget]\n"
+        # Preserve every annotated character, including large deletion hunks.
+        # Each continuation repeats the file header; line numbers stay annotated.
+        while len(h) > budget:
+            if cur:
+                units.append(header + cur)
+                cur = ""
+            cut = h.rfind("\n", 0, budget)
+            cut = cut + 1 if cut >= 0 else budget
+            units.append(header + h[:cut])
+            h = h[cut:]
         if cur and len(cur) + len(h) > budget:
             units.append(header + cur)
             cur = ""

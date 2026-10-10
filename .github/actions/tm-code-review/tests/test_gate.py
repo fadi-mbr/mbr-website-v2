@@ -25,3 +25,12 @@ class GateTests(unittest.TestCase):
 
     def test_minor_findings_are_advisory(self):
         gate.verify(self.result(findings=[dict(severity='minor')]), 'head')
+
+    def test_missing_expected_or_reported_commit_blocks(self):
+        for expected in (None, ''):
+            with self.subTest(expected=expected), self.assertRaises(ValueError):
+                gate.verify(self.result(commit=expected), expected)
+        result = self.result()
+        del result['commit']
+        with self.assertRaises(ValueError):
+            gate.verify(result, 'head')

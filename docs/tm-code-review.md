@@ -41,3 +41,11 @@ Upstream unit tests cover auth rejection, connection failure, credential filteri
 ## Rollback and release scope
 
 Revert the CI integration PR to disable the workflow; revoke only this consumer's credentials through the secrets keeper if needed. This separate PR changes no website behavior. Booking removal remains in PR #71 at 15520b046b91afc1a59c4c7636467638fa7ed55c, with its recorded production approval. Do not merge either PR until its applicable GitHub gates pass. No production deployment is part of this CI change.
+
+## Large removal reviews
+
+The booking retirement diff exceeds the upstream 60,000-character / six-chunk default. This repository requests a bounded 2,000,000-character / 160-chunk review, retaining the same tier/code model and all fail-closed checks. The job has a 260-minute ceiling for 160 sequential 95-second requests plus overhead; normal completion should be much faster. No added exclusions. Lock/generated files and secret-like files retain the upstream exclusions.
+
+The local reviewer patch splits oversized hunks without discarding text; upstream previously silently shortened each oversized hunk. The offline booking-removal coverage audit includes 86 eligible files, approximately 705k annotated characters across 79 chunks, with no unreviewed files or truncation. This is a coverage-plan result, not completed model review.
+
+The first model pass incorrectly reported optional commit matching: gate.py already rejects empty expected IDs and mismatches. Regression now explicitly covers empty/missing IDs. The removed booking iframe exception is replaced by site-wide `frame-ancestors 'self'`, alongside the existing SAMEORIGIN header. Hosted model findings and website checks still govern merge.
