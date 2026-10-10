@@ -145,6 +145,8 @@ class Config:
     reasoning_effort: str = ""
     cf_access_id: str = ""
     cf_access_secret: str = ""
+    review_context: str = ""
+    mock_reply: str = ""
 
     @classmethod
     def from_env(cls, env) -> "Config":
@@ -493,10 +495,22 @@ class GatewayResult:
 
 
 def call_gateway(cfg: Config, chunk_text: str, paths) -> GatewayResult:
+    # Bounded recovery, never convert a failed or partial review into success.
+    for attempt in range(3):
+        result = _call_gateway_once(cfg, chunk_text, paths)
+        if result.ok or result.kind not in ("unavailable", "rate_limited"):
+            return result
+        log("gateway failure kind=%s detail=%s attempt=%d/3" % (result.kind, result.error, attempt + 1))
+        if attempt < 2:
+            time.sleep(5 * (2 ** attempt))
+    return result
+
+
+def _call_gateway_once(cfg: Config, chunk_text: str, paths) -> GatewayResult:
     body = {
         "model": cfg.model,
         "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": SYSTEM_PROMPT + ("\n\nTrusted change scope:\n" + cfg.review_context if cfg.review_context else "")},
             {"role": "user", "content": "Files in this part: %s\n\n```diff\n%s```" % (", ".join(paths), chunk_text)},
         ],
         "max_tokens": cfg.max_tokens,
@@ -515,7 +529,8 @@ def call_gateway(cfg: Config, chunk_text: str, paths) -> GatewayResult:
                                  method="POST", headers=headers)
     started = time.monotonic()
     try:
-        with urllib.request.urlopen(req, timeout=cfg.timeout) as resp:
+        opener = _mock_gateway(cfg.mock_reply) if cfg.mock_reply else urllib.request.urlopen
+        with opener(req, timeout=cfg.timeout) as resp:
             payload = json.loads(resp.read() or b"{}")
     except urllib.error.HTTPError as e:
         ms = int((time.monotonic() - started) * 1000)
@@ -531,6 +546,8 @@ def call_gateway(cfg: Config, chunk_text: str, paths) -> GatewayResult:
             return GatewayResult(False, "key", error="HTTP %d" % e.code, latency_ms=ms)
         if e.code in (400, 404) and "model" in detail:
             return GatewayResult(False, "model", error="HTTP %d model not permitted or unknown" % e.code, latency_ms=ms)
+        if e.code == 429:
+            return GatewayResult(False, "rate_limited", error="HTTP 429", latency_ms=ms)
         if e.code in (400, 413, 422):
             return GatewayResult(False, "bad_request", error="HTTP %d" % e.code, latency_ms=ms)
         return GatewayResult(False, "unavailable", error="HTTP %d" % e.code, latency_ms=ms)
@@ -574,6 +591,7 @@ class Outcome:
 
 REASONS = {
     "unavailable": "the gateway could not be reached or returned a server error",
+    "rate_limited": "the gateway rate limit persisted after bounded retries (HTTP 429)",
     "edge": "the Cloudflare edge refused the request before it reached the gateway",
     "key": "the gateway rejected the review key or access token (missing, expired or revoked)",
     "model": "the model is not on this project's key allow-list, or unknown",
@@ -593,6 +611,8 @@ def run_review(cfg: Config, diff: str) -> Outcome:
         return o
     findings, failures = [], []
     for i, chunk in enumerate(plan.chunks):
+        if i and not cfg.mock_reply:
+            time.sleep(3)  # below the shared 30 requests/minute route budget
         r = call_gateway(cfg, chunk.text, chunk.paths)
         o.latency_ms += r.latency_ms
         o.tokens_in += r.tokens_in
@@ -602,8 +622,10 @@ def run_review(cfg: Config, diff: str) -> Outcome:
             findings.extend(r.findings)
             continue
         failures.append(r.kind)
+        log("chunk=%d/%d failed kind=%s detail=%s" % (i + 1, len(plan.chunks), r.kind, r.error))
         # Stop early on errors that will repeat for every chunk; don't hammer a down gateway.
-        if r.kind in ("key", "model", "edge") or (r.kind == "unavailable" and o.chunks_ok == 0):
+        if r.kind in ("key", "model", "edge", "rate_limited", "unavailable"):
+            # Stop after bounded retries; downstream chunks remain unreviewed.
             break
     o.findings = dedupe(findings)
     if o.chunks_ok == 0:
@@ -855,9 +877,9 @@ def main(argv=None) -> int:
     env = os.environ
     cfg = Config.from_env(env)
     if args.mock_reply:
-        if not args.dry_run:
-            ap.error("--mock-reply requires --dry-run")
-        urllib.request.urlopen = _mock_gateway(args.mock_reply)  # type: ignore[assignment]
+        if not args.dry_run or not args.diff_file:
+            ap.error("--mock-reply requires --dry-run and --diff-file")
+        cfg.mock_reply = args.mock_reply
         cfg.key = cfg.key or "mock"
 
     gl, gh_ctx = None, github_context(env)
@@ -866,6 +888,21 @@ def main(argv=None) -> int:
         api = env.get("CI_API_V4_URL") or (env.get("CI_SERVER_URL", "").rstrip("/") + "/api/v4")
         gl = GitLab(api, env.get("CI_PROJECT_ID", ""), env["CI_MERGE_REQUEST_IID"], env["CODE_REVIEW_GITLAB_TOKEN"])
     poster = gl or gh
+    # Operator-inspected context bound to this repository, PR and baseline.
+    # Never ingest PR prose as trusted instructions, and never suppress findings.
+    if (gh and gh.repo == "fadi-mbr/mbr-website-v2" and gh.number == "71"
+            and gh_base == "1e58d0633d770eaa7c6c6949f8e1d39123a63c05"):
+        cfg.review_context = (
+            "The owner explicitly requested retirement of the entire website booking system. "
+            "Its pages, APIs, validation, tokens, email delivery, ARC/Chatwoot integrations and "
+            "booking tests are deliberately removed; implementation is preserved on "
+            "archive/booking-paused-2026-10-10. Removed booking behavior is not a regression. "
+            "Still report surviving references, broken contact/site behavior, security defects, "
+            "or unintended removals outside booking. Nonproduction integrations intentionally "
+            "return synthetic fixtures or reject writes. Production review reads remain required. "
+            "This PR also adds CI, preview isolation and a fail-closed required AI review gate. "
+            "Every changed file is still in scope; do not overlook defects in the new safeguards."
+        )
 
     try:
         if args.diff_file:

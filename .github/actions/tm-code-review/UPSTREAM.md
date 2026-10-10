@@ -11,4 +11,6 @@ Local action adjustment: check all three credentials and report missing provisio
 Run offline verification: `python3 -m unittest discover -s .github/actions/tm-code-review/tests -v`.
 
 Local coverage patch (October 10): preserve oversized hunks across chunks instead of silently truncating; raise configurable ceilings to 2,000,000 annotated characters / 160 chunks. Defaults remain unchanged. Regression verifies all 800 deleted lines appear exactly once.
-Current review.py SHA-256: 7d6edbe30accf5d27f183334bd2475300467df5c4e0865adf872a017124683a9.
+Current review.py SHA-256: 8458cb77a022afcfaa4880db8b73bf8f95b21148f7dc715215d7cc9bccb6a956.
+
+Local transport patch (October 10): three attempts with bounded 5/10-second backoff; 3-second inter-chunk pacing; explicit redacted HTTP 429 versus server/transport diagnostics; stop on persistent unavailability while retaining failed coverage. Owner-requested booking retirement context is bound to repository, PR 71 and main baseline and included in every model request. No exclusions or severity reductions. Dry-run mocks affect only the Gateway opener and require an explicit diff file. 68 offline tests run, 67 pass and one optional skip.
