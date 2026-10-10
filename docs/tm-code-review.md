@@ -1,3 +1,17 @@
+# Required AI review — October 10 owner decision
+
+Fadi requested AI review instead of a second human GitHub approver. The required `code-review` check replaces the one-person approval count; the five website checks, strict up-to-date checking, administrator enforcement, conversation resolution, force-push and deletion protections remain.
+
+The upstream reviewer still posts advisory findings. A separate pinned gate fails for missing reports/secrets, unavailable or partial review, stale commit, incomplete chunks, reported budget truncation, unreviewed files, and major/critical findings. Minor/info findings remain advisory. Forks, drafts and Dependabot cannot silently pass this required job; use a trusted same-repository branch for review. Filtered secret-like files and generated/lock files remain outside model coverage. AI review is not a guarantee of correctness.
+
+Publication still needs the concrete release approval. The workflow never deploys. To update the trusted reviewer, inspect and commit the action first, then update the immutable checkout pin in a second commit.
+
+The three Gateway secrets were provisioned and actual model access verified October 10. Missing credentials or cold-start timeout block merging; rerun after repair. No credentials belong in task comments or code.
+
+The notes below describe the earlier advisory-only setup and are superseded by this gate policy.
+
+---
+
 # TM AI Gateway review in GitHub CI
 
 The repository-local reviewer runs on pull_request only, uses tier/code, and updates one advisory PR comment. It does not count as an approving GitHub review and does not replace required checks or publication approval. Fork and Dependabot reviews are skipped without secrets. The secret-bearing job executes the inspected action at an immutable commit, not PR code. Review updates to that pin independently.
