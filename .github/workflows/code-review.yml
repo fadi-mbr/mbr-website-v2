@@ -1,0 +1,51 @@
+name: code-review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+concurrency:
+  group: code-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  reviewer-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - run: python3 -m unittest discover -s .github/actions/tm-code-review/tests -v
+  code-review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 260
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Require eligible review context
+        env:
+          ELIGIBLE: ${{ !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]' }}
+        run: test "$ELIGIBLE" = true
+      # Execute the inspected reviewer, never code from the PR being reviewed.
+      # Update this SHA only after reviewing changes to the vendored action.
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: cc774766bdf8224bcec08d2b4104fe442bd2bc6b
+          persist-credentials: false
+          sparse-checkout: .github/actions/tm-code-review
+      - uses: ./.github/actions/tm-code-review
+        with:
+          gateway-key: ${{ secrets.TM_CODE_REVIEW_GATEWAY_KEY }}
+          cf-access-client-id: ${{ secrets.TM_CODE_REVIEW_CF_ACCESS_ID }}
+          cf-access-client-secret: ${{ secrets.TM_CODE_REVIEW_CF_ACCESS_SECRET }}
+          gateway-url: https://llm-review.tmflix.com/v1
+          model: tier/code
+          blocking: 'false'
+          timeout: '95'
+          max-diff-chars: '2000000'
+          max-chunks: '160'
+      - name: Enforce completed AI review
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: python3 .github/actions/tm-code-review/gate.py "$RUNNER_TEMP/code-review.json" "$EXPECTED_HEAD"
