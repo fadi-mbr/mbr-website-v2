@@ -7,9 +7,10 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "test:booking": "tsx src/app/api/booking/__tests__/run-all.ts",
+    "test:booking": "npm run test:unit",
     "typecheck": "tsc --noEmit",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "test:unit": "tsx tests/unit/run-all.ts"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.7",
@@ -18,7 +19,6 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.16",
     "next": "^15.5.15",
-    "nodemailer": "^8.0.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0"
@@ -28,7 +28,6 @@
     "@playwright/test": "1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/nodemailer": "^8.0.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

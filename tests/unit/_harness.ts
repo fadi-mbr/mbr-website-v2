@@ -1,12 +1,12 @@
 /**
- * Zero-dependency test harness used by the booking unit-test files.
+ * Zero-dependency test harness used by the website unit-test files.
  *
  * Why hand-rolled? The website repo has no test runner (no vitest, jest,
  * or node:test wired up) and we don't want to add a dependency just for
  * a handful of pure-function tests. Each test file calls `runSuite()` and
  * gets a non-zero exit code on failure.
  *
- * Run all booking tests with:    npm run test:booking
+ * Run all website tests with:    npm run test:website
  */
 
 interface TestCase {

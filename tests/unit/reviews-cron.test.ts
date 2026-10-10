@@ -1,5 +1,5 @@
 import { runSuite, assert, assertEqual } from './_harness';
-import { GET, POST } from '../../cron/fetch-reviews/route';
+import { GET, POST } from '../../src/app/api/cron/fetch-reviews/route';
 
 export default async function cronSuite() {
   const saved = { ...process.env };

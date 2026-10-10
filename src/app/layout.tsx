@@ -111,7 +111,7 @@ export default function RootLayout({
             __html: JSON.stringify(aggregateRatingSchema)
           }}
         />
-        {!isProductionDeployment() && <div role="status" className="bg-amber-100 text-black text-center p-2 text-sm">Test environment: bookings are simulated. No messages are sent.</div>}
+        {!isProductionDeployment() && <div role="status" className="bg-amber-100 text-black text-center p-2 text-sm">Test environment</div>}
         {children}
         <FloatingWhatsAppButton />
         <CookieConsentBanner />

@@ -8,13 +8,12 @@ export default defineConfig({
   use: { baseURL: 'http://localhost:3005', headless: true },
   webServer: {
     command: 'npm run dev -- --port 3005',
-    url: 'http://localhost:3005/api/booking/health',
+    url: 'http://localhost:3005',
     reuseExistingServer: false,
     timeout: 120000,
     env: {
       VERCEL_ENV: 'development',
       MBR_RUNTIME_ENV: 'staging',
-      BOOKING_TEST_TOKEN_SECRET: 'b'.repeat(64),
       NEXT_TELEMETRY_DISABLED: '1',
     },
   },
