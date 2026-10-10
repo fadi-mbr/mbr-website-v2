@@ -1,0 +1,70 @@
+# tm code-review — GitHub Actions composite action (tm-ai-gateway P5 follow-up).
+# Same reviewer as the GitLab template (../review.py); it reaches the internal-only
+# gateway through the public review-only ingress llm-review.tmflix.com, which needs
+# BOTH a Cloudflare Access service token and a gateway virtual key.
+# Docs: tools/ci/code-review/README.md ("GitHub").
+name: tm code-review
+description: Advisory pull-request review via tm-llm-gateway; keeps one PR comment up to date.
+inputs:
+  gateway-key:
+    description: tm-llm-gateway virtual key (consumer code-review-github or a per-repo row)
+    required: true
+  cf-access-client-id:
+    description: Cloudflare Access service-token client id for llm-review.tmflix.com
+    required: true
+  cf-access-client-secret:
+    description: Cloudflare Access service-token client secret
+    required: true
+  github-token:
+    description: token that reads the PR diff and writes the comment (needs pull-requests write)
+    default: ${{ github.token }}
+  gateway-url:
+    default: https://llm-review.tmflix.com/v1
+  model:
+    default: tier/code
+  blocking:
+    default: "false"
+  block-severity:
+    default: critical
+  exclude:
+    description: extra comma-separated globs to skip
+    default: ""
+  max-tokens:
+    default: "1500"
+  max-diff-chars:
+    default: "60000"
+  max-chunks:
+    default: "6"
+  timeout:
+    description: seconds per gateway request (Cloudflare cuts a silent origin at about 100 s)
+    default: "95"
+runs:
+  using: composite
+  steps:
+    - name: Review
+      shell: bash
+      env:
+        CODE_REVIEW_GATEWAY_KEY: ${{ inputs.gateway-key }}
+        CODE_REVIEW_CF_ACCESS_CLIENT_ID: ${{ inputs.cf-access-client-id }}
+        CODE_REVIEW_CF_ACCESS_CLIENT_SECRET: ${{ inputs.cf-access-client-secret }}
+        CODE_REVIEW_GITHUB_TOKEN: ${{ inputs.github-token }}
+        CODE_REVIEW_GATEWAY_URL: ${{ inputs.gateway-url }}
+        CODE_REVIEW_MODEL: ${{ inputs.model }}
+        CODE_REVIEW_BLOCKING: ${{ inputs.blocking }}
+        CODE_REVIEW_BLOCK_SEVERITY: ${{ inputs.block-severity }}
+        CODE_REVIEW_EXCLUDE: ${{ inputs.exclude }}
+        CODE_REVIEW_MAX_TOKENS: ${{ inputs.max-tokens }}
+        CODE_REVIEW_MAX_DIFF_CHARS: ${{ inputs.max-diff-chars }}
+        CODE_REVIEW_MAX_CHUNKS: ${{ inputs.max-chunks }}
+        CODE_REVIEW_TIMEOUT: ${{ inputs.timeout }}
+      run: |
+        set -euo pipefail
+        # Fork PRs get no secrets: skip quietly instead of posting "review unavailable".
+        if [ -z "$CODE_REVIEW_GATEWAY_KEY" ] || [ -z "$CODE_REVIEW_CF_ACCESS_CLIENT_ID" ] || [ -z "$CODE_REVIEW_CF_ACCESS_CLIENT_SECRET" ]; then
+          echo "::warning::TM code review unavailable: required repository secrets are missing."
+          echo "TM code review unavailable: required repository secrets are missing; no review was performed." >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+        fi
+        script="$GITHUB_ACTION_PATH/review.py"                       # published action repo (flat)
+        [ -f "$script" ] || script="$GITHUB_ACTION_PATH/../review.py"  # ops-brain layout
+        python3 "$script" --json "$RUNNER_TEMP/code-review.json"
