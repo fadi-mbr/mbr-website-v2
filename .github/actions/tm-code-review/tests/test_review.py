@@ -237,6 +237,25 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual(seen[1]["cf-access-client-id"], "id")
         self.assertEqual(seen[1]["cf-access-client-secret"], "s")
 
+    def test_sends_own_user_agent(self):
+        seen = {}
+
+        def fake_urlopen(req, timeout=None):
+            seen["ua"] = req.get_header("User-agent")
+            return FakeResponse(200, chat_reply([]))
+
+        with mock.patch.object(review.urllib.request, "urlopen", fake_urlopen):
+            review.call_gateway(self.cfg(), "d", ["a.py"])
+        self.assertTrue(seen["ua"].startswith("tm-code-review/"))
+
+    def test_cloudflare_edge_refusal_is_not_reported_as_a_bad_key(self):
+        def edge(req, timeout=None):
+            raise urllib.error.HTTPError(req.full_url, 403, "Forbidden", {}, io.BytesIO(b"error code: 1010"))
+
+        with mock.patch.object(review.urllib.request, "urlopen", edge):
+            res = review.call_gateway(self.cfg(), "d", ["a.py"])
+        self.assertEqual(res.kind, "edge")
+
     def test_model_override(self):
         with mock.patch.object(review.urllib.request, "urlopen", lambda req, timeout=None: FakeResponse(200, chat_reply([]))):
             cfg = self.cfg(CODE_REVIEW_MODEL="gemini/flash")

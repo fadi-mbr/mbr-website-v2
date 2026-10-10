@@ -36,6 +36,9 @@ from dataclasses import dataclass, field
 MARKER = "<!-- tm-code-review:v1 -->"
 DEFAULT_GATEWAY = "https://llm.infra.tmflix.com/v1"
 DEFAULT_MODEL = "tier/code"
+# Cloudflare's Browser Integrity Check answers 403 (error 1010) to the default
+# "Python-urllib/3.x" agent, so the public review ingress needs our own name.
+USER_AGENT = "tm-code-review/1.1 (+https://git.tmflix.com/tmwhead/ops-brain)"
 
 SEVERITIES = ["critical", "major", "minor", "info"]  # most → least severe
 CATEGORIES = {"correctness", "security", "performance", "reliability", "maintainability", "other"}
@@ -495,7 +498,7 @@ def call_gateway(cfg: Config, chunk_text: str, paths) -> GatewayResult:
     }
     if cfg.reasoning_effort:
         body["reasoning_effort"] = cfg.reasoning_effort
-    headers = {"Content-Type": "application/json", "Authorization": "Bearer " + cfg.key}
+    headers = {"Content-Type": "application/json", "Authorization": "Bearer " + cfg.key, "User-Agent": USER_AGENT}
     if cfg.cf_access_id and cfg.cf_access_secret:
         # Public review ingress (llm-review.tmflix.com): Cloudflare Access service token at the edge.
         headers["CF-Access-Client-Id"] = cfg.cf_access_id
@@ -514,6 +517,8 @@ def call_gateway(cfg: Config, chunk_text: str, paths) -> GatewayResult:
             detail = ""
         finally:
             e.close()
+        if e.code in (401, 403) and "error code: 10" in detail:  # Cloudflare 1010/1020 etc.
+            return GatewayResult(False, "edge", error="HTTP %d cloudflare" % e.code, latency_ms=ms)
         if e.code in (401, 403):
             return GatewayResult(False, "key", error="HTTP %d" % e.code, latency_ms=ms)
         if e.code in (400, 404) and "model" in detail:
@@ -561,6 +566,7 @@ class Outcome:
 
 REASONS = {
     "unavailable": "the gateway could not be reached or returned a server error",
+    "edge": "the Cloudflare edge refused the request before it reached the gateway",
     "key": "the gateway rejected the review key or access token (missing, expired or revoked)",
     "model": "the model is not on this project's key allow-list, or unknown",
     "bad_request": "the gateway refused the request",
@@ -589,7 +595,7 @@ def run_review(cfg: Config, diff: str) -> Outcome:
             continue
         failures.append(r.kind)
         # Stop early on errors that will repeat for every chunk; don't hammer a down gateway.
-        if r.kind in ("key", "model") or (r.kind == "unavailable" and o.chunks_ok == 0):
+        if r.kind in ("key", "model", "edge") or (r.kind == "unavailable" and o.chunks_ok == 0):
             break
     o.findings = dedupe(findings)
     if o.chunks_ok == 0:
