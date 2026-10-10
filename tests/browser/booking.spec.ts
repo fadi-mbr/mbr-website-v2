@@ -46,6 +46,9 @@ test('public form submits through the server action and shows the pending-email 
   // against the isolated runtime configured in playwright.config.ts.
   await page.goto('/book');
   await page.getByRole('radio', { name: /Staging inspection/ }).click();
+  // Dismiss consent through the visible UI before interacting with lower fields.
+  await page.getByRole('button', { name: 'Reject All', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Reject All', exact: true })).toBeHidden();
   // Tomorrow avoids today's elapsed slots, independently of the runner timezone.
   await page.getByRole('group', { name: 'Booking day' }).getByRole('button').nth(1).click();
   await page.getByRole('list', { name: 'Available times' }).getByRole('button').first().click();
