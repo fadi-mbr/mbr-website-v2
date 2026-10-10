@@ -1,2 +1,4 @@
 import cronSuite from './reviews-cron.test';
-cronSuite().catch(error => { console.error(error); process.exit(1); });
+import stagingSuite from './staging.test';
+async function main() { await cronSuite(); await stagingSuite(); }
+main().catch(error => { console.error(error); process.exit(1); });
