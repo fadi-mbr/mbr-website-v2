@@ -28,9 +28,6 @@ export default function CookieConsentBanner() {
       // Show banner after a short delay
       const timer = setTimeout(() => setIsVisible(true), 1000);
       return () => clearTimeout(timer);
-    } else {
-      // User has already consented, don't show banner
-      setIsVisible(false);
     }
   }, []);
 

@@ -6,13 +6,14 @@ export default defineConfig({
   expect: { timeout: 15000 },
   retries: 0,
   use: {
-    baseURL: process.env.STAGING_URL || 'http://localhost:3005', headless: true,
+    launchOptions: { args: ['--disable-gpu'] },
+    baseURL: process.env.STAGING_URL || 'http://127.0.0.1:3005', headless: true,
     extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
       ? { 'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET } : {},
   },
   webServer: process.env.STAGING_URL ? undefined : {
-    command: 'npm run dev -- --port 3005',
-    url: 'http://localhost:3005',
+    command: 'npm run dev -- --hostname 127.0.0.1 --port 3005',
+    url: 'http://127.0.0.1:3005',
     reuseExistingServer: false,
     timeout: 120000,
     env: {

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { middleware } from '../../src/middleware';
+import { proxy } from '../../src/proxy';
 import { runSuite, assertEqual } from './_harness';
 
 export default async function stagingSuite() {
@@ -15,7 +15,7 @@ export default async function stagingSuite() {
     await runSuite('staging-isolation', [
       { name: 'read fixtures work without reaching providers', fn: async () => {
         for (const path of ['/api/google-reviews', '/api/location']) {
-          const response = middleware(new NextRequest(`https://preview.invalid${path}`));
+          const response = proxy(new NextRequest(`https://preview.invalid${path}`));
           assertEqual(response.status, 200);
           assertEqual((await response.json()).fixture, true);
         }
@@ -24,14 +24,14 @@ export default async function stagingSuite() {
       { name: 'refresh, selection and cron cannot run with copied credentials', fn: async () => {
         for (const path of ['/api/google-reviews', '/api/google-reviews/workflow', '/api/google-reviews/select', '/api/google-reviews/from-database', '/api/cron/fetch-reviews']) {
           for (const method of ['POST', 'PUT', 'DELETE']) {
-            assertEqual(middleware(new NextRequest(`https://preview.invalid${path}`, { method })).status, 403);
+            assertEqual(proxy(new NextRequest(`https://preview.invalid${path}`, { method })).status, 403);
           }
         }
         assertEqual(calls, 0);
       } },
       { name: 'production requests continue to existing handlers', fn: () => {
         process.env.VERCEL_ENV = 'production';
-        const response = middleware(new NextRequest('https://www.mbrme.com/api/google-reviews'));
+        const response = proxy(new NextRequest('https://www.mbrme.com/api/google-reviews'));
         assertEqual(response.headers.get('x-middleware-next'), '1');
       } },
     ]);

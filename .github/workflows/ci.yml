@@ -2,9 +2,9 @@ name: Website CI
 
 on:
   pull_request:
-    branches: [main]
-  push:
     branches: [main, chore/mbr-7-website-safeguards]
+  push:
+    branches: [main, chore/mbr-7-website-safeguards, feat/mbr-8-staging-refresh]
   workflow_dispatch:
 
 permissions:
@@ -48,8 +48,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
-          name: browser-failure-evidence
+          name: browser-evidence
           path: test-results/
           retention-days: 7

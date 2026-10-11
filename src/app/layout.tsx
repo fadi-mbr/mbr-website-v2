@@ -1,18 +1,20 @@
 import { isProductionDeployment } from '@/lib/runtime-environment';
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/react';
 import FloatingWhatsAppButton from "@/components/FloatingWhatsAppButton";
 import CookieConsentBanner from "@/components/CookieConsentBanner";
 import ConditionalGoogleAnalytics from "@/components/ConditionalGoogleAnalytics";
-import { autoRepairSchema, organizationSchema, aggregateRatingSchema } from '@/lib/structured-data';
+import { autoRepairSchema, organizationSchema } from '@/lib/structured-data';
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
+
+const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], weight: ["400"], style: ["italic"], display: "swap" });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -24,7 +26,7 @@ export const metadata: Metadata = {
   description: "Expert luxury car repair & premium auto service in Dubai, UAE. 15+ years experience servicing Mercedes, BMW, Audi, Porsche & all premium brands. Bosch authorized service center in Al Quoz. Expert technicians, genuine parts, warranty coverage.",
   keywords: "luxury car repair Dubai, premium car service UAE, Mercedes repair Dubai, BMW service Dubai, Audi maintenance Dubai, Porsche service Dubai, Range Rover repair Dubai, Lexus service Dubai, luxury auto service Dubai, premium car maintenance UAE, car service Al Quoz, auto repair Dubai, Bosch service center Dubai, luxury car diagnostics Dubai, premium vehicle repair UAE, Mercedes mechanic Dubai, BMW service center Dubai, Audi repair shop Dubai, Porsche maintenance Dubai, luxury car electrical repair Dubai, premium car suspension service Dubai, expert car mechanic Dubai, certified auto service Dubai, 15 years experience car repair Dubai, best luxury car service Dubai",
   authors: [{ name: "MBR Auto Services" }],
-  robots: "index, follow",
+  robots: isProductionDeployment() ? "index, follow" : "noindex, nofollow",
   alternates: {
     canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://mbrme.com",
   },
@@ -84,7 +86,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased`}
       >
         {/* Structured Data for SEO */}
         <Script
@@ -101,14 +103,6 @@ export default function RootLayout({
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationSchema)
-          }}
-        />
-        <Script
-          id="aggregate-rating-schema"
-          type="application/ld+json"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(aggregateRatingSchema)
           }}
         />
         {!isProductionDeployment() && <div role="status" className="bg-amber-100 text-black text-center p-2 text-sm">Test environment</div>}
