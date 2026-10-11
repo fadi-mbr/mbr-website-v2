@@ -49,3 +49,24 @@ The booking retirement diff exceeds the upstream 60,000-character / six-chunk de
 The local reviewer patch splits oversized hunks without discarding text; upstream previously silently shortened each oversized hunk. The offline booking-removal coverage audit includes 86 eligible files, approximately 705k annotated characters across 79 chunks, with no unreviewed files or truncation. This is a coverage-plan result, not completed model review.
 
 The first model pass incorrectly reported optional commit matching: gate.py already rejects empty expected IDs and mismatches. Regression now explicitly covers empty/missing IDs. The removed booking iframe exception is replaced by site-wide `frame-ancestors 'self'`, alongside the existing SAMEORIGIN header. Hosted model findings and website checks still govern merge.
+
+## October 11 response recovery
+
+Owner-approved recovery for refresh PR #73 retains the model, all file exclusions,
+coverage budgets and fail-closed gate. The failed original part 9 contains the tail
+of a split embedded SVG image payload. The raw failed response was not retained,
+so truncation is a hypothesis, not an established cause.
+
+The trusted prompt now explains partial hunks/lines and supplies dated,
+source-verified cross-file observations bound to PR #73 and its exact baseline.
+These observations are context, not finding waivers. Responses must meet the
+schema: missing fields, malformed findings and non-stop finish reasons cannot
+be counted as covered. Reported severity is preserved without coercion or
+confidence downgrades. Out-of-scope findings fail instead of disappearing.
+
+One invalid-response retry may request the same part with a 4,000-token ceiling;
+it stays inside the existing maximum of three requests per part. Valid findings
+are never retried. Diagnostics log finish reason, character count and token count,
+not response content. Persistent failure still blocks complete coverage. The
+operator commits and inspects this action before a separate immutable-pin commit,
+then requests one complete review. No merge or production release is authorized.
