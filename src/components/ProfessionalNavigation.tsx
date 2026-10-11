@@ -3,70 +3,59 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { trackWhatsAppClick, trackNavigation } from '@/lib/analytics';
+import { trackNavigation } from '@/lib/analytics';
 
-interface NavigationProps {
-  currentSection?: string;
-}
-
-const navigationItems = [
+/* Post-Wave-2 section ids:
+ *   - trusted-brands (BrandsStrip)
+ *   - services       (SophisticatedServices)
+ *   - workshop       (OurWorkshop)
+ *   - why-mbr        (WhyMbr)
+ *   - reviews        (SophisticatedReviews)
+ *   - contact        (ContactSection)
+ * The pre-revamp "about" and "team" anchors are gone — they were folded
+ * into Why MBR. The nav reflects the current information architecture. */
+/**
+ * Each item can be either a homepage anchor (id only) or a standalone
+ * route (href explicit). Anchors drive scroll-spy; routes don't.
+ */
+type NavItem = { id: string; label: string; href?: string };
+const navigationItems: NavItem[] = [
   { id: 'services', label: 'Services' },
+  { id: 'workshop', label: 'Workshop', href: '/workshop' },
+  { id: 'about', label: 'About', href: '/about' },
+  { id: 'why-mbr', label: 'Why MBR' },
   { id: 'reviews', label: 'Reviews' },
-  { id: 'about', label: 'About' },
-  { id: 'team', label: 'Team' },
   { id: 'contact', label: 'Contact' },
 ];
 
-export default function ProfessionalNavigation({ currentSection = 'home' }: NavigationProps) {
+export default function ProfessionalNavigation() {
   const menuButton = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
-  const pathname = usePathname();
-  const isHome = pathname === '/';
-  // On non-home pages, section anchors must route home first.
-  const hrefPrefix = isHome ? '' : '/';
 
   useEffect(() => {
-    // Suppress unused-var warning on `currentSection` (kept for API stability).
-    void currentSection;
-  }, [currentSection]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const dismiss = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false);
-        menuButton.current?.focus();
-      }
-    };
-    window.addEventListener('keydown', dismiss);
-    return () => window.removeEventListener('keydown', dismiss);
-  }, [isOpen]);
-
-  useEffect(() => {
-    // Section-scroll spy only makes sense on the home page.
-    if (!isHome) {
-      return;
-    }
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
 
-      // Detect active section based on scroll position
-      const sections = navigationItems.map(item => {
-        const element = document.getElementById(item.id);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          return {
-            id: item.id,
-            top: rect.top,
-            bottom: rect.bottom,
-          };
-        }
-        return null;
-      }).filter(Boolean);
+      // Detect active section based on scroll position. Only anchor-style
+      // items (no `href` override) participate in scroll-spy.
+      const sections = navigationItems
+        .filter(item => !item.href)
+        .map(item => {
+          const element = document.getElementById(item.id);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            return {
+              id: item.id,
+              top: rect.top,
+              bottom: rect.bottom,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
 
       const current = sections.find(
         section => section && section.top <= 100 && section.bottom >= 100
@@ -81,12 +70,20 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
 
     window.addEventListener('scroll', handleScroll);
     handleScroll(); // Initial check
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isHome]);
+  return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+    useEffect(() => {
+    if (!isOpen) return;
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setIsOpen(false); menuButton.current?.focus(); }
+    };
+    window.addEventListener('keydown', dismiss);
+    return () => window.removeEventListener('keydown', dismiss);
+  }, [isOpen]);
 
   return (
-    <motion.nav
-      aria-label="Main navigation"
+    <motion.nav aria-label="Main navigation"
       className={`nav-luxury-enhanced ${scrolled ? 'nav-scrolled' : ''}`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -103,11 +100,11 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
           >
             <Link href="/" className="flex-shrink-0 relative group">
             <Image
-              src="/images/Logo_horizontal.svg"
-              alt="MBR Making Better Rides - Premium Car Repair Dubai, Luxury Auto Service UAE"
-              width={140}
-              height={45}
-                className="h-8 w-auto opacity-95 transition-all duration-300 group-hover:opacity-100 group-hover:brightness-110"
+              src="/images/MBR_Logo_shield.svg"
+              alt="MBR Auto Services. Luxury and exotic-car workshop, Dubai"
+              width={56}
+              height={56}
+                className="w-12 h-12 md:w-14 md:h-14 opacity-95 transition-all duration-300 group-hover:opacity-100 group-hover:brightness-110"
               priority
             />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-red-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
@@ -124,7 +121,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                 transition={{ delay: index * 0.1 + 0.3, duration: 0.4 }}
               >
                 <Link
-                href={`${hrefPrefix}#${item.id}`}
+                href={item.href ?? `/#${item.id}`}
                   className={`nav-link-enhanced ${activeSection === item.id ? 'nav-link-active' : ''}`}
                   onClick={() => trackNavigation(item.id, 'desktop')}
               >
@@ -143,30 +140,33 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
             ))}
           </div>
 
-          {/* CTA Button */}
+          {/* Persistent Enquire CTA.
+              Anchors to the Contact section so the visitor picks their
+              channel (WhatsApp, live chat, call, email, visit). The
+              floating Chatwoot launcher remains available at all times
+              for one-click chat on desktop. */}
           <motion.div
             className="hidden md:block"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5, duration: 0.4 }}
           >
-            <a
-              href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small"
-              onClick={() => trackWhatsAppClick('navigation_desktop', 'Book Service')}
+            <Link
+              href="/#contact"
+              onClick={() => trackNavigation('contact', 'desktop_enquire')}
+              className="liquid-glass-btn liquid-glass-btn-primary liquid-glass-btn-small has-shimmer uppercase inline-block"
+              style={{ letterSpacing: '0.18em', fontSize: '0.78rem' }}
             >
-              Book Service
-            </a>
+              Enquire
+            </Link>
           </motion.div>
 
           {/* Mobile Menu Button */}
           <motion.button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 text-white hover:text-red-400 transition-colors relative z-50"
-            ref={menuButton}
             aria-label="Toggle menu"
+            ref={menuButton}
             aria-expanded={isOpen}
             aria-controls="site-navigation"
             whileTap={{ scale: 0.9 }}
@@ -222,7 +222,7 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                     transition={{ delay: index * 0.1, duration: 0.2 }}
                   >
                 <Link
-                  href={`${hrefPrefix}#${item.id}`}
+                  href={item.href ?? `/#${item.id}`}
                       className={`block nav-link-mobile ${activeSection === item.id ? 'nav-link-mobile-active' : ''}`}
                   onClick={() => {
                     setIsOpen(false);
@@ -240,18 +240,17 @@ export default function ProfessionalNavigation({ currentSection = 'home' }: Navi
                   transition={{ delay: 0.3, duration: 0.2 }}
                   className="pt-4"
                 >
-              <a
-                href="https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20premium%20automotive%20service"
-                target="_blank"
-                rel="noopener noreferrer"
-                    className="block liquid-glass-btn liquid-glass-btn-primary text-center"
+              <Link
+                href="/#contact"
+                className="block w-full liquid-glass-btn liquid-glass-btn-primary text-center has-shimmer uppercase"
+                style={{ letterSpacing: '0.18em', fontSize: '0.85rem' }}
                 onClick={() => {
                   setIsOpen(false);
-                  trackWhatsAppClick('navigation_mobile', 'Book Service');
+                  trackNavigation('contact', 'mobile_enquire');
                 }}
               >
-                Book Service
-              </a>
+                Enquire
+              </Link>
                 </motion.div>
             </div>
           </motion.div>

@@ -6,7 +6,7 @@ for (const width of [390, 768, 1440]) {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Expert Car Care in Dubai');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Service that lives up.*to the badge\./);
     await expect(page.getByRole('main')).toHaveCount(1);
     await page.locator('#reviews').scrollIntoViewIfNeeded();
     await expect(page.getByText('Staging test customer')).toBeVisible();
@@ -22,7 +22,13 @@ for (const width of [390, 768, 1440]) {
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await expect(page.locator('a[href^="/book"]')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Reject All', exact: true }).click();
+    for (const section of await page.locator('main section').all()) {
+      await section.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(250);
+    }
     await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(800);
     await page.screenshot({ path: testInfo.outputPath(`homepage-${width}.png`), fullPage: true });
     expect(errors).toEqual([]);
   });
@@ -64,3 +70,19 @@ test('cookie preferences stay readable and fit a mobile viewport', async ({ page
   await expect(banner).toHaveCount(0);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('mbr_cookie_consent')!).consent.analytics)).toBe(false);
 });
+
+for (const path of ['/about', '/workshop', '/privacy']) {
+  test(`recovered page ${path} remains usable`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', error => errors.push(error.message));
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('main')).toBeFocused();
+    await expect(page.locator('a[href^="/book"]')).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+}
