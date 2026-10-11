@@ -6,7 +6,7 @@ for (const width of [390, 768, 1440]) {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('For the loveof the drive.');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('MakingBetter Rides.');
     await expect(page.getByRole('main')).toHaveCount(1);
     await expect(page.getByText('Staging test customer')).toBeVisible();
     if (width <= 800) {
@@ -62,4 +62,18 @@ test('cookie preferences stay readable and fit a mobile viewport', async ({ page
   await banner.getByRole('button', { name: 'Reject All', exact: true }).click();
   await expect(banner).toHaveCount(0);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('mbr_cookie_consent')!).consent.analytics)).toBe(false);
+});
+
+test('workshop film is opt-in and fails with a readable fallback', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.addInitScript(() => {
+    HTMLMediaElement.prototype.play = () => Promise.reject(new Error('Film offline'));
+  });
+  await page.goto('/');
+  const film = page.locator('video');
+  await expect(film).not.toHaveAttribute('autoplay');
+  expect(await film.evaluate((element: HTMLVideoElement) => element.paused)).toBe(true);
+  await page.getByRole('button', { name: 'Watch workshop film' }).click();
+  await expect(page.getByRole('main').getByRole('status')).toHaveText('Film unavailable. Please try again later.');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 });
