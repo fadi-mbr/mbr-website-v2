@@ -31,7 +31,7 @@ jobs:
       # Update this SHA only after reviewing changes to the vendored action.
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: d180ebb069b82efa0a8e8c02f31713f0be183d3d
+          ref: 5e4c6a412c36bfc698ea67083161ae21a10a447e
           persist-credentials: false
           sparse-checkout: .github/actions/tm-code-review
       - uses: ./.github/actions/tm-code-review
