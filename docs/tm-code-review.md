@@ -6,6 +6,8 @@ The upstream reviewer still posts advisory findings. A separate pinned gate fail
 
 Publication still needs the concrete release approval. The workflow never deploys. To update the trusted reviewer, inspect and commit the action first, then update the immutable checkout pin in a second commit.
 
+The workflow retains the complete reviewer outcome JSON for 14 days, including after gate failure. Download the `code-review-<head SHA>-<attempt>` artifact to inspect every finding and the chunk/coverage metadata; the PR comment displays only the first 25 findings. The artifact contains the review outcome, not the source diff, request headers or credentials. Missing output still fails the enforcement step. Artifact retention does not change the trusted reviewer pin, severity policy or coverage requirements.
+
 The three Gateway secrets were provisioned and actual model access verified October 10. Missing credentials or cold-start timeout block merging; rerun after repair. No credentials belong in task comments or code.
 
 The notes below describe the earlier advisory-only setup and are superseded by this gate policy.
