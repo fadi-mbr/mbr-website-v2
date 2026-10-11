@@ -49,3 +49,11 @@ jobs:
         env:
           EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
         run: python3 .github/actions/tm-code-review/gate.py "$RUNNER_TEMP/code-review.json" "$EXPECTED_HEAD"
+      - name: Retain complete review findings and coverage
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: code-review-${{ github.event.pull_request.head.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/code-review.json
+          if-no-files-found: error
+          retention-days: 14

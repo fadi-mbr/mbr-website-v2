@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 // Check the actual rendered colors against the brightest possible image.
 // A photograph/video may change; caption legibility must not depend on it.

@@ -86,6 +86,15 @@ a credential on purpose.
 Severity: critical = outage, data loss, security breach; major = broken feature or likely bug;
 minor = edge case or future hazard; info = worth a look. Low confidence must not exceed minor.
 "line" is the new-file line number shown in the diff, or null. "file" is the path exactly as shown.
+For each finding, identify the changed surviving code, a concrete trigger or attacker-controlled
+input, and the resulting incorrect behavior. A deleted line is old behavior, not executable
+candidate code. A removed subsystem and its tests may be intentionally retired: use the trusted
+change scope; do not assume deleted callers still exist. If you cannot show a surviving caller,
+do not invent one. Do not assume control of runner-managed environment variables, the runner
+filesystem or deployment configuration without a demonstrated untrusted input path.
+Nonzero process exit is a failure, not successful bypass. A random diagnostic ID is not a
+session credential. Generic public errors with redacted internal telemetry are intentional.
+Still report real leakage, stale references, missing checks and defects in new safeguards.
 Prefer a short list of strong findings; an empty list is a valid answer.
 A part may begin or end mid-hunk or mid-line, including inside embedded SVG image data.
 Do not treat a partial file as the complete document or infer missing references from one part.

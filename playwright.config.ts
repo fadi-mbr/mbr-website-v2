@@ -8,8 +8,6 @@ export default defineConfig({
   use: {
     launchOptions: { args: ['--disable-gpu'] },
     baseURL: process.env.STAGING_URL || 'http://127.0.0.1:3005', headless: true,
-    extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
-      ? { 'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET } : {},
   },
   webServer: process.env.STAGING_URL ? undefined : {
     command: 'npm start -- --hostname 127.0.0.1 --port 3005',

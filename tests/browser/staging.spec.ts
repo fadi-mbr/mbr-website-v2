@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test('staging serves synthetic reads and blocks integration writes', async ({ request }) => {
   for (const path of ['/api/google-reviews', '/api/location']) {
