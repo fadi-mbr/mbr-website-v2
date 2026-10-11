@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface GoogleReview {
   author_name: string;
@@ -11,14 +11,12 @@ interface GoogleReview {
   time: number;
   profile_photo_url: string;
 }
-
 interface ReviewsData {
   overallRating: number;
   totalReviews: number;
   lastUpdated: string;
   reviews: GoogleReview[];
 }
-
 interface UseGoogleReviewsReturn {
   data: ReviewsData | null;
   loading: boolean;
@@ -30,59 +28,46 @@ export function useGoogleReviews(): UseGoogleReviewsReturn {
   const [data, setData] = useState<ReviewsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const request = useRef<AbortController | null>(null);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
+    request.current?.abort();
+    const controller = new AbortController();
+    request.current = controller;
     try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch('/api/google-reviews');
+      const response = await fetch('/api/google-reviews', { signal: controller.signal });
       const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to fetch reviews');
+      if (!response.ok || !result.success || !Array.isArray(result.data?.reviews)) {
+        throw new Error('Reviews are temporarily unavailable');
       }
-
-      if (result.success) {
-        // Data is already filtered to 5-star reviews by the API
-        // But totalReviews should remain the actual total from Google
+      if (!controller.signal.aborted) {
         setData(result.data);
-      } else {
-        throw new Error(result.error || 'API returned unsuccessful response');
+        setError(null);
       }
     } catch (err) {
-      console.error('Error fetching Google reviews:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
-
-      // Fallback to static data if API fails
-      setData({
-        overallRating: 4.8,
-        totalReviews: 883,
-        lastUpdated: new Date().toISOString(),
-        reviews: []
-      });
+      if (!controller.signal.aborted) {
+        setError(err instanceof Error ? err.message : 'Reviews are temporarily unavailable');
+        setData(null);
+      }
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
-  };
-
-  const refetch = async () => {
-    await fetchReviews();
-  };
-
-  useEffect(() => {
-    fetchReviews();
   }, []);
 
+  useEffect(() => {
+    // Start on a microtask; even synchronous fetch errors update state after the effect.
+    let active = true;
+    void Promise.resolve().then(() => { if (active) return fetchReviews(); });
+    return () => { active = false; request.current?.abort(); };
+  }, [fetchReviews]);
+
+  const refetch = async () => {
+    setLoading(true);
+    await fetchReviews();
+  };
   return { data, loading, error, refetch };
 }
 
-// Optional: Component wrapper for easy use
-interface GoogleReviewsProviderProps {
-  children: (props: UseGoogleReviewsReturn) => React.ReactNode;
-}
-
-export function GoogleReviewsProvider({ children }: GoogleReviewsProviderProps) {
-  const reviewsState = useGoogleReviews();
-  return <>{children(reviewsState)}</>;
+export function GoogleReviewsProvider({ children }: { children: (props: UseGoogleReviewsReturn) => React.ReactNode }) {
+  return <>{children(useGoogleReviews())}</>;
 }

@@ -28,9 +28,6 @@ export default function CookieConsentBanner() {
       // Show banner after a short delay
       const timer = setTimeout(() => setIsVisible(true), 1000);
       return () => clearTimeout(timer);
-    } else {
-      // User has already consented, don't show banner
-      setIsVisible(false);
     }
   }, []);
 
@@ -74,10 +71,12 @@ export default function CookieConsentBanner() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6"
+          role="region"
+          aria-label="Cookie consent"
+          className="fixed bottom-0 left-0 right-0 z-[60] p-4 md:p-6 max-h-[90dvh] overflow-y-auto"
         >
           <div className="container-luxury max-w-6xl mx-auto">
-            <div className="glass-card-premium p-6 md:p-8 relative">
+            <div className="bg-[#171c18] border border-white/20 shadow-2xl rounded-xl text-white p-6 md:p-8 relative">
               {/* Close button */}
               <button
                 onClick={() => setIsVisible(false)}
@@ -204,6 +203,7 @@ export default function CookieConsentBanner() {
                               : 'bg-white/20'
                           } relative`}
                           aria-label="Toggle analytics cookies"
+                          aria-pressed={consent.analytics}
                         >
                           <span
                             className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-300 ${
@@ -233,6 +233,7 @@ export default function CookieConsentBanner() {
                               : 'bg-white/20'
                           } relative`}
                           aria-label="Toggle marketing cookies"
+                          aria-pressed={consent.marketing}
                         >
                           <span
                             className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-300 ${
@@ -262,6 +263,7 @@ export default function CookieConsentBanner() {
                               : 'bg-white/20'
                           } relative`}
                           aria-label="Toggle preferences cookies"
+                          aria-pressed={consent.preferences}
                         >
                           <span
                             className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform duration-300 ${

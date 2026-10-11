@@ -74,16 +74,3 @@ export const organizationSchema = {
   ]
 };
 
-export const aggregateRatingSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "MBR Making Better Rides",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "reviewCount": "883",
-    "bestRating": "5",
-    "worstRating": "1"
-  }
-};
-

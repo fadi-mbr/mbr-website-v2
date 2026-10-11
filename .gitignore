@@ -46,3 +46,6 @@ data/reviews-database.json
 # Browser regression output
 /test-results/
 /playwright-report/
+
+# Local process crash dumps
+core.*

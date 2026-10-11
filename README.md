@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MBR Auto Services website
 
-## Getting Started
+Next.js App Router website for MBR in Dubai. Node 22 (`.nvmrc`), React 19 and Tailwind 4. Public production: https://www.mbrme.com. Protected staging: https://mbr-website-staging.vercel.app.
 
-First, run the development server:
+## Develop and verify
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```sh
+npm ci
+npm run dev -- --port 3005
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run build
+npm run test:browser
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install Playwright Chromium and its OS libraries before browser tests (`npx playwright install --with-deps chromium`). Tests start the built application in an isolated local server; run the build first. `STAGING_URL` optionally tests a deployed preview; any temporary bypass token belongs only in the runner environment.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Local and preview environments use synthetic review/location data and block integration writes. Do not copy production credentials locally. See [environment rules](docs/environment.md), [parked booking](docs/booking-parked.md), [required AI review](docs/tm-code-review.md) and [refresh implementation](docs/staging-refresh.md).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Homepage components: `src/components/site`; shared content: `src/lib/site-content.ts`; environment boundary: `src/proxy.ts`. Old `PHASE_TRACKING.md` and portions of `CLAUDE.md` describe historical design experiments, not the current release process.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Work in isolated feature branches, pass required CI and AI review, then prepare a protected staging candidate. Main and public-domain promotion require their applicable release gates and owner authorization. Historical dev and booking archive are preserved.

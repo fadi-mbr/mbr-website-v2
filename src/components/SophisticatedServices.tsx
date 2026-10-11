@@ -1,242 +1,300 @@
 "use client";
 
 import React from 'react';
-import { motion, Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { FaArrowRight, FaWhatsapp, FaCogs, FaBolt, FaWrench, FaOilCan } from 'react-icons/fa';
-import { trackWhatsAppClick, trackServiceClick } from '@/lib/analytics';
+import Link from 'next/link';
+import {
+  FaCalendarAlt,
+  FaWhatsapp,
+  FaCogs,
+  FaBolt,
+  FaWrench,
+  FaOilCan,
+} from 'react-icons/fa';
+import type { IconType } from 'react-icons';
+import { trackServiceClick } from '@/lib/analytics';
+import { triggerChat } from '@/lib/chat-cta';
+import SectionMarker from './SectionMarker';
+import PremiumBrandsCarousel from './PremiumBrandsCarousel';
 
-const services = [
+type ServiceSlab = {
+  title: string;
+  subtitle: string;
+  tiers: string[];
+  description: string;
+  features: string[];
+  image: string;
+  icon: IconType;
+  externalLink?: { url: string; label: string };
+};
+
+const services: ServiceSlab[] = [
   {
-    title: "Mechanical Repairs",
-    subtitle: "Engine & Transmission",
-    description: "Complete mechanical solutions from engine diagnostics to transmission rebuilds. Our certified technicians handle everything from routine maintenance to complex repairs with precision and expertise.",
-    features: ["Engine Diagnostics", "Transmission Service", "Brake Systems", "Clutch Repair"],
-    image: "/images/mbr_mechanic.webp",
+    title: 'Mechanical Repairs',
+    subtitle: 'Engine & Transmission',
+    tiers: ['Supercar', 'Ultra-Luxury', 'Luxury & Sport'],
+    description:
+      'Engine, transmission, clutch and brake work for Ferrari, Lamborghini, Porsche and the wider luxury lineup. Routine service to full rebuilds, carried out with OEM-level tooling and genuine parts.',
+    features: [
+      'Engine Diagnostics',
+      'Transmission Service',
+      'Brake Systems',
+      'Clutch Repair',
+    ],
+    image: '/images/mbr_mechanic.webp',
     icon: FaCogs,
-    color: "from-blue-600/20 to-blue-800/20"
   },
   {
-    title: "Electrical & Diagnostics",
-    subtitle: "Advanced Systems",
-    description: "State-of-the-art diagnostic equipment for all electrical systems. From battery issues to complex ECU problems, we diagnose and repair with manufacturer-level precision.",
-    features: ["ECU Diagnostics", "Battery & Alternator", "Wiring Repair", "Computer Systems"],
-    image: "/images/mbr_electrical.webp",
+    title: 'Electrical & Diagnostics',
+    subtitle: 'Advanced & Exotic Systems',
+    tiers: ['Supercar', 'Ultra-Luxury'],
+    description:
+      'OEM-level diagnostic equipment for every electrical system, including the Leonardo platform purpose-built for Ferrari, Lamborghini and the wider exotic-car lineup. From battery and alternator work to deep ECU diagnostics, we read, code and repair to manufacturer-level precision.',
+    features: [
+      'Leonardo Exotic Diagnostics',
+      'ECU Coding & Reset',
+      'Battery & Alternator',
+      'Wiring & Comfort Systems',
+    ],
+    image: '/images/mbr_electrical.webp',
     icon: FaBolt,
-    color: "from-yellow-600/20 to-orange-600/20"
+    externalLink: {
+      url: 'https://www.leonardodiagnostictool.com/',
+      label: 'About the Leonardo platform',
+    },
   },
   {
-    title: "Suspension & Steering",
-    subtitle: "Precision Handling",
-    description: "Professional wheel alignment, suspension tuning, and steering system services. Experience smooth, controlled driving with our precision alignment and suspension expertise.",
-    features: ["Wheel Alignment", "Shock Absorbers", "Steering Systems", "Suspension Tuning"],
-    image: "/images/mbr_suspension.webp",
+    title: 'Suspension & Steering',
+    subtitle: 'Precision Handling',
+    tiers: ['Supercar', 'Ultra-Luxury'],
+    description:
+      'Air-suspension service, alignment, ride-height calibration and steering work for ultra-luxury and supercar chassis. The fine handling owners pay for, recovered and preserved.',
+    features: [
+      'Wheel Alignment',
+      'Air Suspension',
+      'Steering Systems',
+      'Suspension Tuning',
+    ],
+    image: '/images/mbr_suspension.webp',
     icon: FaWrench,
-    color: "from-purple-600/20 to-indigo-600/20"
   },
   {
-    title: "Maintenance Services",
-    subtitle: "Preventive Care",
-    description: "Comprehensive vehicle maintenance to keep your car running at peak performance. Regular service intervals, quality parts, and detailed inspections for long-term reliability.",
-    features: ["Oil Changes", "AC Service", "Filter Replacement", "Fluid Checks"],
-    image: "/images/mbr_maintainence.webp",
+    title: 'Preventive Maintenance',
+    subtitle: 'Scheduled Care',
+    tiers: ['Supercar', 'Ultra-Luxury', 'Luxury & Sport'],
+    description:
+      'Manufacturer-schedule servicing, fluid changes, AC service and pre-purchase inspections for luxury and exotic vehicles. Detailed inspections, transparent pricing, full service history.',
+    features: [
+      'Oil & Fluid Service',
+      'AC Service',
+      'Filter Replacement',
+      'Pre-purchase Inspections',
+    ],
+    image: '/images/mbr_maintainence.webp',
     icon: FaOilCan,
-    color: "from-green-600/20 to-emerald-600/20"
-  }
+  },
 ];
 
-export default function SophisticatedServices() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: [0.4, 0, 0.2, 1] as [number, number, number, number]
-      }
-    }
-  };
+function ServiceSlabRow({
+  service,
+  index,
+}: {
+  service: ServiceSlab;
+  index: number;
+}) {
+  const flipped = index % 2 === 1; // odd rows reverse layout
+  const sourceKey = `service_card_${service.title.toLowerCase().replace(/\s+/g, '_')}`;
+  const Icon = service.icon;
 
   return (
-    <section id="services" className="relative py-24 bg-black overflow-hidden vibrant-bg-gradient">
+    <motion.article
+      className="group grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+    >
+      {/* Image */}
+      <div
+        className={`lg:col-span-7 relative overflow-hidden rounded-2xl border border-white/10 ${
+          flipped ? 'lg:order-2' : ''
+        }`}
+      >
+        <div className="relative aspect-[16/10]">
+          <Image
+            src={service.image}
+            alt={`${service.title}. ${service.subtitle}. MBR Auto Services Dubai`}
+            fill
+            sizes="(min-width: 1024px) 54vw, (min-width: 768px) 90vw, 100vw"
+            // Phase C perf: first slab is above-the-fold on desktop;
+            // prioritise its decode. Subsequent slabs lazy-load.
+            priority={index === 0}
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          />
+          {/* Bottom gradient for caption legibility + subtle red wash from
+              the trailing corner — anchors the brand without being loud. */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,0.65) 100%), radial-gradient(circle at 100% 100%, rgba(227,6,19,0.18) 0%, transparent 50%)',
+            }}
+          />
 
-      {/* Background Elements - Enhanced */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-600/5 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative container-luxury">
-
-        {/* Section Header */}
-        <motion.div
-          className="text-center mb-20"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-display font-light gradient-text mb-8 tracking-tight">
-            Premium Services
-          </h2>
-          <p className="text-subheading text-body-enhanced max-w-3xl mx-auto leading-relaxed">
-            Comprehensive automotive solutions backed by 15+ years of expertise,
-            certified technicians, and state-of-the-art equipment.
-          </p>
-        </motion.div>
-
-        {/* Services Grid */}
-        <motion.div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          {services.map((service, index) => (
-            <motion.div
-              key={service.title}
-              className="group"
-              variants={itemVariants}
-              whileHover={{ y: -10 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="relative overflow-hidden glass-card glass-shimmer hover:glow-red transition-all duration-500">
-
-                {/* Service Image */}
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src={service.image}
-                    alt={`${service.title} - ${service.subtitle} | Premium Car Service Dubai, UAE | MBR Auto Services`}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-
-                  {/* Gradient Overlay */}
-                  <div className={`absolute inset-0 bg-gradient-to-t ${service.color} to-transparent opacity-60`} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-                  {/* Service Icon */}
-                  <div className="absolute top-6 left-6">
-                    <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:bg-red-600/20 group-hover:border-red-500/40 group-hover:glow-red transition-all duration-300">
-                      <service.icon className="w-6 h-6 text-white group-hover:text-red-400 transition-colors duration-300" />
-                    </div>
-                  </div>
-
-                  {/* Quick Action */}
-                  <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <a
-                      href={`https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20${encodeURIComponent(service.title.toLowerCase())}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center hover:bg-green-500 transition-colors duration-300"
-                      onClick={() => {
-                        trackWhatsAppClick('services_sophisticated_quick', '', service.title);
-                        trackServiceClick(service.title, service.title, 'whatsapp_quick');
-                      }}
-                    >
-                      <FaWhatsapp className="w-6 h-6 text-white" />
-                    </a>
-                  </div>
-                </div>
-
-                {/* Service Content */}
-                <div className="p-8 glass-content">
-                  <div className="mb-6">
-                    <h3 className="text-2xl font-light text-white mb-2">
-                      {service.title}
-                    </h3>
-                    <p className="text-red-400 font-medium text-sm uppercase tracking-wider">
-                      {service.subtitle}
-                    </p>
-                  </div>
-
-                  <p className="text-body-enhanced leading-relaxed mb-6">
-                    {service.description}
-                  </p>
-
-                  {/* Features */}
-                  <div className="grid grid-cols-2 gap-3 mb-8">
-                    {service.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center text-sm text-muted-enhanced">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-600 mr-3"></div>
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <a
-                      href={`https://wa.me/+971565015800?text=Hello%20MBR,%20I%20need%20${encodeURIComponent(service.title.toLowerCase())}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 liquid-glass-btn liquid-glass-btn-primary"
-                      onClick={() => {
-                        trackWhatsAppClick('services_sophisticated', 'Book Service', service.title);
-                        trackServiceClick(service.title, service.title, 'whatsapp');
-                      }}
-                    >
-                      Book Service
-                    </a>
-
-                    <button className="flex-1 liquid-glass-btn liquid-glass-btn-secondary flex items-center justify-center space-x-2">
-                      <span>Learn More</span>
-                      <FaArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Bosch Partnership - Enhanced */}
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-          viewport={{ once: true }}
-        >
-          <div className="inline-flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8 glass-card-premium p-6 md:p-8">
-            <Image
-              src="/images/Bosch_Logo24.webp"
-              alt="Bosch Authorized Service Partner - Certified Premium Car Service Dubai, UAE | MBR Auto Services"
-              width={120}
-              height={60}
-              className="opacity-80"
-            />
-            <div className="text-center md:text-left">
-              <h3 className="text-2xl font-light text-white mb-3">
-                Bosch Authorized Service Partner
-              </h3>
-              <p className="text-muted-enhanced mb-4">
-                Certified quality, genuine parts, and manufacturer-level diagnostics
-              </p>
-              <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-6 text-sm text-subtle-enhanced">
-                <span>• Genuine Parts</span>
-                <span>• Certified Technicians</span>
-                <span>• Warranty Coverage</span>
-              </div>
+          {/* Icon medallion */}
+          <div className="absolute top-6 left-6">
+            <div className="w-12 h-12 rounded-full bg-black/85 backdrop-blur-md border border-white/15 flex items-center justify-center transition-all duration-300 group-hover:border-[var(--primary)]/60 group-hover:glow-red">
+              <Icon className="w-5 h-5 text-white group-hover:text-[var(--text-brand-red)] transition-colors" />
             </div>
           </div>
-        </motion.div>
 
+          {/* Service number watermark — Fraunces serif numeral, oversized,
+              subtle. Renders like a chapter mark on a photo, not a stamped
+              chassis number. */}
+          <div className="absolute bottom-4 right-6 media-caption rounded px-2 py-1 font-display text-white select-none text-5xl md:text-6xl font-light leading-none">
+            {String(index + 1).padStart(2, '0')}
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div
+        className={`lg:col-span-5 ${flipped ? 'lg:order-1 lg:text-right' : ''}`}
+      >
+        {/* Tier eyebrow */}
+        <p
+          className={`text-eyebrow mb-4 ${flipped ? 'lg:justify-end' : ''}`}
+        >
+          {service.tiers.join(' · ')}
+        </p>
+
+        {/* Title (serif) + subtitle (sans, sub-deck) */}
+        <h3 className="font-display text-3xl md:text-4xl lg:text-5xl font-light text-white leading-[1.1] tracking-[-0.02em] mb-3">
+          {service.title}
+        </h3>
+        <p className="text-xs md:text-sm uppercase text-[var(--accent-bronze)] mb-5 tracking-[0.2em] font-medium">
+          {service.subtitle}
+        </p>
+
+        {/* Body */}
+        <p className="text-body text-[var(--text-body)] leading-relaxed mb-6">
+          {service.description}
+        </p>
+
+        {/* Feature list — bullets always lead the text (LTR reading order).
+            On flipped slabs the whole row is right-aligned but each
+            <li> keeps bullet-then-text so the eye doesn't read it as RTL. */}
+        <ul
+          className={`grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 mb-7 text-sm text-[var(--text-muted)] ${
+            flipped ? 'lg:[&_li]:justify-end' : ''
+          }`}
+        >
+          {service.features.map((f) => (
+            <li key={f} className="flex items-center gap-3">
+              <span
+                className="block w-1.5 h-1.5 rounded-full bg-[var(--primary)] flex-shrink-0"
+                style={{ boxShadow: '0 0 8px rgba(227,6,19,0.55)' }}
+                aria-hidden="true"
+              />
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* External reference (Leonardo, etc.) — arrow always trails the
+            label so it reads left-to-right regardless of slab side. */}
+        {service.externalLink && (
+          <a
+            href={service.externalLink.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-eyebrow text-[var(--text-muted)] hover:text-white transition-colors mb-7"
+          >
+            <span>{service.externalLink.label}</span>
+            <span className="ml-2" aria-hidden="true">
+              →
+            </span>
+          </a>
+        )}
+
+        {/* CTAs */}
+        <div
+          className={`flex flex-col sm:flex-row gap-3 ${
+            flipped ? 'lg:justify-end' : ''
+          }`}
+        >
+          <button
+            type="button"
+            className="liquid-glass-btn liquid-glass-btn-primary inline-flex items-center justify-center gap-2"
+            onClick={() => {
+              trackServiceClick(service.title, service.title, 'chat');
+              triggerChat(
+                sourceKey,
+                `Hello MBR, I need ${service.title.toLowerCase()}`,
+              );
+            }}
+          >
+            <FaWhatsapp className="w-4 h-4" />
+            <span>Chat with us</span>
+          </button>
+
+          <Link
+            href="/#contact"
+            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm tracking-wide text-[var(--text-body)] hover:text-white border border-[var(--accent-bronze)]/40 hover:border-[var(--accent-bronze)] hover:bg-[var(--accent-bronze)]/10 transition-all duration-300"
+            onClick={() => trackServiceClick(service.title, service.title, 'book_link')}
+          >
+            <FaCalendarAlt className="w-3.5 h-3.5" />
+            <span>Enquire</span>
+          </Link>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+export default function SophisticatedServices() {
+  // Carousel ribbon sits between slabs 2 and 3 — anchors the brand
+  // hierarchy mid-section without becoming its own moment.
+  const RIBBON_AFTER_INDEX = 1;
+
+  return (
+    <section
+      id="services"
+      className="relative py-24 md:py-32 bg-black overflow-hidden"
+    >
+      {/* Calm background — subtle red bloom from the lower-right only.
+          Phase A removed the multi-pulse circles that competed with content. */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+        style={{
+          background:
+            'radial-gradient(circle at 100% 100%, rgba(227,6,19,0.05) 0%, transparent 55%)',
+        }}
+      />
+
+      <div className="relative container-luxury">
+        <SectionMarker
+          number="02"
+          eyebrow="Craft"
+          headline="Workshop-grade work on every marque we touch."
+          body="Engine, electrical, chassis and maintenance. Performed with OEM-level diagnostics, the Leonardo exotic-car platform, and genuine OEM parts."
+        />
+      </div>
+
+      {/* Alternating slabs */}
+      <div className="relative container-luxury mt-20 md:mt-28 space-y-24 md:space-y-32">
+        {services.map((service, i) => (
+          <React.Fragment key={service.title}>
+            <ServiceSlabRow service={service} index={i} />
+            {i === RIBBON_AFTER_INDEX && (
+              <div className="-mx-6 md:mx-0">
+                <PremiumBrandsCarousel />
+              </div>
+            )}
+          </React.Fragment>
+        ))}
       </div>
     </section>
   );

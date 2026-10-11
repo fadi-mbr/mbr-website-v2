@@ -105,6 +105,23 @@ export function trackPhoneCall(
 }
 
 /**
+ * Track email/mailto clicks
+ *
+ * @param location - Where the email link was clicked
+ * @param emailAddress - Email address that was clicked
+ */
+export function trackEmailClick(
+  location: string,
+  emailAddress: string
+): void {
+  trackEvent('email_click', {
+    location,
+    email_address: emailAddress,
+    interaction_type: 'email',
+  });
+}
+
+/**
  * Track map/location clicks
  * 
  * @param location - Where the map link was clicked

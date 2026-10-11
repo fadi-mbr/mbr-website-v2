@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isProductionDeployment } from './lib/runtime-environment';
 
 /** Preview APIs never call production providers, even if credentials are copied. */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (isProductionDeployment()) return NextResponse.next();
 
   const path = request.nextUrl.pathname;

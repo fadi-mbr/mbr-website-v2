@@ -96,6 +96,9 @@ Nonzero process exit is a failure, not successful bypass. A random diagnostic ID
 session credential. Generic public errors with redacted internal telemetry are intentional.
 Still report real leakage, stale references, missing checks and defects in new safeguards.
 Prefer a short list of strong findings; an empty list is a valid answer.
+A part may begin or end mid-hunk or mid-line, including inside embedded SVG image data.
+Do not treat a partial file as the complete document or infer missing references from one part.
+Keep the summary and each rationale concise so the full JSON fits the response budget.
 Answer with JSON only, matching the provided schema."""
 
 RESPONSE_SCHEMA = {
@@ -464,6 +467,29 @@ def parse_reply(text: str) -> Parsed:
     return Parsed(ok=True, findings=findings, summary=str(obj.get("summary") or "").strip())
 
 
+def parse_strict_reply(text: str) -> Parsed:
+    """Validate the wire schema; never coerce malformed findings into approval."""
+    obj = _extract_json(text)
+    if (not isinstance(obj, dict) or set(obj) != {"summary", "findings"}
+            or not isinstance(obj["summary"], str) or not isinstance(obj["findings"], list)
+            or len(obj["findings"]) > 20):
+        return Parsed(False, error="invalid review response schema")
+    findings = []
+    required = set(RESPONSE_SCHEMA["properties"]["findings"]["items"]["required"])
+    for item in obj["findings"]:
+        if (not isinstance(item, dict) or set(item) != required
+                or any(not isinstance(item[k], str) for k in required - {"line"})
+                or not item["title"].strip() or not item["file"].strip()
+                or item["severity"] not in SEVERITIES
+                or item["confidence"] not in CONFIDENCES
+                or item["category"] not in CATEGORIES
+                or (item["line"] is not None and type(item["line"]) is not int)):
+            return Parsed(False, error="invalid finding schema")
+        # Preserve the reported severity, including low-confidence major findings.
+        findings.append(Finding(**item))
+    return Parsed(True, findings=findings, summary=obj["summary"])
+
+
 def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", " ", s.lower()).strip()
 
@@ -505,8 +531,14 @@ class GatewayResult:
 
 def call_gateway(cfg: Config, chunk_text: str, paths) -> GatewayResult:
     # Bounded recovery, never convert a failed or partial review into success.
+    parse_retried = False
     for attempt in range(3):
         result = _call_gateway_once(cfg, chunk_text, paths)
+        if result.kind == "parse" and not parse_retried and attempt < 2:
+            parse_retried = True
+            log("retrying invalid response once with bounded output budget: " + result.error)
+            cfg = dataclasses.replace(cfg, max_tokens=4000)
+            continue
         if result.ok or result.kind not in ("unavailable", "rate_limited"):
             return result
         log("gateway failure kind=%s detail=%s attempt=%d/3" % (result.kind, result.error, attempt + 1))
@@ -563,12 +595,23 @@ def _call_gateway_once(cfg: Config, chunk_text: str, paths) -> GatewayResult:
     except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
         return GatewayResult(False, "unavailable", error=type(e).__name__, latency_ms=int((time.monotonic() - started) * 1000))
     ms = int((time.monotonic() - started) * 1000)
-    usage = payload.get("usage") or {}
+    usage = (payload.get("usage") or {}) if isinstance(payload, dict) else {}
+    finish_reason = None
     try:
-        content = payload["choices"][0]["message"].get("content") or ""
+        choice = payload["choices"][0]
+        finish_reason = choice.get("finish_reason")
+        content = choice["message"].get("content") or ""
     except (KeyError, IndexError, TypeError, AttributeError):
         content = ""
-    parsed = parse_reply(content)
+    parsed = (parse_strict_reply(content) if isinstance(content, str)
+              else Parsed(False, error="non-text review response"))
+    if finish_reason not in (None, "stop"):
+        parsed = Parsed(False, error="incomplete response: finish_reason=" + str(finish_reason))
+    if not parsed.ok:
+        log("invalid response finish_reason=%s chars=%d tokens_out=%s" % (
+            finish_reason, len(content) if isinstance(content, str) else 0, usage.get("completion_tokens", 0)))
+    if parsed.ok and any(re.sub(r"^[ab]/", "", f.file) not in paths for f in parsed.findings):
+        return GatewayResult(False, "invalid_scope", error="finding outside requested files", latency_ms=ms)
     res = GatewayResult(parsed.ok, "ok" if parsed.ok else "parse", error=parsed.error, latency_ms=ms,
                         tokens_in=int(usage.get("prompt_tokens") or 0), tokens_out=int(usage.get("completion_tokens") or 0))
     if parsed.ok:
@@ -911,6 +954,21 @@ def main(argv=None) -> int:
             "return synthetic fixtures or reject writes. Production review reads remain required. "
             "This PR also adds CI, preview isolation and a fail-closed required AI review gate. "
             "Every changed file is still in scope; do not overlook defects in the new safeguards."
+        )
+
+    if (gh and gh.repo == "fadi-mbr/mbr-website-v2" and gh.number == "73"
+            and gh_base == "ed2292a58a0cf1e54e02f381a8df93f8ca693f1c"):
+        cfg.review_context = (
+            "Owner scope: refresh staging design/components and upgrade the framework; no production release. "
+            "Source observations at candidate 3ba4e41 (recheck changed evidence; these are not waivers): "
+            "src/app/page.tsx renders site/HomePage, which renders site/SiteHeader. "
+            "ProfessionalNavigation re-exports SiteHeader. HeroDashboard, LuxuryHero and MinimalHero "
+            "had no remaining imports in src. Their deletion alone does not demonstrate an outage. "
+            "MBR_Logo_shield.svg is valid XML containing a long embedded PNG data URI split across parts. "
+            "Removing stale hardcoded aggregateRating is intentional. Nonproduction integrations "
+            "remain isolated with synthetic reads and denied writes. Report concrete regressions, "
+            "surviving broken references and all reviewer/security defects. All changed files and "
+            "major/critical gates remain in scope; do not suppress findings based on these observations."
         )
 
     try:
