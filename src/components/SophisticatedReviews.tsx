@@ -1,116 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, Variants } from 'framer-motion';
-import Image from 'next/image';
+import { useGoogleReviews } from './GoogleReviewsHook';
 import { FaStar, FaGoogle, FaQuoteLeft } from 'react-icons/fa';
 import { trackWhatsAppClick } from '@/lib/analytics';
 
-interface Review {
-  author_name: string;
-  author_url?: string;
-  rating: number;
-  text: string;
-  time: number;
-  relative_time_description: string;
-  profile_photo_url?: string;
-}
-
-interface GoogleReviewsData {
-  overallRating: number;
-  totalReviews: number;
-  reviews: Review[];
-}
-
 export default function SophisticatedReviews() {
-  const [reviewsData, setReviewsData] = useState<GoogleReviewsData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await fetch('/api/google-reviews');
-        const result = await response.json();
-
-        if (result.success && result.data) {
-          // Data is already filtered to 5-star reviews by the API
-          // But totalReviews shows the actual total from Google
-          setReviewsData(result.data);
-        } else {
-          // Fallback data
-          setReviewsData({
-            overallRating: 4.8,
-            totalReviews: 883,
-            reviews: [
-              {
-                author_name: "Ahmad Al-Mansouri",
-                author_url: "https://maps.app.goo.gl/gj9EXG4uchRBtZcE6",
-                rating: 5,
-                text: "Exceptional service! The team at MBR diagnosed and fixed my BMW's electrical issue quickly. Professional, knowledgeable, and trustworthy. They explained everything clearly and the pricing was fair. Highly recommend for anyone looking for quality automotive care in Dubai.",
-                time: Date.now() - 86400000,
-                relative_time_description: "a day ago"
-              },
-              {
-                author_name: "Sarah Johnson",
-                rating: 5,
-                text: "Outstanding quality work on my Mercedes. The attention to detail and customer service is unmatched in Dubai. They went above and beyond to ensure my car was running perfectly. Will definitely return for future maintenance.",
-                time: Date.now() - 172800000,
-                relative_time_description: "2 days ago"
-              },
-              {
-                author_name: "Mohammed Hassan",
-                rating: 5,
-                text: "Best automotive service in Al Quoz! They fixed my suspension issues perfectly and the car feels brand new. The staff is professional and the workshop is clean and well-organized. Worth every dirham!",
-                time: Date.now() - 259200000,
-                relative_time_description: "3 days ago"
-              },
-              {
-                author_name: "Lisa Thompson",
-                rating: 5,
-                text: "Amazing experience with MBR Auto Services. They provided detailed diagnostics for my car and explained all the work needed. Transparent pricing, quality work, and excellent customer service. Couldn't ask for more!",
-                time: Date.now() - 345600000,
-                relative_time_description: "4 days ago"
-              },
-              {
-                author_name: "Khalid Al-Rashid",
-                rating: 5,
-                text: "Professional service from start to finish. They handled my Range Rover's maintenance with expertise and care. The team is knowledgeable about luxury vehicles and uses genuine parts. Highly satisfied with the results.",
-                time: Date.now() - 432000000,
-                relative_time_description: "5 days ago"
-              },
-              {
-                author_name: "Emma Rodriguez",
-                rating: 5,
-                text: "Incredible service quality! They repaired my car's AC system efficiently and at a reasonable price. The staff is friendly and the turnaround time was excellent. This is now my go-to automotive service center in Dubai.",
-                time: Date.now() - 518400000,
-                relative_time_description: "6 days ago"
-              }
-            ]
-          });
-        }
-      } catch (error) {
-        console.error('Failed to fetch reviews:', error);
-        // Use fallback data on error
-        setReviewsData({
-          overallRating: 4.8,
-          totalReviews: 883,
-          reviews: [
-            {
-              author_name: "Ahmad Al-Mansouri",
-              rating: 5,
-              text: "Exceptional service! The team at MBR diagnosed and fixed my BMW's electrical issue quickly.",
-              time: Date.now() - 86400000,
-              relative_time_description: "a day ago"
-            }
-          ]
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReviews();
-  }, []);
+  const { data: reviewsData, loading } = useGoogleReviews();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -142,6 +39,17 @@ export default function SophisticatedReviews() {
           <div className="flex items-center justify-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
           </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!reviewsData) {
+    return (
+      <section id="reviews" className="relative py-24 bg-gradient-to-b from-black to-gray-950">
+        <div className="container-luxury text-center">
+          <h2 className="text-display font-light gradient-text mb-8">Customer Stories</h2>
+          <a className="liquid-glass-btn" href="https://maps.app.goo.gl/gj9EXG4uchRBtZcE6" target="_blank" rel="noopener noreferrer">Read our latest reviews on Google.</a>
         </div>
       </section>
     );
@@ -195,7 +103,7 @@ export default function SophisticatedReviews() {
               <div className="text-center flex-1">
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-2">
                   <span className="text-4xl md:text-5xl font-light text-white">
-                    {reviewsData?.overallRating || 4.8}
+                    {reviewsData.overallRating}
                   </span>
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
@@ -204,7 +112,7 @@ export default function SophisticatedReviews() {
                   </div>
                 </div>
                 <p className="text-body-enhanced text-sm md:text-lg">
-                  Based on {(reviewsData?.totalReviews || 883).toLocaleString()} Google Reviews
+                  Based on {reviewsData.totalReviews.toLocaleString()} Google Reviews
                 </p>
               </div>
 

@@ -1156,3 +1156,8 @@ body {
   filter: grayscale(100%) brightness(0) invert(1) brightness(1.1);
   /* Slightly brighter on hover */
 }
+/* Small usability fixes; preserve the existing staging design. */
+.skip-link { position: fixed; top: -5rem; left: 1rem; z-index: 100; padding: .75rem 1rem; background: #000; color: #fff; }
+.skip-link:focus { top: 1rem; }
+a:focus-visible, button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+section[id] { scroll-margin-top: 6rem; }

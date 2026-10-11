@@ -1,6 +1,6 @@
 import { isProductionDeployment } from '@/lib/runtime-environment';
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/react';
 import FloatingWhatsAppButton from "@/components/FloatingWhatsAppButton";
@@ -14,7 +14,6 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], weight: ["400"], style: ["italic"], display: "swap" });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -86,7 +85,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* Structured Data for SEO */}
         <Script

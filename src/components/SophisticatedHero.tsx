@@ -8,19 +8,10 @@ import { useGoogleReviews } from './GoogleReviewsHook';
 import { trackWhatsAppClick } from '@/lib/analytics';
 import { isShopOpen } from '@/lib/business-hours';
 
-interface SophisticatedHeroProps {
-  googleReviews?: {
-    overallRating: number;
-    totalReviews: number;
-  };
-}
-
-export default function SophisticatedHero({
-  googleReviews = { overallRating: 4.8, totalReviews: 883 }
-}: SophisticatedHeroProps) {
+export default function SophisticatedHero() {
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -109,7 +100,7 @@ export default function SophisticatedHero({
               {isOpen ? 'Open Now' : 'Closed'}
             </span>
             <div className="text-white/60 text-xs">
-              {currentTime.toLocaleTimeString('en-US', {
+              {currentTime?.toLocaleTimeString('en-US', {
                 hour: '2-digit',
                 minute: '2-digit',
                 timeZone: 'Asia/Dubai'
@@ -168,12 +159,12 @@ export default function SophisticatedHero({
               <FaGoogle className="text-red-500 text-sm md:text-base" />
               <FaStar className="text-luxury-gold text-sm md:text-base" />
               <span className="text-white font-bold text-sm md:text-lg">
-                {reviewsLoading ? '4.8' : (reviewsData?.overallRating || googleReviews?.overallRating || 4.8)}
+                {reviewsData ? reviewsData.overallRating : 'Google'}
               </span>
             </div>
             <div className="text-left">
               <div className="text-white font-semibold text-xs md:text-sm">
-                {reviewsLoading ? '883' : (reviewsData?.totalReviews || googleReviews?.totalReviews || 883).toLocaleString()}
+                {reviewsData ? reviewsData.totalReviews.toLocaleString() : (reviewsLoading ? 'Loading' : 'View online')}
               </div>
               <div className="text-red-400 text-xs font-medium uppercase tracking-wide">
                 Reviews
@@ -224,9 +215,9 @@ export default function SophisticatedHero({
               />
             </div>
             <div className="max-w-4xl mx-auto">
-              <p className="text-xl md:text-2xl font-light gradient-text mb-4">
+              <h1 className="text-xl md:text-2xl font-light gradient-text mb-4">
                 Expert Car Care in Dubai
-              </p>
+              </h1>
               <p className="text-lg text-muted-enhanced mb-12">
                 Premium Automotive Excellence • Trusted by 5,000+ Customers • 15+ Years Experience
               </p>
