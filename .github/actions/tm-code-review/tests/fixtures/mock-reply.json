@@ -1,0 +1,11 @@
+{"summary": "Canned reply for dry runs; not a real model review.",
+ "findings": [
+  {"file": "tools/ci/code-review/review.py", "line": 760, "severity": "minor", "category": "maintainability",
+   "title": "--mock-reply replaces urllib.request.urlopen process-wide",
+   "rationale": "Acceptable for a one-shot CLI dry run, but importing main() in a long-lived process would leave the mock installed.", "confidence": "high"},
+  {"file": "tools/ci/code-review/review.py", "line": 760, "severity": "info", "category": "maintainability",
+   "title": "--mock-reply replaces urllib.request.urlopen process-wide.",
+   "rationale": "duplicate — should be deduped", "confidence": "high"},
+  {"file": "src/does_not_exist.py", "line": 3, "severity": "critical", "category": "security",
+   "title": "hallucinated file — should be dropped", "rationale": "not in the chunk", "confidence": "high"}
+ ]}

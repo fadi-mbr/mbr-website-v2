@@ -4,6 +4,10 @@
       "path": "/api/cron/fetch-reviews",
       "schedule": "0 2 * * *"
     }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "chore/mbr-7-website-safeguards": false
+    }
+  }
 }
-

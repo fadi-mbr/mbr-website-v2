@@ -1,0 +1,64 @@
+# tm code-review — shared, advisory merge-request reviewer (tm-ai-gateway P5, tmwhead/ops-brain#47)
+#
+# Include from any tmwhead repo:
+#
+#   include:
+#     - project: tmwhead/ops-brain
+#       ref: main
+#       file: tools/ci/code-review/code-review.gitlab-ci.yml
+#
+# Needs (see tools/ci/code-review/README.md):
+#   CODE_REVIEW_GATEWAY_KEY   masked CI variable — the tm-llm-gateway virtual key (consumer `code-review`)
+#   CODE_REVIEW_GITLAB_TOKEN  masked CI variable — project access token, Reporter, scope `api` (read diff, write note)
+#   ops-brain job-token allowlist must include the consuming project (the job clones the reviewer with CI_JOB_TOKEN)
+#
+# Advisory: the script exits 0 on every failure path; the job only fails when
+# CODE_REVIEW_BLOCKING=true and a finding reaches CODE_REVIEW_BLOCK_SEVERITY.
+
+.tm-code-review:
+  image: ${CODE_REVIEW_IMAGE}
+  stage: test
+  needs: []
+  interruptible: true
+  timeout: 20m
+  variables:
+    CODE_REVIEW_IMAGE: "python:3.11.13-alpine3.22"   # pinned; override per repo if needed
+    CODE_REVIEW_PROJECT: "tmwhead/ops-brain"
+    CODE_REVIEW_REF: "main"                         # keep equal to the include `ref:`
+    CODE_REVIEW_GATEWAY_URL: "https://llm.infra.tmflix.com/v1"
+    CODE_REVIEW_MODEL: "tier/code"                  # a paid alias works only if this repo's key allows it
+    CODE_REVIEW_MAX_TOKENS: "1500"
+    CODE_REVIEW_MAX_DIFF_CHARS: "60000"
+    CODE_REVIEW_CHUNK_CHARS: "12000"
+    CODE_REVIEW_MAX_CHUNKS: "6"
+    CODE_REVIEW_TIMEOUT: "180"
+    CODE_REVIEW_BLOCKING: "false"
+    CODE_REVIEW_BLOCK_SEVERITY: "critical"
+    GIT_DEPTH: "1"                                  # the reviewer fetches the MR base itself if it needs git
+  rules:
+    - if: '$CODE_REVIEW_DISABLED == "true"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+      when: never
+    - if: '$CODE_REVIEW_BLOCKING == "true"'
+      allow_failure: false
+    - allow_failure: true
+  script:
+    # quoted: an unquoted ": " inside the echo makes YAML read this item as a mapping
+    - 'apk add --no-cache --quiet git >/dev/null 2>&1 || echo "code-review: git unavailable in image (API diff source only)"'
+    - |
+      if git clone --quiet --depth 1 --filter=blob:none --sparse --branch "$CODE_REVIEW_REF" \
+           "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CODE_REVIEW_PROJECT}.git" /tmp/tm-code-review \
+         && git -C /tmp/tm-code-review sparse-checkout set tools/ci/code-review; then
+        python3 /tmp/tm-code-review/tools/ci/code-review/review.py --json code-review.json
+      else
+        echo "code-review: could not fetch the reviewer from $CODE_REVIEW_PROJECT@$CODE_REVIEW_REF (job-token allowlist?) — skipped, advisory"
+      fi
+  artifacts:
+    when: always
+    paths:
+      - code-review.json
+    expire_in: 1 week
+
+code-review:
+  extends: .tm-code-review
