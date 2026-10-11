@@ -3,8 +3,8 @@
 .site :is(h1,h2,h3) { font-family: inherit; letter-spacing: -.05em; }
 .site :is(a,button):focus-visible { outline: 3px solid #e30613; outline-offset: 5px; }
 .site :is(section,main) { scroll-margin-top: 110px; }
-.skipLink { position: fixed; top: 8px; left: 8px; transform: translateY(-180%); z-index: 100; background: white; color: #111; padding: 14px 24px; }
-.skipLink:focus { transform: translateY(0); }
+.skipLink { position: fixed; top: -100px; left: 8px; z-index: 100; background: white; color: #111; padding: 14px 24px; }
+.skipLink:focus { top: 8px; }
 .header { position: sticky; top: 0; z-index: 40; background: #131614; color: #f7f6f1; border-bottom: 1px solid #ffffff20; }
 .headerInner { max-width: 1600px; margin: auto; min-height: 92px; padding: 18px 4.5%; display: flex; justify-content: space-between; align-items: center; gap: 32px; }
 .logo img { width: 188px; height: auto; }

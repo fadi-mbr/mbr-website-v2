@@ -14,7 +14,7 @@ npm run build
 npm run test:browser
 ```
 
-Install Playwright Chromium and its OS libraries before browser tests (`npx playwright install --with-deps chromium`). Tests start an isolated local server. `STAGING_URL` optionally tests a deployed preview; any temporary bypass token belongs only in the runner environment.
+Install Playwright Chromium and its OS libraries before browser tests (`npx playwright install --with-deps chromium`). Tests start the built application in an isolated local server; run the build first. `STAGING_URL` optionally tests a deployed preview; any temporary bypass token belongs only in the runner environment.
 
 Local and preview environments use synthetic review/location data and block integration writes. Do not copy production credentials locally. See [environment rules](docs/environment.md), [parked booking](docs/booking-parked.md), [required AI review](docs/tm-code-review.md) and [refresh implementation](docs/staging-refresh.md).
 

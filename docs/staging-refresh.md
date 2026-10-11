@@ -26,3 +26,9 @@ This candidate targets the safeguards branch while its PR remains unmerged. Neve
 - Desktop/mobile screenshots reviewed by MBR CTO. Corrected opaque brand logos (removed destructive brightness filter), selected the dark McLaren mark for the light strip, loaded Fraunces explicitly, and corrected exterior-photo alternative text.
 - Current protected staging was accessed with a temporary bypass; the bypass was revoked after each capture. Its legacy homepage has no h1 and depends on client animations to reveal major sections; the refresh supplies server-rendered content with one h1 and a main landmark.
 - Local runtime is Node 24.21.0; repository/hosted verification remains Node 22.22.0. Hosted CI and exact-head AI review must still pass before release eligibility.
+
+## Hosted visual follow-up
+
+The first deployed capture exposed poor contrast in the inherited translucent cookie banner on the new light sections. Replaced it with an opaque dark panel, bounded mobile scrolling and explicit toggle state. Replaced the skip-link hiding transform with offscreen positioning. Added a mobile consent preferences/rejection test. Browser CI now exercises the built production bundle rather than the development server, so optimized CSS is covered. Final screenshot/test evidence supersedes the first deployed capture.
+
+After the hosted corrections, all 12 Chromium tests pass against the production bundle, including consent customization/rejection and mobile panel bounds. Build and lint pass (existing warnings unchanged). Deployed candidate and AI-review SHA must be updated after this correction; prior 627f46b results are superseded.

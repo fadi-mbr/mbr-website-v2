@@ -42,3 +42,24 @@ test('keyboard users can skip navigation', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page.getByRole('main')).toBeFocused();
 });
+
+test('cookie preferences stay readable and fit a mobile viewport', async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  const banner = page.getByRole('region', { name: 'Cookie consent', exact: true });
+  await expect(banner).toBeVisible();
+  await expect(banner.locator('.bg-\\[\\#171c18\\]')).toHaveCSS('background-color', 'rgb(23, 28, 24)');
+  await banner.getByRole('button', { name: 'Customize', exact: true }).click();
+  const analytics = banner.getByRole('button', { name: 'Toggle analytics cookies' });
+  await expect(analytics).toHaveAttribute('aria-pressed', 'false');
+  await analytics.click();
+  await expect(analytics).toHaveAttribute('aria-pressed', 'true');
+  const box = await banner.boundingBox();
+  expect(box!.y).toBeGreaterThanOrEqual(0);
+  expect(box!.width).toBeLessThanOrEqual(390);
+  await page.screenshot({ path: testInfo.outputPath('cookie-preferences-mobile.png') });
+  await banner.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await banner.getByRole('button', { name: 'Reject All', exact: true }).click();
+  await expect(banner).toHaveCount(0);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('mbr_cookie_consent')!).consent.analytics)).toBe(false);
+});
