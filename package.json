@@ -10,7 +10,7 @@
     "test:booking": "npm run test:unit",
     "typecheck": "tsc --noEmit",
     "test:browser": "playwright test",
-    "test:unit": "tsx tests/unit/run-all.ts"
+    "test:unit": "tsx tests/unit/run-all.ts && tsx --test tests/unit/staging-credential.test.ts"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.7",
