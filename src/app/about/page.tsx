@@ -116,9 +116,9 @@ export default function AboutPage() {
                   }}
                 />
                 <div
-                  className="absolute top-5 left-5 px-3 py-1 rounded-full text-eyebrow"
+                  className="media-caption absolute top-5 left-5 px-3 py-1 rounded-full text-eyebrow"
                   style={{
-                    background: 'rgba(165,120,66,0.18)',
+                    background: 'rgba(0,0,0,0.85)',
                     border: '1px solid rgba(165,120,66,0.55)',
                     color: 'var(--accent-bronze)',
                   }}
@@ -265,7 +265,7 @@ export default function AboutPage() {
               >
                 <div
                   className="text-marker mb-4"
-                  style={{ color: 'var(--primary)' }}
+                  style={{ color: 'var(--text-brand-red)' }}
                 >
                   0{i + 1}
                 </div>

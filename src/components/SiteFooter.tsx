@@ -183,7 +183,7 @@ export default function SiteFooter() {
                       'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.75) 100%)',
                   }}
                 />
-                <div className="absolute inset-x-0 bottom-0 p-4 flex items-end justify-between gap-3">
+                <div className="media-caption absolute inset-x-0 bottom-0 p-4 flex items-end justify-between gap-3">
                   <div className="text-white">
                     <p className="text-eyebrow text-[var(--accent-bronze)] mb-1">
                       Al Quoz Industrial 4

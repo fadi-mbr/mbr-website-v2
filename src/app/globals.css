@@ -32,31 +32,16 @@
   --surface: var(--surface-2);
   --surface-elevated: var(--surface-3);
 
-  /* Enhanced Text Hierarchy - Luxury Automotive */
-  /*
-   * Body / muted / subtle text are bumped one zinc step brighter so all
-   * content meets WCAG AA on the dark theme:
-   *   body   #d4d4d8 (zinc-300) on #000  =>  contrast 13.6 (AAA)
-   *   muted  #a1a1aa (zinc-400) on #000  =>  contrast  8.9 (AAA)
-   *   subtle #71717a (zinc-500) on #000  =>  contrast  4.5 (AA, was 2.6 fail)
-   */
+  /* Text colors are checked against the elevated #1c1c1c surface. */
   --text-primary: #ffffff;
   --text-secondary: #e5e5e5;
   --text-body: #d4d4d8;
   --text-muted: #a1a1aa;
-  --text-subtle: #71717a;
+  --text-subtle: #a1a1aa;
 
-  /* Luxury Text Accents
-   * --text-luxury-gold (#fcd34d) is RETIRED — failed WCAG AA at 2.8:1.
-   * Two replacements:
-   *   --accent-bronze (#A57842) — burnished metal for text labels,
-   *     uppercase tracking, certification badges. 6.2:1 on near-black (AA).
-   *   --star-gold (#fbbf24) — DECORATIVE only, restricted to FaStar
-   *     rating icons where the gold star is a universal convention.
-   *     Not for text.
-   */
+  /* Bronze remains the editorial accent, bright enough for small labels. */
   --text-luxury-silver: #f3f4f6;
-  --accent-bronze: #A57842;
+  --accent-bronze: #c49a68;
   --accent-bronze-soft: rgba(165, 120, 66, 0.18);
   --star-gold: #fbbf24;
   --text-brand-red: #f87171;
@@ -71,7 +56,7 @@
   --text-display: clamp(2.5rem, 6vw, 4.5rem);
   --text-heading: clamp(1.75rem, 4vw, 2.75rem);
   --text-subheading: clamp(1.125rem, 2.5vw, 1.5rem);
-  --text-body: clamp(0.95rem, 1.5vw, 1.125rem);
+  --font-size-body: clamp(0.95rem, 1.5vw, 1.125rem);
   --text-caption: clamp(0.8rem, 1.2vw, 0.95rem);
 
   /* Sophisticated Spacing */
@@ -270,7 +255,7 @@ body {
 }
 
 .text-body {
-  font-size: var(--text-body);
+  font-size: var(--font-size-body);
   font-weight: 400;
   line-height: 1.6;
 }
@@ -366,7 +351,7 @@ body {
   color: var(--text-secondary);
   text-decoration: none;
   font-weight: 400;
-  font-size: var(--text-body);
+  font-size: var(--font-size-body);
   letter-spacing: 0.02em;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0.5rem 0.75rem;
@@ -567,7 +552,7 @@ body {
   background: var(--primary);
   color: var(--text-primary);
   font-weight: 500;
-  font-size: var(--text-body);
+  font-size: var(--font-size-body);
   text-decoration: none;
   border: none;
   cursor: pointer;
@@ -590,7 +575,7 @@ body {
   background: transparent;
   color: var(--text-primary);
   font-weight: 400;
-  font-size: var(--text-body);
+  font-size: var(--font-size-body);
   text-decoration: none;
   border: 1px solid rgba(255, 255, 255, 0.3);
   cursor: pointer;
@@ -633,7 +618,7 @@ body {
 }
 
 .content-block p {
-  font-size: var(--text-body);
+  font-size: var(--font-size-body);
   color: var(--text-muted);
   line-height: 1.7;
   margin-bottom: var(--space-content);
@@ -1093,12 +1078,7 @@ body {
 
 /* Primary Liquid Glass Button - Enhanced with Vibrant Effects */
 .liquid-glass-btn-primary {
-  background: linear-gradient(135deg,
-    rgba(227, 6, 19, 0.9) 0%,
-    rgba(255, 26, 46, 0.8) 25%,
-    rgba(255, 71, 87, 0.7) 50%,
-    rgba(255, 26, 46, 0.8) 75%,
-    rgba(227, 6, 19, 0.9) 100%);
+  background: linear-gradient(135deg, #b80510, #cf0612);
   background-size: 200% 200%;
   backdrop-filter: blur(20px) saturate(200%) brightness(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.2);
@@ -1113,12 +1093,7 @@ body {
 }
 
 .liquid-glass-btn-primary:hover {
-  background: linear-gradient(135deg,
-    rgba(255, 26, 46, 1) 0%,
-    rgba(255, 71, 87, 0.95) 25%,
-    rgba(255, 107, 157, 0.9) 50%,
-    rgba(255, 71, 87, 0.95) 75%,
-    rgba(255, 26, 46, 1) 100%);
+  background: linear-gradient(135deg, #a0040d, #bd0510);
   background-size: 200% 200%;
   border-color: rgba(255, 26, 46, 0.6);
   transform: translateY(-2px) scale(1.05);
@@ -1182,7 +1157,7 @@ body {
 
 /* Control Button Style (for video controls, etc.) */
 .liquid-glass-control {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px) saturate(150%);
   -webkit-backdrop-filter: blur(12px) saturate(150%);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1390,4 +1365,9 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+/* A local dark backing makes caption contrast independent of the photo/frame.
+   Over pure white, 85% black is #262626; bronze labels exceed 5.8:1. */
+.media-caption {
+  background: rgba(0, 0, 0, 0.85);
 }

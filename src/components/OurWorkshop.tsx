@@ -114,14 +114,9 @@ export default function OurWorkshop() {
                 />
               </div>
 
-              {/* Bottom gradient — slightly deeper on hover for the story
-                  swap. Always-visible caption + metadata; story fades in. */}
+              {/* Back captions with a fixed scrim so bright photos cannot wash out text. */}
               <div
-                className="pointer-events-none absolute inset-x-0 bottom-0 p-5 md:p-7 transition-all duration-500"
-                style={{
-                  background:
-                    'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.92) 100%)',
-                }}
+                className="media-caption pointer-events-none absolute inset-x-0 bottom-0 p-5 md:p-7 transition-all duration-500"
               >
                 {photo.metadata && (
                   <span className="block text-eyebrow text-[var(--accent-bronze)] text-[0.6rem] md:text-[0.7rem] mb-2 tracking-[0.25em]">

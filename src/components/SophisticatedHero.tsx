@@ -110,10 +110,10 @@ export default function SophisticatedHero() {
           transition={{ delay: 1.5, duration: 0.8 }}
         >
           {isOpen ? (
-            <div className="backdrop-blur-sm bg-black/20 border border-white/10 rounded-full px-4 py-2 flex items-center space-x-3">
+            <div className="backdrop-blur-sm bg-black/85 border border-white/10 rounded-full px-4 py-2 flex items-center space-x-3">
               <div className="w-2 h-2 rounded-full bg-green-400" />
               <span className="text-white text-sm font-light">Open Now</span>
-              <div className="text-white/60 text-xs">
+              <div className="text-white/90 text-xs">
                 {currentTime.toLocaleTimeString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -126,7 +126,7 @@ export default function SophisticatedHero() {
               href="https://wa.me/+971565015800?text=Hello%20MBR%2C%20I%20need%20after-hours%20assistance"
               target="_blank"
               rel="noopener noreferrer"
-              className="group backdrop-blur-sm bg-black/30 border border-white/15 hover:border-[var(--primary)]/50 rounded-full px-4 py-2 flex items-center gap-3 transition-colors"
+              className="group backdrop-blur-sm bg-black/85 border border-white/15 hover:border-[var(--primary)]/50 rounded-full px-4 py-2 flex items-center gap-3 transition-colors"
               aria-label="Closed now. WhatsApp for after-hours assistance"
             >
               <div className="w-2 h-2 rounded-full bg-red-400" />
@@ -169,7 +169,7 @@ export default function SophisticatedHero() {
             href="https://www.instagram.com/mbr.auto/"
             target="_blank"
             rel="noopener noreferrer"
-            className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-full p-3 md:p-4 flex items-center justify-center shadow-lg hover:bg-black/40 transition-all duration-300 hover:scale-110"
+            className="backdrop-blur-sm bg-black/85 border border-white/20 rounded-full p-3 md:p-4 flex items-center justify-center shadow-lg hover:bg-black/90 transition-all duration-300 hover:scale-110"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.3, duration: 0.8 }}
@@ -184,7 +184,7 @@ export default function SophisticatedHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.5, duration: 0.8 }}
         >
-          <div className="backdrop-blur-sm bg-black/30 border border-white/20 rounded-3xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg max-w-full overflow-hidden">
+          <div className="backdrop-blur-sm bg-black/85 border border-white/20 rounded-3xl p-3 md:p-4 flex items-center space-x-2 md:space-x-3 shadow-lg max-w-full overflow-hidden">
             <div className="flex items-center space-x-1 md:space-x-2">
               <FaGoogle className="text-red-500 text-sm md:text-base" />
               <FaStar className="text-star-gold text-sm md:text-base" />
@@ -325,7 +325,7 @@ export default function SophisticatedHero() {
               />
               <div className="flex hero-credential-track" aria-hidden="true">
                 {[0, 1].map((dupKey) => (
-                  <div key={dupKey} className="flex shrink-0 items-center gap-14 md:gap-20 pr-14 md:pr-20 text-eyebrow text-[var(--text-subtle)] opacity-70" style={{ fontSize: '0.6rem', letterSpacing: '0.32em' }}>
+                  <div key={dupKey} className="flex shrink-0 items-center gap-14 md:gap-20 pr-14 md:pr-20 text-eyebrow text-[var(--text-subtle)]" style={{ fontSize: '0.6rem', letterSpacing: '0.32em' }}>
                     <span>Bosch Authorised</span>
                     <span className="text-[var(--primary)]">·</span>
                     <span>Leonardo Diagnostics</span>

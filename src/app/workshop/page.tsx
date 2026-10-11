@@ -128,7 +128,7 @@ export default function WorkshopPage() {
                     'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.65) 100%)',
                 }}
               />
-              <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 right-6 md:right-8 flex items-end justify-between">
+              <div className="media-caption absolute bottom-0 inset-x-0 p-6 md:p-8 flex items-end justify-between">
                 <div>
                   <p className="text-eyebrow text-[var(--accent-bronze)] mb-1">
                     Al Quoz Industrial 4
@@ -233,7 +233,7 @@ export default function WorkshopPage() {
                     }}
                   />
                 </div>
-                <figcaption className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+                <figcaption className="media-caption absolute inset-x-0 bottom-0 p-5 md:p-6">
                   <p className="text-eyebrow text-[var(--accent-bronze)] mb-2">
                     {photo.metadata}
                   </p>
@@ -277,7 +277,7 @@ export default function WorkshopPage() {
               >
                 <div
                   className="text-marker mb-3"
-                  style={{ color: 'var(--primary)' }}
+                  style={{ color: 'var(--text-brand-red)' }}
                 >
                   {step.n}
                 </div>

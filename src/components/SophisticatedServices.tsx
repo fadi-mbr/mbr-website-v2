@@ -144,7 +144,7 @@ function ServiceSlabRow({
 
           {/* Icon medallion */}
           <div className="absolute top-6 left-6">
-            <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/15 flex items-center justify-center transition-all duration-300 group-hover:border-[var(--primary)]/60 group-hover:glow-red">
+            <div className="w-12 h-12 rounded-full bg-black/85 backdrop-blur-md border border-white/15 flex items-center justify-center transition-all duration-300 group-hover:border-[var(--primary)]/60 group-hover:glow-red">
               <Icon className="w-5 h-5 text-white group-hover:text-[var(--text-brand-red)] transition-colors" />
             </div>
           </div>
@@ -152,7 +152,7 @@ function ServiceSlabRow({
           {/* Service number watermark — Fraunces serif numeral, oversized,
               subtle. Renders like a chapter mark on a photo, not a stamped
               chassis number. */}
-          <div className="absolute bottom-4 right-6 font-display text-white/25 select-none text-5xl md:text-6xl font-light leading-none">
+          <div className="absolute bottom-4 right-6 media-caption rounded px-2 py-1 font-display text-white select-none text-5xl md:text-6xl font-light leading-none">
             {String(index + 1).padStart(2, '0')}
           </div>
         </div>

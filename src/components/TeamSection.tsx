@@ -83,9 +83,9 @@ export default function TeamSection({ teamMembers: TEAM }: { teamMembers: TeamMe
                     {/* Owner badge */}
                     {isOwner && (
                       <div
-                        className="absolute top-5 left-5 px-3 py-1 rounded-full text-eyebrow"
+                        className="media-caption absolute top-5 left-5 px-3 py-1 rounded-full text-eyebrow"
                         style={{
-                          background: 'rgba(165,120,66,0.18)',
+                          background: 'rgba(0,0,0,0.85)',
                           border: '1px solid rgba(165,120,66,0.55)',
                           color: 'var(--accent-bronze)',
                         }}

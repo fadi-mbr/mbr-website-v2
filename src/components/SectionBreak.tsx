@@ -68,14 +68,12 @@ export default function SectionBreak({
         className="object-cover"
       />
 
-      {/* Dual gradient overlay — deepens the bottom for legibility, hints a
-          red brand wash from the top-right corner so it doesn't read as a
-          generic stock photo. */}
+      {/* Keep a minimum 85% dark scrim behind text, even over bright imagery. */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0.85) 100%), radial-gradient(circle at 80% 0%, rgba(227,6,19,0.18) 0%, transparent 55%)',
+            'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.85) 35%, rgba(0,0,0,0.85) 100%), radial-gradient(circle at 80% 0%, rgba(227,6,19,0.18) 0%, transparent 55%)',
         }}
       />
 
